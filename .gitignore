@@ -5,3 +5,7 @@ output/
 .superpowers/
 *.tmp
 .claude/settings.local.json
+bin/
+obj/
+*.user
+.vs/

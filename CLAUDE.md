@@ -24,6 +24,7 @@ Stałe decyzje:
 - `scripts/` – obecny launcher, zasobnik (z obsługą Lively) i instalator w PowerShell/C#. Zostaną zastąpione przez host .NET w kroku 3; do tego czasu nie rozbudowuj ich.
 - Działająca instalacja użytkownika jest w OneDrive (`Bookshelf Wallpaper\Biblioteczka`). Nie uruchamiaj `scripts/package.ps1` ani instalatora z tego repozytorium bez wyraźnej prośby — mogłoby to podmienić jego codzienną wersję.
 - `tests/` – `node --test`, bez sieci i płatnych wywołań.
+- `host/` – host Windows w C#/.NET 10 (WinForms + WebView2): tapeta za ikonami, serwer Node jako proces potomny. Testy: `dotnet test host/Biblioteczka.slnx`. Prototyp domyślnie używa portu 47832 i danych w `output/host-prototype-data`, żeby nie kolidować z instalacją użytkownika (47831).
 
 ## Polecenia
 

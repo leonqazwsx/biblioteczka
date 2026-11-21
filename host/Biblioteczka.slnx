@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Biblioteczka.Host.Tests/Biblioteczka.Host.Tests.csproj" />
+  <Project Path="Biblioteczka.Host/Biblioteczka.Host.csproj" />
+</Solution>
