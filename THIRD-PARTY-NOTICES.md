@@ -7,4 +7,4 @@
 - Tekstury drewna: wygenerowane dla projektu narzędziem imagegen, prompty w public/assets/README.md.
 - Literata: lokalna czcionka grzbietów, niezmieniony plik zmienny z oficjalnego repozytorium Google Fonts. Źródło: https://github.com/google/fonts/tree/main/ofl/literata. Licencja SIL Open Font License 1.1 i informacje o autorach: public/assets/fonts/Literata-OFL.txt. Pochodzenie i suma SHA-256: public/assets/fonts/Literata-source.json. Pozostałe kroje: systemowe Segoe UI i Georgia.
 
-Kod aplikacji nie ma zależności npm ani kodu z Lively. Przed komercyjnym wydaniem należy ustalić własną licencję produktu i zasady korzystania z zewnętrznych materiałów.
+Kod aplikacji jest udostępniany na licencji GNU GPL 3.0 lub nowszej (plik LICENSE). Nie ma zależności npm w czasie działania; Prettier służy tylko do formatowania kodu podczas rozwoju. Fragmenty przeniesione w przyszłości z Lively Wallpaper (GPL-3.0) zachowają informację o autorach.
