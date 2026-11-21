@@ -144,7 +144,6 @@ export function guardStorage({
 export async function openAssetMaintenance({
   dataDir,
   store,
-  jobs,
   gate = createStorageGate(),
   clock = () => new Date(),
   fsAdapter = fs,
@@ -213,11 +212,9 @@ export async function openAssetMaintenance({
         blockers.push('Nie można sprawdzić referencji w ' + filename + '.');
       }
     }
-    let cached = false;
     try {
       const cache = await readJson(path.join(root, 'ai-spine-cache.json'), { optional: true });
       if (cache) {
-        cached = true;
         if (
           cache.version !== 1 ||
           !cache.entries ||
@@ -252,26 +249,6 @@ export async function openAssetMaintenance({
       }
     } catch {
       blockers.push('Nie można sprawdzić zapisanych zadań AI.');
-    }
-    try {
-      if (jobs?.references) {
-        const active = jobs.references();
-        for (const id of active.covers) protect('covers', id);
-        for (const id of active.spines) protect('spines', id);
-      } else {
-        const status = jobs?.status();
-        if (status) {
-          if (!cached && status.reusableCoverIds?.length)
-            blockers.push('Indeks lokalnego cache zniknął podczas działania aplikacji.');
-          for (const job of status.jobs ?? [])
-            if (['queued', 'generating'].includes(job.state)) {
-              protect('covers', job.coverId);
-              if (job.assetId) protect('spines', job.assetId);
-            }
-        }
-      }
-    } catch {
-      blockers.push('Nie można sprawdzić aktywnych zadań AI.');
     }
     return { refs, blockers };
   }

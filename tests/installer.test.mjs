@@ -9,8 +9,7 @@ import { randomUUID } from 'node:crypto';
 import { openStore } from '../src/store.mjs';
 import { openCoverStore } from '../src/covers.mjs';
 import { openSpineStore } from '../src/spine-assets.mjs';
-import { openAutomaticSpineJournal } from '../src/automatic-spine-journal.mjs';
-import { png } from './helpers/service-images.mjs';
+import { png } from './helpers/images.mjs';
 import { stopRuntime } from './helpers/windows-runtime.mjs';
 async function execute(file, args) {
   return new Promise((resolve, reject) => {
@@ -167,23 +166,25 @@ test(
         expectedGeneration: beforeClaim.books[0].spineGeneration,
       });
     assert.ok(claimed);
-    const journal = await openAutomaticSpineJournal({ dataDir }),
-      entry = {
-        collectionId: beforeClaim.collectionId,
-        bookId: pendingId,
-        coverId,
-        expectedGeneration: beforeClaim.books[0].spineGeneration,
-        ticket: claimed.ticket,
-        requestId: randomUUID(),
-        remoteJobId: randomUUID(),
-        origin: 'http://127.0.0.1:47842',
-        phase: 'submitted',
-        state: 'queued',
-        retryAt: '2050-01-01T00:01:00.000Z',
-        errorCode: 'PROVIDER_QUOTA',
-      };
-    await journal.put(entry);
-    await journal.close();
+    // A legacy automatic-spine journal left by older versions must survive updates byte for byte.
+    const entry = {
+      collectionId: beforeClaim.collectionId,
+      bookId: pendingId,
+      coverId,
+      expectedGeneration: beforeClaim.books[0].spineGeneration,
+      ticket: claimed.ticket,
+      requestId: randomUUID(),
+      remoteJobId: randomUUID(),
+      origin: 'http://127.0.0.1:47842',
+      phase: 'submitted',
+      state: 'queued',
+      retryAt: '2050-01-01T00:01:00.000Z',
+      errorCode: 'PROVIDER_QUOTA',
+    };
+    await fs.writeFile(
+      path.join(dataDir, 'automatic-spines.json'),
+      JSON.stringify({ version: 1, entries: [entry] }),
+    );
     await store.commit(
       {
         type: 'addBook',

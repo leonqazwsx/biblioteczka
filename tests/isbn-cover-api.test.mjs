@@ -6,7 +6,7 @@ import path from 'node:path';
 import { createAppServer } from '../src/server.mjs';
 import { openStore } from '../src/store.mjs';
 import { openCoverStore } from '../src/covers.mjs';
-import { png } from './helpers/service-images.mjs';
+import { png } from './helpers/images.mjs';
 async function app(t) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'bookshelf-isbn-api-')),
     store = await openStore(root),

@@ -6,20 +6,10 @@ const waitingMessages = new Set([
   'Automatyczne ilustracje są obecnie niedostępne.',
 ]);
 
-export function renderAiSettings(root, { status }) {
-  const message = !status.available
-    ? 'Grzbiety korzystają z grafiki zapisanych okładek. ' +
-      (status.connection === 'unconfigured'
-        ? 'Generowanie ilustracji AI nie jest podłączone.'
-        : 'Generowanie ilustracji AI jest obecnie niedostępne.')
-    : status.connection === 'offline'
-      ? 'Ilustracje pojawią się po odzyskaniu połączenia.'
-      : status.connection === 'unauthorized'
-        ? 'Automatyczne ilustracje są obecnie niedostępne.'
-        : 'Ilustracje przygotowują się automatycznie po dodaniu książki, na podstawie motywu okładki.';
+export function renderAiSettings(root) {
   root.replaceChildren(
     el('h2', '', 'Ilustracje grzbietów'),
-    el('p', '', message),
+    el('p', '', 'Grzbiety korzystają z grafiki zapisanych okładek.'),
     el(
       'p',
       'muted',

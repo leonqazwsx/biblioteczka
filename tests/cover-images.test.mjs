@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { png, variant } from './helpers/service-images.mjs';
+import { png, variant } from './helpers/images.mjs';
 const { createCoverImageLoader } = await import('../src/cover-images.mjs').catch(() => ({}));
 const request = { kind: 'id', value: 14425283 };
 function loader(options = {}) {

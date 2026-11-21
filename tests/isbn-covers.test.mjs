@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { openCoverStore } from '../src/covers.mjs';
-import { png } from './helpers/service-images.mjs';
+import { png } from './helpers/images.mjs';
 import { createStorageGate, guardStorage } from '../src/asset-maintenance.mjs';
 
 async function store(t, fetchImpl) {

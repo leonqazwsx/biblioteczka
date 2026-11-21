@@ -7,7 +7,7 @@ import { run } from '../src/main.mjs';
 
 async function fixture(t, options = {}) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'bookshelf runtime intent '));
-  const app = await run({ appRoot: root, port: 0, spineService: null, ...options });
+  const app = await run({ appRoot: root, port: 0, ...options });
   t.after(async () => {
     await fs.rm(path.join(root, 'data/runtime-stop.json'), { recursive: true, force: true });
     await app.close();
@@ -76,7 +76,7 @@ test('programmatic close also publishes intentional stop and a new session repla
     JSON.parse(await fs.readFile(path.join(root, 'data/runtime-stop.json'), 'utf8')).sessionId,
     health.sessionId,
   );
-  const again = await run({ appRoot: root, port: 0, spineService: null });
+  const again = await run({ appRoot: root, port: 0 });
   t.after(() => again.close());
   const next = await (await fetch(again.origin + '/api/health')).json();
   assert.notEqual(next.sessionId, health.sessionId);

@@ -94,21 +94,9 @@ Tapeta → Rozmieszczenie: włącz własny układ dla wybranego pokoju. Wybierz 
 
 Podgląd pokazuje lokalny szkic. „Zapisz rozmieszczenie” aktualizuje tapetę, „Cofnij zmiany” przywraca zapisany stan, „Przywróć automatyczny układ” usuwa przypisania tego pokoju dopiero po zapisie. Samo wyłączenie własnego układu zachowuje jego wybory. Zmiana zakładki zachowuje szkic; jeśli inne okno zmieni kolekcję, panel zachowuje szkic i wymaga cofnięcia zmian przed edycją aktualnej wersji. Układy innych pokojów pozostają zapisane. Niewidoczne wnęki w innym rozmiarze monitora korzystają z dostępnych półek bez zmiany zapisanych przypisań. Kopia JSON obejmuje rozmieszczenie.
 
-## Automatyczne ilustracje grzbietów
+## Ilustracje grzbietów
 
-W źródłach przygotowano integrację Cloudflare Workers Free do pilotażu 0.16. Instrukcja konta, lokalnego wprowadzenia tokenu i osobnej kolekcji próbnej: [prywatna usługa](services/spine-service/README.md). Obecna instalacja 0.15 pozostaje nieskonfigurowana do czasu odbioru 3–5 prawdziwych ilustracji. Pula dostawcy i lokalny limit prób są oddzielne; po odmowie darmowego limitu kolejka czeka na reset.
-
-Po podłączeniu prywatnej usługi dodanie lub import książki uruchamia przygotowanie nowej ilustracji inspirowanej motywem okładki. Nie wymaga przycisku generowania, promptu ani klucza użytkownika. Zapis jest lokalny i kończy się przed pracą sieciową. Do czasu wyniku pozostaje dotychczasowy grzbiet; gotowy obraz zapisuje się lokalnie i działa offline. Ręczne ilustracje zachowują pierwszeństwo.
-
-Brakującą okładkę program próbuje odnaleźć po zgodnym ISBN-10/ISBN-13 albo jednoznacznie zgodnym tytule i głównym autorze. Nie zgaduje spośród kilku wydań i nie nadpisuje danych książki. Jednoznaczny brak dopasowania jest zapamiętany; zmiana tożsamości lub dodanie okładki pozwala rozpatrzyć książkę ponownie. Błąd sieci jest ponawiany z rosnącym odstępem. Istniejące książki bez ilustracji są uzupełniane stopniowo, nowe mają pierwszeństwo.
-
-Zmiany tytułu, daty, gatunku, motywu i kadru nie uruchamiają nowej płatnej pracy. Zmiana okładki unieważnia stary bilet i przygotowuje ilustrację dla nowej. Wgranie własnego obrazu, usunięcie książki i przywrócenie kolekcji blokują dołączenie starych wyników. Identyczne obrazy i ustawienia modelu współdzielą cache usługi.
-
-Klucz dostawcy, trwała kolejka i licznik prób znajdują się wyłącznie w osobnym procesie operatora. Biblioteczka otrzymuje adres i indywidualne poświadczenie instalacji przez środowisko procesu; przeglądarka i kopia JSON ich nie otrzymują. Bez konfiguracji program zachowuje lokalne grzbiety i nie wysyła okładek. Stare pole aiEnabled pozostaje dla zgodności kopii, lecz nie steruje automatyzacją. Dawny ręczny endpoint generowania zwraca 410, bez zadania i opłaty.
-
-Prywatna usługa ma jeden worker, limit 10 rozpoczętych prób na dobę UTC, idempotencję, kontrolę obrazów i ochronę przed ponownym wywołaniem po niepewnej odpowiedzi. Próba jest zapisana atomowo przed wywołaniem dostawcy. Timeout i przerwane generating stają się uncertain, bez automatycznej kolejnej płatnej próby. Szczegóły uruchomienia i odzyskiwania opisuje [instrukcja operatora](services/spine-service/README.md) w źródłach projektu. Ta usługa i jej sekrety nie wchodzą do instalatora.
-
-Wersja 0.15 ma zweryfikowany przepływ z generatorem kontrolnym na osobnych danych. Działająca kolekcja pozostaje nieskonfigurowana do czasu osobnego uruchomienia prywatnej usługi: hostingu/HTTPS, poświadczeń, klucza dostawcy i finansowania. Rzeczywiste AI oraz jakość kilku ilustracji wymagają osobnego odbioru; testy tej wersji nie wykonują płatnych wywołań.
+Automatyczne generowanie ilustracji przez AI zostało wycofane. Grzbiety powstają lokalnie z zapisanej okładki; własną ilustrację możesz dodać z pliku lub linku i dopasować jej kadr.
 
 ## Dane, kopie i aktualizacja
 
@@ -138,7 +126,7 @@ Format UTF8 (BOM opcjonalny), do10MiB i10000 niepustych pozycji. Wymagane kolumn
 
 Puste daty pozostają puste. `Date Read` przyjmuje rzeczywisty dzień `YYYY/MM/DD` lub `YYYY-MM-DD`; import obejmuje jedną datę, bez historii ponownego czytania. Podgląd ma50wierszy na stronę; wybór wszystkich dotyczy całego pliku. Wybory pozostają w pamięci przy zmianie zakładki. Podgląd jest ważny10minut. Zmiana kolekcji lub restart serwera wymaga ponownego wczytania pliku. Jeśli po zapisie zabraknie odpowiedzi, sprawdź kolekcję i wczytaj CSV ponownie — już dołączone książki zostaną rozpoznane jako duplikaty.
 
-Nie jest to synchronizacja konta Goodreads. Zapis CSV działa offline; po skonfigurowaniu prywatnej usługi brakujące okładki i ilustracje są uzupełniane w tle. Pole `goodreadsId` zachowuje się w pełnej kopii JSON. Starsze programy mogą pominąć je przy zapisie, dlatego przed powrotem do starej wersji zachowaj folder danych. Odbiór korzysta z jawnie syntetycznych CSV; nie otrzymano autentycznego eksportu użytkownika z2026.
+Nie jest to synchronizacja konta Goodreads. Zapis CSV działa offline. Pole `goodreadsId` zachowuje się w pełnej kopii JSON. Starsze programy mogą pominąć je przy zapisie, dlatego przed powrotem do starej wersji zachowaj folder danych. Odbiór korzysta z jawnie syntetycznych CSV; nie otrzymano autentycznego eksportu użytkownika z2026.
 
 ## Rozwój i paczka
 

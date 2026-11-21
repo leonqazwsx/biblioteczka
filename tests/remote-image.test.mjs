@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { Readable } from 'node:stream';
-import { png } from './helpers/service-images.mjs';
+import { png } from './helpers/images.mjs';
 const { downloadRemoteImage } = await import('../src/remote-image.mjs').catch(() => ({}));
 function transport(routes = {}) {
   const calls = [];

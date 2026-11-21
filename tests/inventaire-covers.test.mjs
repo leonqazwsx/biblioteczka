@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { openCoverStore } from '../src/covers.mjs';
-import { png } from './helpers/service-images.mjs';
+import { png } from './helpers/images.mjs';
 const module = await import('../src/inventaire-covers.mjs').catch(() => ({}));
 const isbn = '9788370541163',
   uri = 'inv:6703e9d56f0860634193cfc03ff570b5',

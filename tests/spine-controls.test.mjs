@@ -127,12 +127,6 @@ test('a cover-backed binding is identified honestly while AI is disconnected', (
   renderAiSettings(root, { status: { available: false, connection: 'unconfigured', jobs: [] } });
   assert.match(root.textContent, /okładek/i);
 });
-test('an unavailable configured generator is not described as unconfigured', (t) => {
-  const { root } = dom(t);
-  renderAiSettings(root, { status: { available: false, connection: 'offline', jobs: [] } });
-  assert.doesNotMatch(root.textContent, /nie jest podłączone/i);
-  assert.match(root.textContent, /okładek/i);
-});
 
 test('quota and authorization messages refresh in place without exposing provider details', (t) => {
   const { root, doc } = dom(t);

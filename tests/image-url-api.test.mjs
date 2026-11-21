@@ -7,7 +7,7 @@ import { createAppServer } from '../src/server.mjs';
 import { openStore } from '../src/store.mjs';
 import { openCoverStore } from '../src/covers.mjs';
 import { openSpineStore } from '../src/spine-assets.mjs';
-import { png, variant } from './helpers/service-images.mjs';
+import { png, variant } from './helpers/images.mjs';
 async function app(t) {
   const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'bookshelf-image-url-')),
     store = await openStore(dataDir),

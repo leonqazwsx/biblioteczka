@@ -4,7 +4,7 @@ import * as fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { openCoverStore } from '../src/covers.mjs';
-import { png as validPng } from './helpers/service-images.mjs';
+import { png as validPng } from './helpers/images.mjs';
 export const PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB9kAAAAASUVORK5CYII=',
   'base64',

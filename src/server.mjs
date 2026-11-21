@@ -23,7 +23,6 @@ export function createAppServer({
   catalog,
   covers,
   spines,
-  jobs,
   storage,
   windows,
   publicDir,
@@ -72,18 +71,8 @@ export function createAppServer({
       version: packageInfo.version,
     };
   };
-  const publish = (aiChanged = false) => {
-    for (const client of clients)
-      client.write(
-        'data: ' +
-          JSON.stringify({ ...metadata(), ...(aiChanged ? { aiChanged: true } : {}) }) +
-          '\n\n',
-      );
-  };
-  const schedule = (newBookIds = []) => {
-    try {
-      Promise.resolve(jobs?.schedule?.({ newBookIds })).catch(() => {});
-    } catch {}
+  const publish = () => {
+    for (const client of clients) client.write('data: ' + JSON.stringify(metadata()) + '\n\n');
   };
   const imageBytes = (input) => {
     if (
@@ -197,16 +186,12 @@ export function createAppServer({
           });
         }
         if (route === '/api/ai/status')
-          return json(
-            res,
-            200,
-            jobs?.status() ?? {
-              available: false,
-              enabled: false,
-              connection: 'unconfigured',
-              jobs: [],
-            },
-          );
+          return json(res, 200, {
+            available: false,
+            enabled: false,
+            connection: 'unconfigured',
+            jobs: [],
+          });
         if (route === '/api/storage') {
           if (!storage) throw problem('STORAGE_UNAVAILABLE', 'Raport miejsca jest niedostępny.');
           return json(res, 200, await storage.report());
@@ -387,14 +372,8 @@ export function createAppServer({
           return json(res, 200, goodreads.preview(bytes));
         }
         if (route === '/api/goodreads/confirm') {
-          const before = store.read(),
-            next = await goodreads.confirm(input);
+          const next = await goodreads.confirm(input);
           publish();
-          schedule(
-            next.books
-              .filter((book) => !before.books.some((old) => old.id === book.id))
-              .map((book) => book.id),
-          );
           return json(res, 200, next);
         }
         if (route === '/api/windows') {
@@ -432,7 +411,6 @@ export function createAppServer({
             input.expectedRevision,
           );
           publish();
-          schedule();
           return json(res, 200, next);
         }
         if (route === '/api/commands') {
@@ -443,16 +421,8 @@ export function createAppServer({
             const coverId = (command.draft ?? command.patch)?.coverId;
             if (coverId) await covers.read(coverId);
           }
-          const before = store.read(),
-            next = await store.commit(command, input.expectedRevision);
+          const next = await store.commit(command, input.expectedRevision);
           publish();
-          schedule(
-            command.type === 'addBook'
-              ? next.books
-                  .filter((book) => !before.books.some((old) => old.id === book.id))
-                  .map((book) => book.id)
-              : [],
-          );
           return json(res, 200, next);
         }
         if (route === '/api/covers') {
@@ -512,7 +482,6 @@ export function createAppServer({
             );
             imports.delete(input.importId);
             publish();
-            schedule();
             return json(res, 200, next);
           } finally {
             entry.busy = false;

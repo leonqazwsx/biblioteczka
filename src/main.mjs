@@ -6,9 +6,6 @@ import { openCoverStore } from './covers.mjs';
 import { createAppServer } from './server.mjs';
 import { problem } from './domain.mjs';
 import { openSpineStore } from './spine-assets.mjs';
-import { openAutomaticSpines } from './automatic-spines.mjs';
-import { createSpineServiceClient } from './spine-service-client.mjs';
-import { localSpineServiceConfig } from './spine-service-config.mjs';
 import { installationId } from './installation.mjs';
 import { createWindowsIntegration } from './windows.mjs';
 import fs from 'node:fs/promises';
@@ -22,7 +19,6 @@ export async function run({
   appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
   port = 47831,
   dataDir = path.join(appRoot, 'data'),
-  spineService = localSpineServiceConfig(),
   catalog: createAppCatalog = createCatalog(),
   recoveryNonce,
 } = {}) {
@@ -57,7 +53,6 @@ export async function run({
   const lock = await acquireDataLock(dataDir);
   let closing,
     server,
-    jobs,
     started = false,
     stopIntentPromise;
   const runtimeSessionId = crypto.randomUUID();
@@ -85,7 +80,6 @@ export async function run({
             ? new Promise((resolve) => server.close(() => resolve()))
             : Promise.resolve();
           server?.closeAllConnections();
-          await jobs?.close();
           await finished;
           await server?.drainRequests();
         } finally {
@@ -132,23 +126,12 @@ export async function run({
         .catch((e) => {
           if (e.code !== 'EEXIST') throw e;
         });
-    const client = spineService ? createSpineServiceClient(spineService) : null;
-    jobs = await openAutomaticSpines({
-      dataDir,
-      store,
-      covers,
-      spines,
-      catalog: createAppCatalog,
-      client,
-      onState: () => server?.publishChanges(true),
-    });
-    const storage = await openAssetMaintenance({ dataDir, store, jobs, gate });
+    const storage = await openAssetMaintenance({ dataDir, store, gate });
     const coverDiscovery = createCoverDiscovery({ covers, imageLoader, inventaireLookup });
     server = createAppServer({
       store,
       covers,
       spines,
-      jobs,
       storage,
       coverDiscovery,
       catalog: createAppCatalog,
@@ -170,7 +153,6 @@ export async function run({
       server.listen(port, '127.0.0.1', resolve);
     });
     started = true;
-    jobs.schedule();
     return { origin: 'http://127.0.0.1:' + server.address().port, alreadyRunning: false, close };
   } catch (error) {
     await close();
