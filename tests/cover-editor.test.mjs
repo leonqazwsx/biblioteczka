@@ -126,7 +126,10 @@ test('submitting a book cancels discovery before the pending save response retur
   });
   const source = await fs.readFile(new URL('../public/manager/app.mjs', import.meta.url), 'utf8');
   vm.runInContext(
-    source.slice(source.indexOf("$('book-form').onsubmit ="), source.indexOf('\ntry {\n  const info =')),
+    source.slice(
+      source.indexOf("$('book-form').onsubmit ="),
+      source.indexOf('\ntry {\n  const info ='),
+    ),
     c,
   );
   const saving = $('book-form').onsubmit({ preventDefault() {} });

@@ -451,7 +451,10 @@ test('editor loads and saves the chosen completion date', async () => {
         source.indexOf('async function command('),
         source.indexOf('\nfunction navigate'),
       ) +
-      source.slice(source.indexOf("$('book-form').onsubmit ="), source.indexOf('\ntry {\n  const info =')),
+      source.slice(
+        source.indexOf("$('book-form').onsubmit ="),
+        source.indexOf('\ntry {\n  const info ='),
+      ),
     context,
   );
   vm.runInContext('populate(state.books[0])', context);

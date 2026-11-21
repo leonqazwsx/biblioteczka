@@ -18,8 +18,7 @@ test('actual upgrade wiring preserves unsaved status/date in lightweight details
     notice: (text) => (message = text),
   });
   vm.runInContext(
-    topLevelStatement(source, 'const clientUpgrade =') +
-      'clientUpgrade.available();',
+    topLevelStatement(source, 'const clientUpgrade =') + 'clientUpgrade.available();',
     context,
   );
   assert.equal(reloads, 0);

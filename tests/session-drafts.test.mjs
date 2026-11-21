@@ -129,7 +129,10 @@ test('editor preserves its draft when recovery reuses the opening revision for a
       refresh +
       command +
       source.slice(source.indexOf('function populate('), source.indexOf('\nfunction showEditor')) +
-      source.slice(source.indexOf("$('book-form').onsubmit ="), source.indexOf('\ntry {\n  const info =')),
+      source.slice(
+        source.indexOf("$('book-form').onsubmit ="),
+        source.indexOf('\ntry {\n  const info ='),
+      ),
     c,
   );
   vm.runInContext('populate(state.books[0])', c);
