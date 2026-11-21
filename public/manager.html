@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Moja biblioteczka</title><link rel="stylesheet" href="/styles/tokens.css"><link rel="stylesheet" href="/styles/spines.css"><link rel="stylesheet" href="/styles/room-view.css"><link rel="stylesheet" href="/styles/manager.css"></head>
+<body class="manager-app" data-theme="light">
+<div class="app-shell">
+ <header class="topbar"><div class="topbar-inner">
+  <span class="brand">Biblioteczka</span>
+  <nav class="top-nav" aria-label="Nawigacja">
+   <button class="nav-item" id="all-books" type="button">Wszystkie książki<span id="total" hidden></span></button>
+   <button class="nav-item" id="wallpaper-view" type="button">Tapeta</button>
+   <button class="nav-item" id="settings-view" type="button">Ustawienia</button>
+  </nav>
+  <div class="theme-toggle" role="group" aria-label="Motyw panelu">
+   <button id="theme-light" type="button" aria-pressed="true" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>Jasny</button>
+   <button id="theme-dark" type="button" aria-pressed="false" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 15.5A9 9 0 0 1 8.5 4 9 9 0 1 0 20 15.5Z"/></svg>Ciemny</button>
+  </div>
+ </div></header>
+ <main class="main-panel">
+  <header class="main-header"><div><h1 id="view-title">Moja biblioteczka</h1><p id="view-description">Wczytywanie kolekcji…</p></div><button class="primary" id="add-book" type="button">Dodaj książkę</button></header>
+  <div id="recovery-notice" role="alert" hidden></div><div id="notice" role="status" hidden></div>
+  <div class="collection-controls" id="collection-controls">
+   <div class="collection-categories" role="group" aria-label="Filtruj według półki"><button id="all-shelves" class="category-button active" type="button" aria-pressed="true">Wszystkie</button><div id="shelf-nav"></div><button id="manage-shelves" class="shelves-button" type="button">Zarządzaj półkami</button></div>
+   <div id="collection-tools"></div>
+  </div>
+  <section id="main-content" aria-label="Zawartość biblioteczki"></section>
+ </main>
+</div>
+<aside id="editor" class="editor" role="dialog" aria-modal="true" aria-labelledby="editor-title" hidden><header><div><span class="eyebrow">KSIĄŻKA</span><h2 id="editor-title">Dodaj książkę</h2></div><button id="close-editor" class="icon-button" aria-label="Zamknij formularz">×</button></header><div id="search-area"><form id="search-form" class="search-form"><label for="query">Znajdź książkę</label><div><input id="query" maxlength="500" aria-describedby="search-feedback" placeholder="Tytuł, autor lub ISBN" autocomplete="off"><button class="primary" id="search-button">Szukaj</button></div></form><div id="search-feedback" role="status"></div><div id="search-results"></div><button id="manual-button" class="text-button" type="button">Wpiszę dane ręcznie →</button></div><form id="book-form"><div class="form-top"><img id="cover-preview" alt="Okładka książki" hidden><div id="cover-placeholder" class="cover-placeholder" aria-hidden="true">▥</div><div><label class="file-label" for="cover-file">Dodaj własną okładkę</label><input id="cover-file" type="file" accept="image/jpeg,image/png,image/webp"><p id="cover-note" class="muted">Okładka jest opcjonalna.</p><button id="remove-cover" class="text-button" type="button" hidden>Usuń okładkę</button></div></div><label for="title">Tytuł</label><input id="title" required maxlength="500"><label for="authors">Autor / autorzy</label><input id="authors" required maxlength="4000" placeholder="Wielu autorów oddziel średnikiem"><label for="shelf">Gatunek</label><select id="shelf" required></select><label for="read-date">Data ostatniego przeczytania (opcjonalnie)</label><input id="read-date" type="date" min="0001-01-01" max="9999-12-31" aria-describedby="read-date-note"><p id="read-date-note" class="muted">Zostaw puste, jeśli nie pamiętasz daty.</p><details><summary>Dane wydania i grzbiet</summary><div class="form-grid"><div><label for="isbn">ISBN</label><input id="isbn" maxlength="24"></div><div><label for="page-count">Liczba stron</label><input id="page-count" type="number" min="1" max="100000"></div></div><label for="publisher">Wydawca</label><input id="publisher"><div class="form-grid"><div><label for="publication-year">Rok / data wydania</label><input id="publication-year"></div><div><label for="language">Język wydania</label><input id="language"></div></div><label for="spine-color">Kolor grzbietu</label><input id="spine-color" type="color" value="#31596b"></details><div id="form-error" role="alert" hidden></div><button id="edit-duplicate" class="text-button" type="button" hidden>Edytuj istniejącą książkę →</button><div class="form-actions"><button id="save-book" class="primary">Zapisz książkę</button><button id="cancel-book" type="button" class="secondary">Anuluj</button></div></form></aside><dialog id="book-details" class="book-details" aria-labelledby="detail-title"></dialog><script type="module" src="/manager/app.mjs"></script></body></html>
+

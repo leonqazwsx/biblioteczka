@@ -1,0 +1,41 @@
+@font-face{font-family:ShelfLiterata;src:url('/assets/fonts/Literata.ttf') format('truetype');font-style:normal;font-weight:200 900;font-display:swap}
+.spine-art{--binding-height:260px;--binding-curve:38% 43% 23% 20% / 1.2% 1.4% .5% .45%;--binding-fold:.16;position:relative;display:block;flex:none;width:var(--book-width);height:260px;padding:0;overflow:visible;border:0;border-radius:var(--binding-curve);background:transparent;color:var(--letter)}
+.spine-visual{position:absolute;display:block;inset:0;overflow:hidden;border-radius:inherit;background:var(--spine);pointer-events:none;box-shadow:1px 0 1px #100d0a70,3px 1px 5px #100d0a38;isolation:isolate;transform-origin:bottom center}
+/* Light is painted above the artwork, so an opaque cover still has a binding.
+   The shallow crown and folded edge stay proportional at actual shelf size. */
+.spine-visual::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:3;border-radius:inherit;background:linear-gradient(180deg,#fff4db24,transparent 1.5%,transparent 95%,#120e0a38);box-shadow:inset 0 .65px .4px #fff8e629,inset 0 -.8px .6px #100c0959}
+.spine-visual::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:4;border-radius:inherit;background:linear-gradient(90deg,transparent 3%,rgb(255 246 220 / var(--binding-fold)) 4%,#16100c26 5.5%,transparent 8%),linear-gradient(90deg,#0c090640,transparent 13%,#fff6df10 30%,transparent 55%,#100c0914 80%,#100c094d 100%)}
+/* Surface treatment is derived from the existing binding; it never changes layout. */
+.spine-surface{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.55;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='120'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.83' numOctaves='3' stitchTiles='stitch' seed='8'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 .13 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");background-size:90px 120px}
+.spine-art[data-material='paper']{--binding-curve:14% 20% 12% 10% / .35% .5% .25% .25%;--binding-fold:.1}
+.spine-art[data-material='cloth'] .spine-surface{opacity:.75;background-image:repeating-linear-gradient(0deg,#f8efdb24 0px,#f8efdb24 .5px,transparent .5px,transparent 2px),repeating-linear-gradient(90deg,#140e1021 0px,#140e1021 .5px,transparent .5px,transparent 2px);background-size:100% 100%}
+.spine-art[data-material='hardcover'] .spine-surface{opacity:.8;background-image:linear-gradient(105deg,#fff5dc21 0%,transparent 32%,#110b0812 62%,#fff5dc0a 100%);background-size:100% 100%}
+.spine-art[data-material='hardcover']{--binding-curve:32% 38% 20% 18% / 1% 1.2% .4% .4%;--binding-fold:.22}
+.spine-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0}
+.spine-visual[data-illustrated='true'] .spine-ornament{display:none}
+.spine-art .spine-visual[data-illustrated='true'] .spine-inlay{display:block;inset:0;border:0;border-radius:0;opacity:1;z-index:1;background:linear-gradient(0deg,#0c0a08c2 0%,#0c0a0873 10%,transparent 24%),linear-gradient(90deg,transparent 0%,#0c0a08ad 28%,#0c0a08ad 72%,transparent 100%)}
+.spine-visual[data-illustrated='true'] .spine-title,.spine-visual[data-illustrated='true'] .spine-author,.spine-visual[data-illustrated='true'] .spine-imprint{z-index:2;color:#fff7e4!important;background:transparent;padding:0;text-shadow:0 1px 2px #000}
+.spine-inlay{position:absolute;inset:6px 8px;border:1px solid var(--spine-accent);opacity:.55;pointer-events:none}
+.spine-title,.spine-author,.spine-imprint{z-index:2}
+.spine-ornament{position:absolute;top:15px;left:50%;width:30px;height:30px;transform:translateX(-50%);color:var(--spine-accent)}.spine-ornament svg{display:block;width:100%;height:100%}
+.spine-title{position:absolute;top:56px;bottom:53px;left:50%;transform:translateX(-50%);writing-mode:vertical-rl;font:var(--title-size)/1.2 Georgia,serif;letter-spacing:.025em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 18px)}
+.spine-author{position:absolute;bottom:28px;left:8px;right:8px;max-height:22px;overflow:hidden;font:10px/1.12 'Segoe UI',sans-serif;text-align:center;overflow-wrap:anywhere}
+.spine-imprint{position:absolute;bottom:10px;left:8px;right:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;font:6px/1.2 'Segoe UI',sans-serif;letter-spacing:.1em;opacity:.75}
+.spine-art[data-style='1'] .spine-visual{background:var(--spine)}.spine-art[data-style='1'] .spine-inlay{border:0;border-top:2px solid var(--spine-accent);border-bottom:2px solid var(--spine-accent);inset:9px 8px}.spine-art[data-style='1'] .spine-title{font-family:'Segoe UI',sans-serif;font-weight:600}
+.spine-art[data-style='2'] .spine-inlay{inset:0;border:0;border-top:8px solid var(--spine-accent);border-bottom:8px solid var(--spine-accent);opacity:1}.spine-art[data-style='2'] .spine-title{font-weight:700}.spine-art[data-style='2'] .spine-imprint{bottom:13px}
+.spine-art[data-style='3'] .spine-inlay{inset:6px;border-style:double;border-width:3px;border-radius:24px 24px 3px 3px}.spine-art[data-style='3'] .spine-title{font-style:italic}
+.spine-art[data-style='4'] .spine-inlay{inset:49px 6px 47px;border:0;background:var(--spine-accent);opacity:1}.spine-art[data-style='4'] .spine-title{color:var(--accent-ink);font-family:'Segoe UI',sans-serif;font-weight:650;letter-spacing:0}
+.spine-art[data-style='5'] .spine-inlay{inset:7px 7px;border:0;border-left:1px solid var(--spine-accent);border-right:1px solid var(--spine-accent)}.spine-art[data-style='5'] .spine-author{font-family:Georgia,serif;font-style:italic}
+@media(max-height:850px){.book .spine-ornament{top:7px;width:18px;height:18px}.book .spine-title{top:30px;bottom:35px;font-size:min(var(--title-size),14px)}.book .spine-author{bottom:15px;max-height:20px;font-size:8px}.book .spine-imprint{bottom:5px}.book[data-style='4'] .spine-inlay{top:28px;bottom:31px}.book[data-style='2'] .spine-imprint{bottom:9px}}
+
+/* The accepted binding: smooth artwork without an application-rendered title.
+   Shared by editor previews, room layouts and the wallpaper itself. */
+.spine-art .spine-visual .spine-surface,.spine-art .spine-visual .spine-ornament{display:none}
+.spine-art .spine-visual .spine-title{display:none;top:8%;bottom:auto;left:50%;width:86%;max-width:86%;height:84%;padding:0;border:0;background:none;font-family:ShelfLiterata,Georgia,serif;font-size:calc(var(--binding-height)*.135);font-weight:500;font-style:normal;font-optical-sizing:auto;font-synthesis:none;line-height:1.05;letter-spacing:.01em;white-space:nowrap;overflow-wrap:normal;word-break:normal;overflow:hidden;text-overflow:ellipsis;text-align:start}
+.spine-art[data-style='4'] .spine-visual .spine-inlay{inset:0;border:0}
+.spine-art .spine-visual[data-illustrated='true'] .spine-inlay{background:none}
+.spine-art .spine-visual[data-illustrated='true'] .spine-title{color:#fff5df!important;text-shadow:0 1px 2px #15150ed9,0 -1px 1px #15150e99}
+/* A cover supplies an immediate local composition until a saved illustration
+   is available. Keep its proportions and fill the whole binding with artwork. */
+.spine-art .spine-visual .spine-cover-image{inset:0;height:100%;object-fit:cover;mask-image:none}
+.spine-art .spine-visual[data-artwork='cover'] .spine-inlay{display:block;inset:0;border:0;border-radius:0;opacity:1;background:none}

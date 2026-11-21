@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+const {createSpineFrameDraft}=await import('../public/manager/spine-frame-editor.mjs').catch(()=>({}));
+const assetId='a'.repeat(64),otherId='b'.repeat(64),image={assetId,kind:'manual'};
+function draft(){assert.equal(typeof createSpineFrameDraft,'function','image framing needs a draft independent from saved state');return createSpineFrameDraft();}
+test('receiving an illustration without local edits leaves the editor clean',()=>{const d=draft();d.receive(image);assert.equal(d.isDirty(),false);assert.equal(d.dirtySnapshot(),null);assert.equal(d.patch(),null);assert.deepEqual(d.value(image),{x:50,y:50,zoom:1});});
+test('frame adjustments remain a draft and survive ordinary image refreshes',()=>{const d=draft();d.reset(image);d.set('x',23);d.receive(image);assert.deepEqual(d.patch(),{assetId,frame:{x:23,y:50,zoom:1}});assert.equal(image.frame,undefined);assert.equal(d.isDirty(),true);});
+test('restoring default frame is a pending reset for previously framed artwork',()=>{const d=draft();d.reset({...image,frame:{x:23,y:72,zoom:1.6}});d.restoreDefault();assert.equal(d.isDirty(),true);assert.deepEqual(d.patch(),{assetId,frame:null});assert.deepEqual(d.value(image),{x:50,y:50,zoom:1});});
+test('replaced artwork preserves pending edits and refuses to apply them to the new image',()=>{const d=draft();d.reset(image);d.set('zoom',1.6);const before=d.dirtySnapshot();d.receive({assetId:otherId,kind:'manual'});assert.deepEqual(d.dirtySnapshot(),before);assert.equal(d.isStale(),true);assert.throws(()=>d.patch(),e=>e.code==='CONFLICT');assert.deepEqual(d.value({assetId:otherId,kind:'manual'}),{x:50,y:50,zoom:1});d.reset({assetId:otherId,kind:'manual'});assert.equal(d.isDirty(),false);assert.equal(d.patch(),null);});
+test('concurrent frame change on the same image is also protected',()=>{const d=draft();d.reset(image);d.set('y',72);d.receive({...image,frame:{x:23,y:50,zoom:1}});assert.equal(d.isStale(),true);assert.throws(()=>d.patch(),e=>e.code==='CONFLICT');});
+test('new artwork without a pending crop inherits only its own saved frame',()=>{const d=draft();d.reset({...image,frame:{x:23,y:72,zoom:1.6}});d.receive({assetId:otherId,kind:'manual'});assert.deepEqual(d.value({assetId:otherId}),{x:50,y:50,zoom:1});assert.equal(d.dirtySnapshot(),null);});

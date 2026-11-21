@@ -1,0 +1,2947 @@
+[
+  {
+    "query": "Odwaga bycia nielubianym",
+    "records": [
+      {
+        "id": 5906788,
+        "zone": "institution",
+        "createdDate": "2018-02-16T12:00:00.000Z",
+        "updatedDate": "2026-10-14T04:50:26.030Z",
+        "deleted": false,
+        "deletedDate": null,
+        "language": "polski",
+        "subject": "Self-actualization (Psychology) Adlerian psychology Interpersonal relations Happiness Psychologia indywidualna Relacje międzyludzkie Wolność Thought and thinking",
+        "subjectPlace": "Japonia",
+        "subjectTime": "",
+        "subjectWork": "",
+        "isbnIssn": "9788375796025 :",
+        "author": "Kishimi, Ichiro (1956- ) Cieślak, Piotr (1976- ) Kishimi, Ichiro (1956- ) Koga, Fumitake (1973- ) Wydawnictwo Galaktyka",
+        "placeOfPublication": "Łódź : Polska",
+        "location": "1 1",
+        "title": "Odwaga bycia nielubianym : japoński fenomen, który pokazuje, jak być wolnym i odmienić własne życie / Kirawareru yuki,",
+        "udc": "159.923 316.47 02",
+        "publisher": "Wydawnictwo Galaktyka Galaktyka,",
+        "kind": "książka",
+        "domain": "Psychologia",
+        "formOfWork": "Książki Publikacje popularnonaukowe",
+        "genre": "Dialog",
+        "timePeriodOfCreation": "2013",
+        "audienceGroup": "",
+        "demographicGroup": "",
+        "nationalBibliographyNumber": "UWD 2018/6057",
+        "publicationYear": "2017",
+        "languageOfOriginal": "japonski",
+        "marc": {
+          "leader": "03410nam a2200937 i 4500",
+          "fields": [
+            {
+              "001": "b0000005906788"
+            },
+            {
+              "005": "20261014045026.0"
+            },
+            {
+              "008": "180216s2017    pl           |000 0 pol  "
+            },
+            {
+              "009": "991023075349705066"
+            },
+            {
+              "015": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "UWD 2018/6057"
+                  }
+                ]
+              }
+            },
+            {
+              "020": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "9788375796025 :"
+                  },
+                  {
+                    "c": "zł 39,90"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "991023075349705066"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(EXLNZ-48OMNIS_NETWORK)9910089700605606"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(PL)b0000005906788"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(PL-WaBN)b59067883-48omnis_nlop"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "b59067883"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(OCoLC)1020469155"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "xx005596662"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "xx004193583"
+                  }
+                ]
+              }
+            },
+            {
+              "040": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "WA N"
+                  },
+                  {
+                    "c": "WA N"
+                  },
+                  {
+                    "d": "WA N"
+                  },
+                  {
+                    "d": "MBPWR"
+                  },
+                  {
+                    "d": "WA N"
+                  },
+                  {
+                    "d": "MBPWR"
+                  },
+                  {
+                    "d": "WA N"
+                  },
+                  {
+                    "d": "ELBLAG M"
+                  },
+                  {
+                    "d": "Ł M"
+                  },
+                  {
+                    "d": "GD 015"
+                  },
+                  {
+                    "d": "OLSZT 003"
+                  },
+                  {
+                    "d": "POZN M"
+                  },
+                  {
+                    "d": "WA N"
+                  },
+                  {
+                    "d": "ELBLAG M"
+                  },
+                  {
+                    "d": "POZN M"
+                  },
+                  {
+                    "d": "MBPB"
+                  },
+                  {
+                    "d": "WA N"
+                  },
+                  {
+                    "d": "KOSZ W"
+                  }
+                ]
+              }
+            },
+            {
+              "041": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "pol"
+                  },
+                  {
+                    "h": "jpn"
+                  }
+                ]
+              }
+            },
+            {
+              "046": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "k": "2013"
+                  }
+                ]
+              }
+            },
+            {
+              "080": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "1.1\\x"
+                  },
+                  {
+                    "a": "159.923"
+                  }
+                ]
+              }
+            },
+            {
+              "080": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "1.2\\x"
+                  },
+                  {
+                    "a": "316.47"
+                  }
+                ]
+              }
+            },
+            {
+              "084": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "02"
+                  }
+                ]
+              }
+            },
+            {
+              "100": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Kishimi, Ichiro"
+                  },
+                  {
+                    "d": "(1956- )"
+                  },
+                  {
+                    "e": "Autor"
+                  }
+                ]
+              }
+            },
+            {
+              "245": {
+                "ind1": "0",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Odwaga bycia nielubianym :"
+                  },
+                  {
+                    "b": "japoński fenomen, który pokazuje, jak być wolnym i odmienić własne życie /"
+                  },
+                  {
+                    "c": "Ichiro Kishimi, Fumitake Koga ; przekład Piotr Cieślak."
+                  }
+                ]
+              }
+            },
+            {
+              "246": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "i": "Tytuł oryginału:"
+                  },
+                  {
+                    "a": "Kirawareru yuki,"
+                  },
+                  {
+                    "f": "2013"
+                  }
+                ]
+              }
+            },
+            {
+              "250": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wydanie I."
+                  }
+                ]
+              }
+            },
+            {
+              "260": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Łódź :"
+                  },
+                  {
+                    "b": "Galaktyka,"
+                  },
+                  {
+                    "c": "copyright 2017."
+                  }
+                ]
+              }
+            },
+            {
+              "300": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "IX, [1], 235 stron ;"
+                  },
+                  {
+                    "c": "23 cm."
+                  }
+                ]
+              }
+            },
+            {
+              "336": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Tekst"
+                  },
+                  {
+                    "b": "txt"
+                  },
+                  {
+                    "2": "rdacontent"
+                  }
+                ]
+              }
+            },
+            {
+              "337": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Bez urządzenia pośredniczącego"
+                  },
+                  {
+                    "b": "n"
+                  },
+                  {
+                    "2": "rdamedia"
+                  }
+                ]
+              }
+            },
+            {
+              "338": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wolumin"
+                  },
+                  {
+                    "b": "nc"
+                  },
+                  {
+                    "2": "rdacarrier"
+                  }
+                ]
+              }
+            },
+            {
+              "380": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Książki"
+                  }
+                ]
+              }
+            },
+            {
+              "380": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Publikacje popularnonaukowe"
+                  }
+                ]
+              }
+            },
+            {
+              "388": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "2001-"
+                  }
+                ]
+              }
+            },
+            {
+              "500": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "W obrębie wydania dodruki w latach: 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025."
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Self-actualization (Psychology)"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Adlerian psychology"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Interpersonal relations"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Happiness"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Psychologia indywidualna"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Relacje międzyludzkie"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Wolność"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Thought and thinking"
+                  }
+                ]
+              }
+            },
+            {
+              "651": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Japonia"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "655": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Dialog"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "658": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Psychologia"
+                  }
+                ]
+              }
+            },
+            {
+              "700": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Cieślak, Piotr"
+                  },
+                  {
+                    "d": "(1976- )"
+                  },
+                  {
+                    "e": "Tłumaczenie"
+                  }
+                ]
+              }
+            },
+            {
+              "700": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Kishimi, Ichiro"
+                  },
+                  {
+                    "d": "(1956- )"
+                  },
+                  {
+                    "e": "Autor"
+                  }
+                ]
+              }
+            },
+            {
+              "700": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Koga, Fumitake"
+                  },
+                  {
+                    "d": "(1973- )"
+                  },
+                  {
+                    "e": "Autor"
+                  }
+                ]
+              }
+            },
+            {
+              "710": {
+                "ind1": "2",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wydawnictwo Galaktyka"
+                  },
+                  {
+                    "e": "Wydawca"
+                  },
+                  {
+                    "4": "pbl"
+                  }
+                ]
+              }
+            },
+            {
+              "852": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "22517317540005066"
+                  },
+                  {
+                    "j": "1"
+                  },
+                  {
+                    "h": "1.544.726"
+                  },
+                  {
+                    "b": "BN_PL"
+                  },
+                  {
+                    "p": "30001025451113"
+                  },
+                  {
+                    "c": "bk8"
+                  }
+                ]
+              }
+            },
+            {
+              "852": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "22517317520005066"
+                  },
+                  {
+                    "j": "1"
+                  },
+                  {
+                    "h": "3.041.254 A"
+                  },
+                  {
+                    "b": "BN_PL"
+                  },
+                  {
+                    "p": "30001025451106"
+                  },
+                  {
+                    "c": "bk1"
+                  }
+                ]
+              }
+            },
+            {
+              "920": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "978-83-7579-602-5 : zł 39,90"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "query": "Dziwne obrazki",
+    "records": [
+      {
+        "id": 1854156,
+        "zone": "institution",
+        "createdDate": "2006-09-29T12:00:00.000Z",
+        "updatedDate": "2024-11-25T22:40:07.328Z",
+        "deleted": false,
+        "deletedDate": null,
+        "language": "polski",
+        "subject": "Rośliny",
+        "subjectPlace": "",
+        "subjectTime": "",
+        "subjectWork": "",
+        "isbnIssn": "",
+        "author": "Arct-Golczewska, Maria (1872-1913)",
+        "placeOfPublication": "Warszawa : Polska",
+        "location": "1",
+        "title": "Grzyby : dziwne rośliny : obrazki z natury / Zajmujące Czytanki nr 222",
+        "udc": "",
+        "publisher": "M. Arct,",
+        "kind": "książka",
+        "domain": "",
+        "formOfWork": "Książki",
+        "genre": "Publikacje dla dzieci",
+        "timePeriodOfCreation": "",
+        "audienceGroup": "",
+        "demographicGroup": "",
+        "nationalBibliographyNumber": "",
+        "publicationYear": "1917",
+        "languageOfOriginal": "polski",
+        "marc": {
+          "leader": "01787nam a2200457 i 4500",
+          "fields": [
+            {
+              "001": "b0000001854156"
+            },
+            {
+              "005": "20241125224007.3"
+            },
+            {
+              "008": "060929s1917    pl a         |000 0 pol  "
+            },
+            {
+              "009": "991031741389705066"
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "991031741389705066"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(PL-WaBN)b18541562-48omnis_nlop"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "b18541562"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(OCoLC)838876706"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(PL)b0000001854156"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(EXLNZ-48OMNIS_NETWORK)9910415747205606"
+                  }
+                ]
+              }
+            },
+            {
+              "040": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "WA N"
+                  },
+                  {
+                    "c": "WA N"
+                  },
+                  {
+                    "d": "WA N"
+                  }
+                ]
+              }
+            },
+            {
+              "100": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Arct-Golczewska, Maria"
+                  },
+                  {
+                    "d": "(1872-1913)"
+                  },
+                  {
+                    "e": "Autor"
+                  }
+                ]
+              }
+            },
+            {
+              "245": {
+                "ind1": "1",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Grzyby :"
+                  },
+                  {
+                    "b": "dziwne rośliny : obrazki z natury /"
+                  },
+                  {
+                    "c": "Marja Arct-Golczewska."
+                  }
+                ]
+              }
+            },
+            {
+              "260": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Warszawa :"
+                  },
+                  {
+                    "b": "M. Arct,"
+                  },
+                  {
+                    "c": "[1917]."
+                  }
+                ]
+              }
+            },
+            {
+              "300": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "S. [2], 83-134, [1] :"
+                  },
+                  {
+                    "b": "il. ;"
+                  },
+                  {
+                    "c": "18 cm."
+                  }
+                ]
+              }
+            },
+            {
+              "336": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Tekst"
+                  },
+                  {
+                    "b": "txt"
+                  },
+                  {
+                    "2": "rdacontent"
+                  }
+                ]
+              }
+            },
+            {
+              "337": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Bez urządzenia pośredniczącego"
+                  },
+                  {
+                    "b": "n"
+                  },
+                  {
+                    "2": "rdamedia"
+                  }
+                ]
+              }
+            },
+            {
+              "338": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wolumin"
+                  },
+                  {
+                    "b": "nc"
+                  },
+                  {
+                    "2": "rdacarrier"
+                  }
+                ]
+              }
+            },
+            {
+              "380": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Książki"
+                  }
+                ]
+              }
+            },
+            {
+              "490": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Zajmujące Czytanki"
+                  },
+                  {
+                    "v": "nr 222"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Rośliny"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "655": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Publikacje dla dzieci"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "830": {
+                "ind1": " ",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Zajmujące Czytanki"
+                  },
+                  {
+                    "v": "nr 222"
+                  }
+                ]
+              }
+            },
+            {
+              "852": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "22523257270005066"
+                  },
+                  {
+                    "j": "1"
+                  },
+                  {
+                    "h": "216.841"
+                  },
+                  {
+                    "b": "BN_PL"
+                  },
+                  {
+                    "p": "30001005834967"
+                  },
+                  {
+                    "c": "bk7"
+                  }
+                ]
+              }
+            },
+            {
+              "950": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "u": "https://eu05.alma.exlibrisgroup.com/view/uresolver/48OMNIS_NLOP/openurl?u.ignore_date_coverage=true&portfolio_pid=53674865700005066&Force_direct=true"
+                  },
+                  {
+                    "z": "Zobacz w Polonie sygnatura: 216.841"
+                  },
+                  {
+                    "8": "53674865700005066"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": 5168408,
+        "zone": "institution",
+        "createdDate": "2016-04-04T12:00:00.000Z",
+        "updatedDate": "2026-10-21T04:08:19.215Z",
+        "deleted": false,
+        "deletedDate": null,
+        "language": "polski",
+        "subject": "",
+        "subjectPlace": "",
+        "subjectTime": "1901-2000",
+        "subjectWork": "",
+        "isbnIssn": "",
+        "author": "Krumłowski, Konstanty (1872-1938)",
+        "placeOfPublication": "[S.l. : nieokreslony",
+        "location": "1 1",
+        "title": "Białe fartuszki czyli Dziwne przygody pokojówki : wesołe obrazki z życia służących dziewcząt / Dziwne przygody pokojówki",
+        "udc": "",
+        "publisher": "s.n.]",
+        "kind": "książka",
+        "domain": "",
+        "formOfWork": "Książki",
+        "genre": "Wodewil polski Pieśń i piosenka",
+        "timePeriodOfCreation": "",
+        "audienceGroup": "",
+        "demographicGroup": "Muzyka polska",
+        "nationalBibliographyNumber": "",
+        "publicationYear": "1912",
+        "languageOfOriginal": "polski",
+        "marc": {
+          "leader": "02219nam a2200541 i 4500",
+          "fields": [
+            {
+              "001": "b0000005168408"
+            },
+            {
+              "005": "20261021040819.2"
+            },
+            {
+              "008": "160404s1912    xx           |000 0 pol  "
+            },
+            {
+              "009": "991046758619705066"
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "991046758619705066"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(PL-WaBN)b51684081-48omnis_nlop"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "b51684081"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(OCoLC)69282041"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "zz2006823358"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(PL)b0000005168408"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(EXLNZ-48OMNIS_NETWORK)9910158654005606"
+                  }
+                ]
+              }
+            },
+            {
+              "040": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "WA N"
+                  },
+                  {
+                    "c": "WA N"
+                  }
+                ]
+              }
+            },
+            {
+              "100": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Krumłowski, Konstanty"
+                  },
+                  {
+                    "d": "(1872-1938)"
+                  }
+                ]
+              }
+            },
+            {
+              "245": {
+                "ind1": "1",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Białe fartuszki czyli Dziwne przygody pokojówki :"
+                  },
+                  {
+                    "b": "wesołe obrazki z życia służących dziewcząt /"
+                  },
+                  {
+                    "c": "napisał Chat-Noir."
+                  }
+                ]
+              }
+            },
+            {
+              "246": {
+                "ind1": "3",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Dziwne przygody pokojówki"
+                  }
+                ]
+              }
+            },
+            {
+              "260": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "[S.l. :"
+                  },
+                  {
+                    "b": "s.n.]"
+                  },
+                  {
+                    "c": "1912."
+                  }
+                ]
+              }
+            },
+            {
+              "300": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "40, [1] s. ;"
+                  },
+                  {
+                    "c": "19 cm."
+                  }
+                ]
+              }
+            },
+            {
+              "336": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Tekst"
+                  },
+                  {
+                    "b": "txt"
+                  },
+                  {
+                    "2": "rdacontent"
+                  }
+                ]
+              }
+            },
+            {
+              "337": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Bez urządzenia pośredniczącego"
+                  },
+                  {
+                    "b": "n"
+                  },
+                  {
+                    "2": "rdamedia"
+                  }
+                ]
+              }
+            },
+            {
+              "338": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wolumin"
+                  },
+                  {
+                    "b": "nc"
+                  },
+                  {
+                    "2": "rdacarrier"
+                  }
+                ]
+              }
+            },
+            {
+              "380": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Książki"
+                  }
+                ]
+              }
+            },
+            {
+              "386": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "m": "Przynależność kulturowa"
+                  },
+                  {
+                    "a": "Muzyka polska"
+                  }
+                ]
+              }
+            },
+            {
+              "388": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "1901-2000"
+                  }
+                ]
+              }
+            },
+            {
+              "500": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Na s. tyt. pseud. aut., nazwa: Konstanty Krumłowski."
+                  }
+                ]
+              }
+            },
+            {
+              "648": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "1901-2000"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "655": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Wodewil polski"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "655": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Pieśń i piosenka"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "852": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "22554602920005066"
+                  },
+                  {
+                    "j": "1"
+                  },
+                  {
+                    "h": "1.474.257 A"
+                  },
+                  {
+                    "b": "BN_PL"
+                  },
+                  {
+                    "p": "777i5047764x"
+                  },
+                  {
+                    "c": "bk1"
+                  }
+                ]
+              }
+            },
+            {
+              "852": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "22554602900005066"
+                  },
+                  {
+                    "j": "1"
+                  },
+                  {
+                    "h": "mf.81591"
+                  },
+                  {
+                    "b": "BN_PL"
+                  },
+                  {
+                    "p": "777i50477651"
+                  },
+                  {
+                    "c": "bamf"
+                  },
+                  {
+                    "z": "UWAGA: z egz.: BN 1.474.257 A"
+                  }
+                ]
+              }
+            },
+            {
+              "950": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "u": "https://eu05.alma.exlibrisgroup.com/view/uresolver/48OMNIS_NLOP/openurl?u.ignore_date_coverage=true&portfolio_pid=53680607690005066&Force_direct=true"
+                  },
+                  {
+                    "z": "Zobacz w Polonie sygnatura: 1.474.257 A"
+                  },
+                  {
+                    "8": "53680607690005066"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": 1000006179873,
+        "zone": "institution",
+        "createdDate": "2025-07-04T12:00:00.000Z",
+        "updatedDate": "2026-06-17T08:40:11.421Z",
+        "deleted": false,
+        "deletedDate": null,
+        "language": "polski",
+        "subject": "Rysunki Tajemnica Blog",
+        "subjectPlace": "Japonia",
+        "subjectTime": "",
+        "subjectWork": "",
+        "isbnIssn": "9788383821726",
+        "author": "Uketsu Manasterska, Sara Wydawnictwo Czarna Owca",
+        "placeOfPublication": "Warszawa : Polska",
+        "location": "1 1",
+        "title": "Dziwne obrazki / Hennae,",
+        "udc": "821.521-3 06",
+        "publisher": "Wydawnictwo Czarna Owca Wydawnictwo Czarna Owca,",
+        "kind": "książka",
+        "domain": "",
+        "formOfWork": "Książki Proza",
+        "genre": "Kryminał Powieść",
+        "timePeriodOfCreation": "2022",
+        "audienceGroup": "",
+        "demographicGroup": "Literatura japońska",
+        "nationalBibliographyNumber": "UWD 2025/22854",
+        "publicationYear": "2025",
+        "languageOfOriginal": "japonski",
+        "marc": {
+          "leader": "02249nam a2200685 i 4500",
+          "fields": [
+            {
+              "001": "b1000006179873"
+            },
+            {
+              "005": "20260617084011.4"
+            },
+            {
+              "008": "250704s2025    pl a         |000 f pol c"
+            },
+            {
+              "009": "991053148448805066"
+            },
+            {
+              "015": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "UWD 2025/22854"
+                  }
+                ]
+              }
+            },
+            {
+              "020": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "9788383821726"
+                  },
+                  {
+                    "q": "(oprawa miękka) :"
+                  },
+                  {
+                    "c": "zł 49,99"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(PL)b1000006179873"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(EXLNZ-48OMNIS_NETWORK)9914840926505606"
+                  }
+                ]
+              }
+            },
+            {
+              "040": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "ELBLAG M"
+                  },
+                  {
+                    "c": "ELBLAG M"
+                  },
+                  {
+                    "d": "WR M"
+                  },
+                  {
+                    "d": "POZN M"
+                  },
+                  {
+                    "d": "WA N"
+                  },
+                  {
+                    "d": "POZN M"
+                  }
+                ]
+              }
+            },
+            {
+              "041": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "pol"
+                  },
+                  {
+                    "h": "jpn"
+                  }
+                ]
+              }
+            },
+            {
+              "046": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "k": "2022"
+                  }
+                ]
+              }
+            },
+            {
+              "080": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "821.521-3"
+                  }
+                ]
+              }
+            },
+            {
+              "084": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "06"
+                  }
+                ]
+              }
+            },
+            {
+              "100": {
+                "ind1": "0",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Uketsu"
+                  },
+                  {
+                    "e": "Autor"
+                  },
+                  {
+                    "e": "Ilustracje"
+                  }
+                ]
+              }
+            },
+            {
+              "245": {
+                "ind1": "1",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Dziwne obrazki /"
+                  },
+                  {
+                    "c": "Uketsu ; przełożyła Sara Manasterska ; [ilustracje Uketsu]."
+                  }
+                ]
+              }
+            },
+            {
+              "246": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "6": "880-01"
+                  },
+                  {
+                    "i": "Tytuł oryginału:"
+                  },
+                  {
+                    "a": "Hennae,"
+                  },
+                  {
+                    "f": "2022"
+                  }
+                ]
+              }
+            },
+            {
+              "250": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wydanie pierwsze."
+                  }
+                ]
+              }
+            },
+            {
+              "260": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Warszawa :"
+                  },
+                  {
+                    "b": "Wydawnictwo Czarna Owca,"
+                  },
+                  {
+                    "c": "2025."
+                  }
+                ]
+              }
+            },
+            {
+              "300": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "271 stron :"
+                  },
+                  {
+                    "b": "ilustracje ;"
+                  },
+                  {
+                    "c": "21 cm."
+                  }
+                ]
+              }
+            },
+            {
+              "336": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Tekst"
+                  },
+                  {
+                    "b": "txt"
+                  },
+                  {
+                    "2": "rdacontent"
+                  }
+                ]
+              }
+            },
+            {
+              "337": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Bez urządzenia pośredniczącego"
+                  },
+                  {
+                    "b": "n"
+                  },
+                  {
+                    "2": "rdamedia"
+                  }
+                ]
+              }
+            },
+            {
+              "338": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wolumin"
+                  },
+                  {
+                    "b": "nc"
+                  },
+                  {
+                    "2": "rdacarrier"
+                  }
+                ]
+              }
+            },
+            {
+              "380": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Książki"
+                  }
+                ]
+              }
+            },
+            {
+              "380": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Proza"
+                  }
+                ]
+              }
+            },
+            {
+              "386": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "m": "Przynależność kulturowa"
+                  },
+                  {
+                    "a": "Literatura japońska"
+                  }
+                ]
+              }
+            },
+            {
+              "388": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "2001-"
+                  }
+                ]
+              }
+            },
+            {
+              "500": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "W książce wyłącznie pseudonim autora."
+                  }
+                ]
+              }
+            },
+            {
+              "504": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Bibliografia na stronie 271."
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Rysunki"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Tajemnica"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Blog"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "651": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Japonia"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "655": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Kryminał"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "655": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Powieść"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "700": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Manasterska, Sara"
+                  },
+                  {
+                    "e": "Tłumaczenie"
+                  }
+                ]
+              }
+            },
+            {
+              "710": {
+                "ind1": "2",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wydawnictwo Czarna Owca"
+                  },
+                  {
+                    "e": "Wydawca"
+                  },
+                  {
+                    "4": "pbl"
+                  }
+                ]
+              }
+            },
+            {
+              "852": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "22735604970005066"
+                  },
+                  {
+                    "j": "1"
+                  },
+                  {
+                    "h": "3.335.688 A"
+                  },
+                  {
+                    "b": "BN_PL"
+                  },
+                  {
+                    "p": "30001036061295"
+                  },
+                  {
+                    "c": "bk1"
+                  }
+                ]
+              }
+            },
+            {
+              "852": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "22735604920005066"
+                  },
+                  {
+                    "j": "1"
+                  },
+                  {
+                    "h": "3.696.046"
+                  },
+                  {
+                    "b": "BN_PL"
+                  },
+                  {
+                    "p": "30001036061325"
+                  },
+                  {
+                    "c": "bk8"
+                  }
+                ]
+              }
+            },
+            {
+              "880": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "6": "246-01/$1"
+                  },
+                  {
+                    "i": "Tytuł oryginału:"
+                  },
+                  {
+                    "a": "変な絵,"
+                  },
+                  {
+                    "f": "2022"
+                  }
+                ]
+              }
+            },
+            {
+              "920": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "978-83-8382-172-6 (oprawa miękka) : zł 49,99"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "query": "rozproszone umysły",
+    "records": [
+      {
+        "id": 1000002917574,
+        "zone": "institution",
+        "createdDate": "2023-05-08T12:00:00.000Z",
+        "updatedDate": "2026-10-14T04:50:26.030Z",
+        "deleted": false,
+        "deletedDate": null,
+        "language": "polski",
+        "subject": "Maté, Gabor, 1944- Zespół nadruchliwości z deficytem uwagi Zespół nadruchliwości z deficytem uwagi Attention-deficit hyperactivity disorder in adults People with attention-deficit hyperactivity disorder Attention-deficit hyperactivity disorder Mózg Relacje międzyludzkie Rodzina Zespół ADHD Umysł Leczenie Rozwój psychiczny",
+        "subjectPlace": "",
+        "subjectTime": "",
+        "subjectWork": "",
+        "isbnIssn": "9788382523911 9788381434607",
+        "author": "Maté, Gabor (1944- ) Cieślak, Piotr (1976- ) Wydawnictwo Czarna Owca",
+        "placeOfPublication": "Warszawa : Polska",
+        "location": "0 1",
+        "title": "Rozproszone umysły : przyczyny i leczenie zespołu deficytu uwagi / Scattered minds : the origin and healing of attention deficit disorder, Przyczyny i leczenie zespołu deficytu uwagi",
+        "udc": "159.922.76-056.49 159.922.8-056.49 612.82 316.362 02",
+        "publisher": "Wydawnictwo Czarna Owca Wydawnictwo Czarna Owca,",
+        "kind": "książka",
+        "domain": "Medycyna i zdrowie Psychologia",
+        "formOfWork": "Książki Publikacje popularnonaukowe",
+        "genre": "Opracowanie",
+        "timePeriodOfCreation": "1999",
+        "audienceGroup": "",
+        "demographicGroup": "",
+        "nationalBibliographyNumber": "UWD 2023/15747",
+        "publicationYear": "2023",
+        "languageOfOriginal": "angielski",
+        "marc": {
+          "leader": "03431nam a2200925 i 4500",
+          "fields": [
+            {
+              "001": "b1000002917574"
+            },
+            {
+              "005": "20261014045026.0"
+            },
+            {
+              "008": "230508s2023    pl           |000 0 pol c"
+            },
+            {
+              "009": "991053071430405066"
+            },
+            {
+              "015": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "UWD 2023/15747"
+                  }
+                ]
+              }
+            },
+            {
+              "020": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "9788382523911"
+                  },
+                  {
+                    "q": "(oprawa miękka) :"
+                  },
+                  {
+                    "c": "zł 54,99"
+                  }
+                ]
+              }
+            },
+            {
+              "020": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "9788381434607"
+                  },
+                  {
+                    "q": "(oprawa miękka) :"
+                  },
+                  {
+                    "c": "zł 59,99"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "xx005698272"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "xx005559309"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(PL)b1000002917574"
+                  }
+                ]
+              }
+            },
+            {
+              "035": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "(EXLNZ-48OMNIS_NETWORK)9913224551405606"
+                  }
+                ]
+              }
+            },
+            {
+              "040": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "WA N"
+                  },
+                  {
+                    "c": "WA N"
+                  },
+                  {
+                    "d": "WA N"
+                  },
+                  {
+                    "d": "KR U"
+                  },
+                  {
+                    "d": "WA N"
+                  },
+                  {
+                    "d": "LUBL KUL"
+                  },
+                  {
+                    "d": "ELBLAG M"
+                  },
+                  {
+                    "d": "KIEL W"
+                  },
+                  {
+                    "d": "KR U"
+                  },
+                  {
+                    "d": "OLSZT W"
+                  },
+                  {
+                    "d": "GD 027"
+                  },
+                  {
+                    "d": "KR 295"
+                  },
+                  {
+                    "d": "KOSZ W"
+                  },
+                  {
+                    "d": "WA N"
+                  },
+                  {
+                    "d": "ELBLAG M"
+                  },
+                  {
+                    "d": "WA N"
+                  }
+                ]
+              }
+            },
+            {
+              "041": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "pol"
+                  },
+                  {
+                    "h": "eng"
+                  }
+                ]
+              }
+            },
+            {
+              "046": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "k": "1999"
+                  }
+                ]
+              }
+            },
+            {
+              "080": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "1.1\\x"
+                  },
+                  {
+                    "a": "159.922.76-056.49"
+                  }
+                ]
+              }
+            },
+            {
+              "080": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "1.2\\x"
+                  },
+                  {
+                    "a": "159.922.8-056.49"
+                  }
+                ]
+              }
+            },
+            {
+              "080": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "1.3\\x"
+                  },
+                  {
+                    "a": "612.82"
+                  }
+                ]
+              }
+            },
+            {
+              "080": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "1.4\\x"
+                  },
+                  {
+                    "a": "316.362"
+                  }
+                ]
+              }
+            },
+            {
+              "084": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "02"
+                  }
+                ]
+              }
+            },
+            {
+              "100": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Maté, Gabor"
+                  },
+                  {
+                    "d": "(1944- )"
+                  },
+                  {
+                    "e": "Autor"
+                  }
+                ]
+              }
+            },
+            {
+              "245": {
+                "ind1": "1",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Rozproszone umysły :"
+                  },
+                  {
+                    "b": "przyczyny i leczenie zespołu deficytu uwagi /"
+                  },
+                  {
+                    "c": "Gabor Maté ; przełożył Piotr Cieślak."
+                  }
+                ]
+              }
+            },
+            {
+              "246": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "i": "Tytuł oryginału:"
+                  },
+                  {
+                    "a": "Scattered minds :"
+                  },
+                  {
+                    "b": "the origin and healing of attention deficit disorder,"
+                  },
+                  {
+                    "f": "1999"
+                  }
+                ]
+              }
+            },
+            {
+              "246": {
+                "ind1": "3",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Przyczyny i leczenie zespołu deficytu uwagi"
+                  }
+                ]
+              }
+            },
+            {
+              "250": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wydanie I."
+                  }
+                ]
+              }
+            },
+            {
+              "260": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Warszawa :"
+                  },
+                  {
+                    "b": "Wydawnictwo Czarna Owca,"
+                  },
+                  {
+                    "c": "copyright 2023."
+                  }
+                ]
+              }
+            },
+            {
+              "300": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "336 stron ;"
+                  },
+                  {
+                    "c": "23 cm."
+                  }
+                ]
+              }
+            },
+            {
+              "336": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Tekst"
+                  },
+                  {
+                    "b": "txt"
+                  },
+                  {
+                    "2": "rdacontent"
+                  }
+                ]
+              }
+            },
+            {
+              "337": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Bez urządzenia pośredniczącego"
+                  },
+                  {
+                    "b": "n"
+                  },
+                  {
+                    "2": "rdamedia"
+                  }
+                ]
+              }
+            },
+            {
+              "338": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wolumin"
+                  },
+                  {
+                    "b": "nc"
+                  },
+                  {
+                    "2": "rdacarrier"
+                  }
+                ]
+              }
+            },
+            {
+              "380": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Książki"
+                  }
+                ]
+              }
+            },
+            {
+              "380": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Publikacje popularnonaukowe"
+                  }
+                ]
+              }
+            },
+            {
+              "388": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "1901-2000"
+                  }
+                ]
+              }
+            },
+            {
+              "388": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "1989-2000"
+                  }
+                ]
+              }
+            },
+            {
+              "500": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "W obrębie wydania wznowienie w roku 2024. W obrębie wydania nakłady z różnymi numerami ISBN. W obrębie wydania nakłady z różnymi cenami."
+                  }
+                ]
+              }
+            },
+            {
+              "504": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Bibliografia na stronach 331-336."
+                  }
+                ]
+              }
+            },
+            {
+              "600": {
+                "ind1": "1",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Maté, Gabor,"
+                  },
+                  {
+                    "d": "1944-"
+                  },
+                  {
+                    "x": "Mental health."
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "2",
+                "subfields": [
+                  {
+                    "a": "Zespół nadruchliwości z deficytem uwagi"
+                  },
+                  {
+                    "x": "etiopatogeneza"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "2",
+                "subfields": [
+                  {
+                    "a": "Zespół nadruchliwości z deficytem uwagi"
+                  },
+                  {
+                    "x": "leczenie"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Attention-deficit hyperactivity disorder in adults"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "People with attention-deficit hyperactivity disorder"
+                  },
+                  {
+                    "z": "Canada"
+                  },
+                  {
+                    "v": "Biography."
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "0",
+                "subfields": [
+                  {
+                    "a": "Attention-deficit hyperactivity disorder"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Mózg"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Relacje międzyludzkie"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Rodzina"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Zespół ADHD"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Umysł"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Leczenie"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "650": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Rozwój psychiczny"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "655": {
+                "ind1": " ",
+                "ind2": "7",
+                "subfields": [
+                  {
+                    "a": "Opracowanie"
+                  },
+                  {
+                    "2": "DBN"
+                  }
+                ]
+              }
+            },
+            {
+              "658": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Medycyna i zdrowie"
+                  }
+                ]
+              }
+            },
+            {
+              "658": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Psychologia"
+                  }
+                ]
+              }
+            },
+            {
+              "700": {
+                "ind1": "1",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Cieślak, Piotr"
+                  },
+                  {
+                    "d": "(1976- )"
+                  },
+                  {
+                    "e": "Tłumaczenie"
+                  }
+                ]
+              }
+            },
+            {
+              "710": {
+                "ind1": "2",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "Wydawnictwo Czarna Owca"
+                  },
+                  {
+                    "e": "Wydawca"
+                  },
+                  {
+                    "4": "pbl"
+                  }
+                ]
+              }
+            },
+            {
+              "852": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "22720360060005066"
+                  },
+                  {
+                    "j": "0"
+                  },
+                  {
+                    "h": "3.640.248"
+                  },
+                  {
+                    "b": "BN_PL"
+                  },
+                  {
+                    "p": "30001032501740"
+                  },
+                  {
+                    "c": "bk8"
+                  }
+                ]
+              }
+            },
+            {
+              "852": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "8": "22720360100005066"
+                  },
+                  {
+                    "j": "1"
+                  },
+                  {
+                    "h": "3.254.464 A"
+                  },
+                  {
+                    "b": "BN_PL"
+                  },
+                  {
+                    "p": "30001032501757"
+                  },
+                  {
+                    "c": "bk1"
+                  }
+                ]
+              }
+            },
+            {
+              "920": {
+                "ind1": " ",
+                "ind2": " ",
+                "subfields": [
+                  {
+                    "a": "978-83-8252-391-1 (oprawa miękka) : zł 54,99"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "file": "Literata.ttf",
+  "family": "Literata",
+  "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/literata/Literata%5Bopsz%2Cwght%5D.ttf",
+  "sha256": "b41138c9373112f32abb589cc22e8674b06ed4048b0c513be922bdd26f274440",
+  "bytes": 955132,
+  "licenseFile": "Literata-OFL.txt",
+  "checkedCharacters": "ĄĆĘŁŃÓŚŹŻąćęłńóśźż0123456789",
+  "missingCharacters": []
+}

@@ -1,0 +1,1 @@
+Synthetic Goodreads-compatible CSV examples created for this application's tests. These are not an authentic user export. Private Notes/Review markers test that ignored columns never enter preview or stored books.

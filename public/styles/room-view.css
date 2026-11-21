@@ -1,0 +1,13 @@
+#bookcase,.room-scene{position:absolute;isolation:isolate}.room-background,.room-front{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}.room-background{z-index:0}.room-front{z-index:3}.room-cavity{position:absolute;display:flex;align-items:flex-end;gap:2px;z-index:2;overflow:visible}
+.room-extension{position:absolute;overflow:hidden;pointer-events:none;user-select:none;z-index:0}.room-extension>img{position:absolute;max-width:none;object-fit:fill}
+.book{flex:none;z-index:1;outline-offset:2px}
+/* A narrow contact shadow anchors the binding; the photo's shelf lip remains
+   in front. Neither this shadow nor the moving face changes the hit area. */
+.book::before{content:'';position:absolute;left:-1px;right:-2px;bottom:-.5px;height:2.5px;border-radius:45%;background:#0b0906b3;filter:blur(.55px);pointer-events:none}
+.book .spine-visual{transition:transform 220ms cubic-bezier(.22,1,.36,1),box-shadow 220ms,filter 220ms;filter:brightness(.88) saturate(.94);box-shadow:1px 0 1px #0d0a087a,2px 1px 3px #0d0a0866,0 1px 1px #0d0a0899}
+.book:hover,.book:focus-visible{z-index:4}
+.book:hover .spine-visual,.book:focus-visible .spine-visual{transform:perspective(600px) translateZ(14px) rotateY(-3deg);filter:brightness(.96) saturate(.96);box-shadow:1px 0 1px #0d0a0880,5px 2px 7px #0d0a0880}
+[data-scene-lighting=evening] .book .spine-visual{filter:brightness(.72) sepia(.08) saturate(.92)}
+[data-scene-lighting=evening] .book:hover .spine-visual,[data-scene-lighting=evening] .book:focus-visible .spine-visual{filter:brightness(.87) sepia(.08) saturate(.94)}
+.room-cavity .spine-ornament{top:5px;width:12px;height:12px}.room-cavity .spine-title{top:19px;bottom:18px;max-width:calc(100% - 8px);font-size:10px}.room-cavity .spine-author{left:2px;right:2px;bottom:5px;max-height:11px;font-size:5px}.room-cavity .spine-imprint{display:none}.room-cavity .spine-inlay{inset:3px}.room-cavity [data-style='4'] .spine-inlay{inset:17px 3px 16px}.room-cavity [data-style='2'] .spine-inlay{inset:0;border-top-width:3px;border-bottom-width:3px}.cavity-label{position:absolute;top:calc(100% + 4px);left:2px;z-index:6;padding:3px 7px;background:#20150de6;color:#f7efdf;border-radius:3px;font:10px 'Segoe UI',sans-serif;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 160ms}.room-cavity:hover+.cavity-label,.room-cavity:focus-within+.cavity-label{opacity:1}.room-error{position:fixed;left:24px;bottom:14px;z-index:6;background:var(--surface);padding:10px 14px;border-radius:6px}
+@media(prefers-reduced-motion:reduce){.book .spine-visual{transition:none}.book:hover .spine-visual,.book:focus-visible .spine-visual{transform:none}}

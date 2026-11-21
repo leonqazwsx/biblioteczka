@@ -1,0 +1,13 @@
+Title,Author,Additional Authors,ISBN,ISBN13,Date Read,Exclusive Shelf,Bookshelves,Number of Pages,Year Published,Book Id,Publisher
+Czytana,Autor,,,9780140328721,2024-02-29,read,"read, fantasy",100,2024,1,Wydawca
+W trakcie,Autor,,,,,currently-reading,currently-reading,,,,
+Później,Autor,,,,,to-read,to-read,,,,
+Nieznany status,Autor,,,,,maybe,"personal-tag, fantasy, mystery",,,,
+Sprzeczne,Autor,,,,,,"read, currently-reading",,,,
+Brak daty,Autor,,,,,read,read,,,,
+Niemożliwy dzień,Autor,,,,2025/02/29,read,read,,,,
+Zły ISBN,Autor,,123,,,,,,,,
+Złe strony,Autor,,,,,,,0,,,
+Współautorzy,Autor,"Kowalski, Jan, Nowak, Anna",,,2020/12/31,read,"biography, biography, read",123,2000,999,
+Dodatkowy ISBN,Autor,,123,9780140328721,,to-read,,,,,
+Brak autora,,,,,,,,,,,

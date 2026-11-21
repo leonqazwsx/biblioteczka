@@ -1,0 +1,4 @@
+﻿Book Id,Title,Author,Additional Authors,ISBN,ISBN13,Publisher,Year Published,Number of Pages,Date Read,Bookshelves,Exclusive Shelf,Private Notes,My Review,Date Added
+12345678901234567890123456789012,"Podróż, ""daleko""
+do domu","Kowalski, Jan",,"=""0140328726""","=""9780140328721""",Wydawnictwo Test,2024,240,2024/02/29,"read, fantasy",read,PRIVATE_MARKER_123,REVIEW_MARKER_456,2024/01/01
+2,=SUM(1+1),Autor,,,,,,,,to-read,,SECRET_UNUSED,,2020/01/01
