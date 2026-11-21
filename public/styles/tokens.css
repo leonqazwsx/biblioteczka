@@ -1,3 +1,83 @@
-:root{color-scheme:light;--bg:oklch(96% .013 85);--surface:oklch(99% .008 85);--subtle:oklch(93% .018 85);--ink:oklch(28% .02 70);--muted:oklch(51% .025 80);--line:oklch(86% .02 85);--accent:oklch(42% .055 145);--accent-ink:oklch(98% .01 85);--danger:oklch(48% .14 30);--wood:url('/assets/ash.png');--wall:#e9e4da;--ledge:#c9b394;--shadow:rgba(71,48,23,.20);font-family:'Segoe UI',system-ui,sans-serif}
-[data-theme=dark]{color-scheme:dark;--bg:oklch(22% .018 75);--surface:oklch(26% .019 75);--subtle:oklch(30% .02 75);--ink:oklch(93% .023 85);--muted:oklch(73% .025 85);--line:oklch(38% .02 75);--accent:oklch(76% .065 145);--accent-ink:oklch(20% .02 100);--danger:oklch(74% .13 30);--wood:url('/assets/walnut.png');--wall:#252522;--ledge:#533722;--shadow:rgba(12,9,6,.6)}
-*{box-sizing:border-box}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:3px}button,a{-webkit-tap-highlight-color:transparent}button{color:var(--ink)}[hidden]{display:none!important}dialog{color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:14px}dialog::backdrop{background:rgba(20,18,15,.45)}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+:root {
+  color-scheme: light;
+  --bg: oklch(96% 0.013 85);
+  --surface: oklch(99% 0.008 85);
+  --subtle: oklch(93% 0.018 85);
+  --ink: oklch(28% 0.02 70);
+  --muted: oklch(51% 0.025 80);
+  --line: oklch(86% 0.02 85);
+  --accent: oklch(42% 0.055 145);
+  --accent-ink: oklch(98% 0.01 85);
+  --danger: oklch(48% 0.14 30);
+  --wood: url('/assets/ash.png');
+  --wall: #e9e4da;
+  --ledge: #c9b394;
+  --shadow: rgba(71, 48, 23, 0.2);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: oklch(22% 0.018 75);
+  --surface: oklch(26% 0.019 75);
+  --subtle: oklch(30% 0.02 75);
+  --ink: oklch(93% 0.023 85);
+  --muted: oklch(73% 0.025 85);
+  --line: oklch(38% 0.02 75);
+  --accent: oklch(76% 0.065 145);
+  --accent-ink: oklch(20% 0.02 100);
+  --danger: oklch(74% 0.13 30);
+  --wood: url('/assets/walnut.png');
+  --wall: #252522;
+  --ledge: #533722;
+  --shadow: rgba(12, 9, 6, 0.6);
+}
+* {
+  box-sizing: border-box;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  color: var(--ink);
+}
+[hidden] {
+  display: none !important;
+}
+dialog {
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+dialog::backdrop {
+  background: rgba(20, 18, 15, 0.45);
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

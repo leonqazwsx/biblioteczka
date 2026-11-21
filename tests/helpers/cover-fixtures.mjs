@@ -1,3 +1,30 @@
-import {deflateSync} from 'node:zlib';
-function chunk(type,data){const b=Buffer.alloc(data.length+12);b.writeUInt32BE(data.length);b.write(type,4);data.copy(b,8);let crc=0xffffffff;for(const n of b.subarray(4,-4)){crc^=n;for(let k=0;k<8;k++)crc=crc&1?(crc>>>1)^0xedb88320:crc>>>1;}b.writeUInt32BE((crc^0xffffffff)>>>0,b.length-4);return b;}
-export function coverPng(value=31,width=8,height=12){const ihdr=Buffer.alloc(13);ihdr.writeUInt32BE(width);ihdr.writeUInt32BE(height,4);ihdr[8]=8;ihdr[9]=2;const pixels=Buffer.alloc(height*(1+width*3));for(let y=0;y<height;y++)pixels.fill(value,y*(1+width*3)+1,(y+1)*(1+width*3));return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',ihdr),chunk('IDAT',deflateSync(pixels)),chunk('IEND',Buffer.alloc(0))]);}
+import { deflateSync } from 'node:zlib';
+function chunk(type, data) {
+  const b = Buffer.alloc(data.length + 12);
+  b.writeUInt32BE(data.length);
+  b.write(type, 4);
+  data.copy(b, 8);
+  let crc = 0xffffffff;
+  for (const n of b.subarray(4, -4)) {
+    crc ^= n;
+    for (let k = 0; k < 8; k++) crc = crc & 1 ? (crc >>> 1) ^ 0xedb88320 : crc >>> 1;
+  }
+  b.writeUInt32BE((crc ^ 0xffffffff) >>> 0, b.length - 4);
+  return b;
+}
+export function coverPng(value = 31, width = 8, height = 12) {
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8;
+  ihdr[9] = 2;
+  const pixels = Buffer.alloc(height * (1 + width * 3));
+  for (let y = 0; y < height; y++)
+    pixels.fill(value, y * (1 + width * 3) + 1, (y + 1) * (1 + width * 3));
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    chunk('IHDR', ihdr),
+    chunk('IDAT', deflateSync(pixels)),
+    chunk('IEND', Buffer.alloc(0)),
+  ]);
+}

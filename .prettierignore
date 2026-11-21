@@ -1,0 +1,10 @@
+node_modules/
+data/
+dist/
+output/
+package-lock.json
+public/assets/
+services/spine-service/assets/
+tests/fixtures/
+docs/
+*.md

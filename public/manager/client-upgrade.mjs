@@ -1,7 +1,19 @@
-export function createClientUpgrade({isEditing,reload,notice}){
- let pending=false;
- return {
-  available(){if(isEditing()){pending=true;notice('Jest nowa wersja Biblioteczki. Zapisz lub odrzuć wszystkie niezapisane zmiany w formularzu, rozmieszczeniu i imporcie; panel odświeży się, gdy wszystkie będą zamknięte.');}else reload();},
-  editorClosed(){if(pending&&!isEditing()){pending=false;reload();}}
- };
+export function createClientUpgrade({ isEditing, reload, notice }) {
+  let pending = false;
+  return {
+    available() {
+      if (isEditing()) {
+        pending = true;
+        notice(
+          'Jest nowa wersja Biblioteczki. Zapisz lub odrzuć wszystkie niezapisane zmiany w formularzu, rozmieszczeniu i imporcie; panel odświeży się, gdy wszystkie będą zamknięte.',
+        );
+      } else reload();
+    },
+    editorClosed() {
+      if (pending && !isEditing()) {
+        pending = false;
+        reload();
+      }
+    },
+  };
 }

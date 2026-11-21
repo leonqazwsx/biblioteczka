@@ -1,11 +1,59 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import path from 'node:path';import os from 'node:os';import http from 'node:http';import {run} from '../src/main.mjs';
-test('Windows PowerShell launchers have UTF-8 BOM for Polish text',async()=>{for(const file of ['scripts/start.ps1','scripts/package.ps1']){const bytes=await fs.readFile(new URL('../'+file,import.meta.url));assert.deepEqual([...bytes.subarray(0,3)],[239,187,191],file);}});
-test('service restart restores local state and repeated start reuses original',async t=>{const root=await fs.mkdtemp(path.join(os.tmpdir(),'bookshelf app test '));t.after(()=>fs.rm(root,{recursive:true,force:true}));const a=await run({appRoot:root,port:0});const port=new URL(a.origin).port;const token=(await (await fetch(a.origin+'/api/bootstrap')).json()).token;await fetch(a.origin+'/api/commands',{method:'POST',headers:{Origin:a.origin,'Content-Type':'application/json','X-Bookshelf-Token':token},body:JSON.stringify({expectedRevision:0,command:{type:'updateSettings',patch:{theme:'dark'}}})});const other=await run({appRoot:root,port:Number(port)});assert.equal(other.alreadyRunning,true);await a.close();const again=await run({appRoot:root,port:0});assert.equal((await (await fetch(again.origin+'/api/state')).json()).settings.theme,'dark');await again.close();assert.ok((await fs.stat(path.join(root,'data','library.json'))).isFile());});
-test('occupied port owned by another program is not reused',async t=>{const server=http.createServer((req,res)=>res.end('{}'));await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(r)));await assert.rejects(()=>run({appRoot:os.tmpdir(),port:server.address().port}),e=>e.code==='PORT_IN_USE');});
-test('a different Biblioteczka installation cannot reuse the occupied port',async t=>{
-  const root=await fs.mkdtemp(path.join(os.tmpdir(),'bookshelf identity '));
-  const a=await run({appRoot:root,port:0});t.after(async()=>{await a.close();await fs.rm(root,{recursive:true,force:true});});
-  await assert.rejects(()=>run({appRoot:path.join(root,'another app'),port:Number(new URL(a.origin).port)}),e=>e.code==='PORT_IN_USE');
-  const health=await (await fetch(a.origin+'/api/health')).json();
-  assert.equal(typeof health.installationId,'string');assert.equal(health.pid,process.pid);
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import http from 'node:http';
+import { run } from '../src/main.mjs';
+test('Windows PowerShell launchers have UTF-8 BOM for Polish text', async () => {
+  for (const file of ['scripts/start.ps1', 'scripts/package.ps1']) {
+    const bytes = await fs.readFile(new URL('../' + file, import.meta.url));
+    assert.deepEqual([...bytes.subarray(0, 3)], [239, 187, 191], file);
+  }
+});
+test('service restart restores local state and repeated start reuses original', async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'bookshelf app test '));
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  const a = await run({ appRoot: root, port: 0 });
+  const port = new URL(a.origin).port;
+  const token = (await (await fetch(a.origin + '/api/bootstrap')).json()).token;
+  await fetch(a.origin + '/api/commands', {
+    method: 'POST',
+    headers: { Origin: a.origin, 'Content-Type': 'application/json', 'X-Bookshelf-Token': token },
+    body: JSON.stringify({
+      expectedRevision: 0,
+      command: { type: 'updateSettings', patch: { theme: 'dark' } },
+    }),
+  });
+  const other = await run({ appRoot: root, port: Number(port) });
+  assert.equal(other.alreadyRunning, true);
+  await a.close();
+  const again = await run({ appRoot: root, port: 0 });
+  assert.equal((await (await fetch(again.origin + '/api/state')).json()).settings.theme, 'dark');
+  await again.close();
+  assert.ok((await fs.stat(path.join(root, 'data', 'library.json'))).isFile());
+});
+test('occupied port owned by another program is not reused', async (t) => {
+  const server = http.createServer((req, res) => res.end('{}'));
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  t.after(() => new Promise((r) => server.close(r)));
+  await assert.rejects(
+    () => run({ appRoot: os.tmpdir(), port: server.address().port }),
+    (e) => e.code === 'PORT_IN_USE',
+  );
+});
+test('a different Biblioteczka installation cannot reuse the occupied port', async (t) => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'bookshelf identity '));
+  const a = await run({ appRoot: root, port: 0 });
+  t.after(async () => {
+    await a.close();
+    await fs.rm(root, { recursive: true, force: true });
+  });
+  await assert.rejects(
+    () => run({ appRoot: path.join(root, 'another app'), port: Number(new URL(a.origin).port) }),
+    (e) => e.code === 'PORT_IN_USE',
+  );
+  const health = await (await fetch(a.origin + '/api/health')).json();
+  assert.equal(typeof health.installationId, 'string');
+  assert.equal(health.pid, process.pid);
 });

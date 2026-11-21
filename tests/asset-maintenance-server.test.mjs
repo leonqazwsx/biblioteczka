@@ -1,6 +1,119 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import {run} from '../src/main.mjs';
-const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB9kAAAAASUVORK5CYII=','base64');
-async function app(t){const root=await fs.mkdtemp(path.join(os.tmpdir(),'asset-maintenance-api-')),a=await run({appRoot:root,port:0}),bootstrap=await(await fetch(a.origin+'/api/bootstrap')).json();t.after(async()=>{await a.close();await fs.rm(root,{recursive:true,force:true,maxRetries:6,retryDelay:50});});const post=(route,body,headers={})=>fetch(a.origin+route,{method:'POST',headers:{Origin:a.origin,'Content-Type':'application/json','X-Bookshelf-Token':bootstrap.token,...headers},body:JSON.stringify(body)});const upload=await post('/api/covers',{mime:'image/png',base64:png.toString('base64')}),{coverId}=await upload.json();const file=path.join(root,'data','covers',coverId),old=new Date(Date.now()-8*86400000);await fs.utimes(file,old,old);return {...a,root,post,coverId,file};}
-test('storage API reports unused bytes and requires authenticated explicit quarantine and restore',async t=>{const a=await app(t),response=await fetch(a.origin+'/api/storage');assert.equal(response.status,200);const report=await response.json();assert.equal(report.cleanupAllowed,true);assert.deepEqual(report.candidates.map(({kind,id})=>({kind,id})),[{kind:'covers',id:a.coverId}]);assert.equal(report.totals.covers.bytes,png.length);const body={expectedRevision:report.revision,assets:[{kind:'covers',id:a.coverId}]};assert.equal((await a.post('/api/storage/quarantine',body,{Origin:'https://evil.example'})).status,403);assert.equal((await a.post('/api/storage/quarantine',{...body,expectedRevision:123})).status,409);const moved=await a.post('/api/storage/quarantine',body);assert.equal(moved.status,200);const result=await moved.json();await assert.rejects(()=>fs.access(a.file),e=>e.code==='ENOENT');const restored=await a.post('/api/storage/restore',{expectedRevision:report.revision,quarantineId:result.quarantineId});assert.equal(restored.status,200);assert.deepEqual(await fs.readFile(a.file),png);assert.equal((await(await fetch(a.origin+'/api/storage')).json()).candidates.length,0);});
-test('storage API exposes broken-reference blockers and refuses unsafe cleanup',async t=>{const a=await app(t);await fs.writeFile(path.join(a.root,'data','library.backup.json'),'broken');const report=await(await fetch(a.origin+'/api/storage')).json();assert.equal(report.cleanupAllowed,false);assert.ok(report.blockers.length);assert.equal((await a.post('/api/storage/quarantine',{expectedRevision:0,assets:[{kind:'covers',id:a.coverId}]})).status,503);await fs.access(a.file);});
-test('permanent cleanup API requires its token, matching revision and mature batch',async t=>{const a=await app(t),result=await(await a.post('/api/storage/quarantine',{expectedRevision:0,assets:[{kind:'covers',id:a.coverId}]})).json(),body={expectedRevision:0,quarantineId:result.quarantineId};assert.equal((await a.post('/api/storage/purge',body,{'X-Bookshelf-Token':''})).status,403);assert.equal((await a.post('/api/storage/purge',{...body,expectedRevision:99})).status,409);assert.equal((await a.post('/api/storage/purge',body)).status,409);const manifestFile=path.join(a.root,'data','asset-quarantine',result.quarantineId,'manifest.json'),manifest=JSON.parse(await fs.readFile(manifestFile,'utf8'));manifest.createdAt=new Date(Date.now()-31*86400000).toISOString();await fs.writeFile(manifestFile,JSON.stringify(manifest));const report=await(await fetch(a.origin+'/api/storage')).json();assert.equal(report.quarantine[0].purgeEligible,true);const response=await a.post('/api/storage/purge',body);assert.equal(response.status,200);const deleted=await response.json();assert.equal(deleted.deletedBytes,png.length);assert.equal(deleted.report.totals.quarantine.bytes,0);await fs.access(path.join(a.root,'data','library.json'));});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { run } from '../src/main.mjs';
+const png = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jB9kAAAAASUVORK5CYII=',
+  'base64',
+);
+async function app(t) {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'asset-maintenance-api-')),
+    a = await run({ appRoot: root, port: 0 }),
+    bootstrap = await (await fetch(a.origin + '/api/bootstrap')).json();
+  t.after(async () => {
+    await a.close();
+    await fs.rm(root, { recursive: true, force: true, maxRetries: 6, retryDelay: 50 });
+  });
+  const post = (route, body, headers = {}) =>
+    fetch(a.origin + route, {
+      method: 'POST',
+      headers: {
+        Origin: a.origin,
+        'Content-Type': 'application/json',
+        'X-Bookshelf-Token': bootstrap.token,
+        ...headers,
+      },
+      body: JSON.stringify(body),
+    });
+  const upload = await post('/api/covers', { mime: 'image/png', base64: png.toString('base64') }),
+    { coverId } = await upload.json();
+  const file = path.join(root, 'data', 'covers', coverId),
+    old = new Date(Date.now() - 8 * 86400000);
+  await fs.utimes(file, old, old);
+  return { ...a, root, post, coverId, file };
+}
+test('storage API reports unused bytes and requires authenticated explicit quarantine and restore', async (t) => {
+  const a = await app(t),
+    response = await fetch(a.origin + '/api/storage');
+  assert.equal(response.status, 200);
+  const report = await response.json();
+  assert.equal(report.cleanupAllowed, true);
+  assert.deepEqual(
+    report.candidates.map(({ kind, id }) => ({ kind, id })),
+    [{ kind: 'covers', id: a.coverId }],
+  );
+  assert.equal(report.totals.covers.bytes, png.length);
+  const body = { expectedRevision: report.revision, assets: [{ kind: 'covers', id: a.coverId }] };
+  assert.equal(
+    (await a.post('/api/storage/quarantine', body, { Origin: 'https://evil.example' })).status,
+    403,
+  );
+  assert.equal(
+    (await a.post('/api/storage/quarantine', { ...body, expectedRevision: 123 })).status,
+    409,
+  );
+  const moved = await a.post('/api/storage/quarantine', body);
+  assert.equal(moved.status, 200);
+  const result = await moved.json();
+  await assert.rejects(
+    () => fs.access(a.file),
+    (e) => e.code === 'ENOENT',
+  );
+  const restored = await a.post('/api/storage/restore', {
+    expectedRevision: report.revision,
+    quarantineId: result.quarantineId,
+  });
+  assert.equal(restored.status, 200);
+  assert.deepEqual(await fs.readFile(a.file), png);
+  assert.equal((await (await fetch(a.origin + '/api/storage')).json()).candidates.length, 0);
+});
+test('storage API exposes broken-reference blockers and refuses unsafe cleanup', async (t) => {
+  const a = await app(t);
+  await fs.writeFile(path.join(a.root, 'data', 'library.backup.json'), 'broken');
+  const report = await (await fetch(a.origin + '/api/storage')).json();
+  assert.equal(report.cleanupAllowed, false);
+  assert.ok(report.blockers.length);
+  assert.equal(
+    (
+      await a.post('/api/storage/quarantine', {
+        expectedRevision: 0,
+        assets: [{ kind: 'covers', id: a.coverId }],
+      })
+    ).status,
+    503,
+  );
+  await fs.access(a.file);
+});
+test('permanent cleanup API requires its token, matching revision and mature batch', async (t) => {
+  const a = await app(t),
+    result = await (
+      await a.post('/api/storage/quarantine', {
+        expectedRevision: 0,
+        assets: [{ kind: 'covers', id: a.coverId }],
+      })
+    ).json(),
+    body = { expectedRevision: 0, quarantineId: result.quarantineId };
+  assert.equal((await a.post('/api/storage/purge', body, { 'X-Bookshelf-Token': '' })).status, 403);
+  assert.equal((await a.post('/api/storage/purge', { ...body, expectedRevision: 99 })).status, 409);
+  assert.equal((await a.post('/api/storage/purge', body)).status, 409);
+  const manifestFile = path.join(
+      a.root,
+      'data',
+      'asset-quarantine',
+      result.quarantineId,
+      'manifest.json',
+    ),
+    manifest = JSON.parse(await fs.readFile(manifestFile, 'utf8'));
+  manifest.createdAt = new Date(Date.now() - 31 * 86400000).toISOString();
+  await fs.writeFile(manifestFile, JSON.stringify(manifest));
+  const report = await (await fetch(a.origin + '/api/storage')).json();
+  assert.equal(report.quarantine[0].purgeEligible, true);
+  const response = await a.post('/api/storage/purge', body);
+  assert.equal(response.status, 200);
+  const deleted = await response.json();
+  assert.equal(deleted.deletedBytes, png.length);
+  assert.equal(deleted.report.totals.quarantine.bytes, 0);
+  await fs.access(path.join(a.root, 'data', 'library.json'));
+});

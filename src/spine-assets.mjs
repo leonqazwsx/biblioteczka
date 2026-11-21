@@ -1,6 +1,56 @@
-import * as fs from 'node:fs/promises';import path from 'node:path';import {createHash} from 'node:crypto';import {setTimeout as delay} from 'node:timers/promises';import {imageMime} from './covers.mjs';import {problem} from './domain.mjs';
-export async function openSpineStore(dataDir,{fsAdapter=fs}={}){
-  const root=path.join(dataDir,'spines'),f=fsAdapter;await f.mkdir(root,{recursive:true});const hash=b=>createHash('sha256').update(b).digest('hex');
-  function file(id){if(typeof id!=='string'||!/^[a-f0-9]{64}$/.test(id))throw problem('INVALID','Nieprawidłowy identyfikator ilustracji.');return path.join(root,id);}
-  return {async put(bytes,mime){if(!Buffer.isBuffer(bytes)||bytes.length>5*1024*1024)throw problem('TOO_LARGE','Ilustracja może mieć maksymalnie 5 MB.');if(imageMime(bytes)!==mime)throw problem('INVALID','Nieprawidłowy format ilustracji.');const assetId=hash(bytes),target=file(assetId);try{if(hash(await f.readFile(target))===assetId)return {assetId,mime};}catch(e){if(e.code!=='ENOENT')throw e;}const temp=target+'.'+crypto.randomUUID()+'.tmp';try{await f.writeFile(temp,bytes);for(let attempt=0;;attempt++){try{await f.rename(temp,target);break;}catch(e){if(!['EPERM','EACCES','EBUSY'].includes(e.code)||attempt>=5)throw e;await delay(40*2**attempt);}}}finally{await f.unlink(temp).catch(()=>{});}return {assetId,mime};},async read(assetId){const bytes=await f.readFile(file(assetId));if(hash(bytes)!==assetId)throw problem('INVALID','Ilustracja jest uszkodzona. Dodaj ją ponownie lub przywróć kopię.');return {bytes,mime:imageMime(bytes)};}};
+import * as fs from 'node:fs/promises';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
+import { setTimeout as delay } from 'node:timers/promises';
+import { imageMime } from './covers.mjs';
+import { problem } from './domain.mjs';
+export async function openSpineStore(dataDir, { fsAdapter = fs } = {}) {
+  const root = path.join(dataDir, 'spines'),
+    f = fsAdapter;
+  await f.mkdir(root, { recursive: true });
+  const hash = (b) => createHash('sha256').update(b).digest('hex');
+  function file(id) {
+    if (typeof id !== 'string' || !/^[a-f0-9]{64}$/.test(id))
+      throw problem('INVALID', 'Nieprawidłowy identyfikator ilustracji.');
+    return path.join(root, id);
+  }
+  return {
+    async put(bytes, mime) {
+      if (!Buffer.isBuffer(bytes) || bytes.length > 5 * 1024 * 1024)
+        throw problem('TOO_LARGE', 'Ilustracja może mieć maksymalnie 5 MB.');
+      if (imageMime(bytes) !== mime) throw problem('INVALID', 'Nieprawidłowy format ilustracji.');
+      const assetId = hash(bytes),
+        target = file(assetId);
+      try {
+        if (hash(await f.readFile(target)) === assetId) return { assetId, mime };
+      } catch (e) {
+        if (e.code !== 'ENOENT') throw e;
+      }
+      const temp = target + '.' + crypto.randomUUID() + '.tmp';
+      try {
+        await f.writeFile(temp, bytes);
+        for (let attempt = 0; ; attempt++) {
+          try {
+            await f.rename(temp, target);
+            break;
+          } catch (e) {
+            if (!['EPERM', 'EACCES', 'EBUSY'].includes(e.code) || attempt >= 5) throw e;
+            await delay(40 * 2 ** attempt);
+          }
+        }
+      } finally {
+        await f.unlink(temp).catch(() => {});
+      }
+      return { assetId, mime };
+    },
+    async read(assetId) {
+      const bytes = await f.readFile(file(assetId));
+      if (hash(bytes) !== assetId)
+        throw problem(
+          'INVALID',
+          'Ilustracja jest uszkodzona. Dodaj ją ponownie lub przywróć kopię.',
+        );
+      return { bytes, mime: imageMime(bytes) };
+    },
+  };
 }

@@ -1,6 +1,85 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import vm from 'node:vm';
-const source=await fs.readFile(new URL('../public/manager/app.mjs',import.meta.url),'utf8'),helper=source.slice(source.indexOf('async function findMissingCover('),source.indexOf('\nfunction showEditor('));
-test('an uncovered saved book delegates to exact automatic discovery with or without ISBN',async()=>{let calls=0;const c=vm.createContext({coverId:null,coverPicker:{search(options){assert.equal(options.automatic,true);calls++;}}});vm.runInContext(helper,c);await c.findMissingCover({id:'a',isbn:'837054116X'});await c.findMissingCover({id:'b',title:'Solaris',authors:['Lem']});assert.equal(calls,2);c.coverId='manual';await c.findMissingCover({id:'c'});assert.equal(calls,2);c.coverId=null;await c.findMissingCover({id:'c',spine:{assetId:'own'}});assert.equal(calls,2);});
-test('opening a saved editor automatically searches only when no cover or own spine exists',()=>{const line=source.split('\n').find(l=>l.startsWith('function showEditor('));let calls=0,resets=0;const fields=new Map(),$=id=>{if(!fields.has(id))fields.set(id,{hidden:true,disabled:false,value:'',replaceChildren(){},focus(){}});return fields.get(id);};const c=vm.createContext({$,draftGuard:{start(){}},suggestions:{input(){}},reloadLatest:{},operation:0,uploading:false,shelfTouched:false,populate(){},editorFields(){return {};},fitSpineTitles(){},spinePreview:{},document:{querySelector:()=>({})},coverPicker:{reset(){resets++;}},findMissingCover(){calls++;}});vm.runInContext(line,c);
- for(const b of [{id:'a',isbn:'837054116X'},{id:'b',title:'Solaris',authors:['Lem']},{id:'c',isbn:'837054116X',coverId:'existing'},{id:'d',isbn:'837054116X',spine:{assetId:'own'}}]){$('editor').hidden=true;c.showEditor(b);}assert.equal(calls,2);assert.equal(resets,4);
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import vm from 'node:vm';
+import { topLevelStatement } from './helpers/source.mjs';
+const source = await fs.readFile(new URL('../public/manager/app.mjs', import.meta.url), 'utf8'),
+  helper = source.slice(
+    source.indexOf('async function findMissingCover('),
+    source.indexOf('\nfunction showEditor('),
+  );
+test('an uncovered saved book delegates to exact automatic discovery with or without ISBN', async () => {
+  let calls = 0;
+  const c = vm.createContext({
+    coverId: null,
+    coverPicker: {
+      search(options) {
+        assert.equal(options.automatic, true);
+        calls++;
+      },
+    },
+  });
+  vm.runInContext(helper, c);
+  await c.findMissingCover({ id: 'a', isbn: '837054116X' });
+  await c.findMissingCover({ id: 'b', title: 'Solaris', authors: ['Lem'] });
+  assert.equal(calls, 2);
+  c.coverId = 'manual';
+  await c.findMissingCover({ id: 'c' });
+  assert.equal(calls, 2);
+  c.coverId = null;
+  await c.findMissingCover({ id: 'c', spine: { assetId: 'own' } });
+  assert.equal(calls, 2);
+});
+test('opening a saved editor automatically searches only when no cover or own spine exists', () => {
+  const line = topLevelStatement(source, 'function showEditor(');
+  let calls = 0,
+    resets = 0;
+  const fields = new Map(),
+    $ = (id) => {
+      if (!fields.has(id))
+        fields.set(id, {
+          hidden: true,
+          disabled: false,
+          value: '',
+          replaceChildren() {},
+          focus() {},
+        });
+      return fields.get(id);
+    };
+  const c = vm.createContext({
+    $,
+    draftGuard: { start() {} },
+    suggestions: { input() {} },
+    reloadLatest: {},
+    operation: 0,
+    uploading: false,
+    shelfTouched: false,
+    populate() {},
+    editorFields() {
+      return {};
+    },
+    fitSpineTitles() {},
+    spinePreview: {},
+    document: { querySelector: () => ({}) },
+    coverPicker: {
+      reset() {
+        resets++;
+      },
+    },
+    findMissingCover() {
+      calls++;
+    },
+  });
+  vm.runInContext(line, c);
+  for (const b of [
+    { id: 'a', isbn: '837054116X' },
+    { id: 'b', title: 'Solaris', authors: ['Lem'] },
+    { id: 'c', isbn: '837054116X', coverId: 'existing' },
+    { id: 'd', isbn: '837054116X', spine: { assetId: 'own' } },
+  ]) {
+    $('editor').hidden = true;
+    c.showEditor(b);
+  }
+  assert.equal(calls, 2);
+  assert.equal(resets, 4);
 });
