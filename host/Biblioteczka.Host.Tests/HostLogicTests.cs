@@ -51,36 +51,65 @@ public class FullscreenRuleTests
 
 public class MouseTranslationTests
 {
+    private static readonly DateTime T0 = new(2026, 11, 22, 12, 0, 0, DateTimeKind.Utc);
+
     [Fact]
-    public void ClickProducesDownAndUpWithHeldButtonState()
+    public void EveryEventStartsWithAMoveSoHoverFollowsTheCursor()
     {
-        var translation = new MouseTranslation();
-        var down = Assert.Single(translation.Translate(0x0001, 0));
-        Assert.Equal((0x0201u, 0x0001), (down.Id, down.Keys));
-        Assert.Equal(0x0001, translation.Keys);
-        var up = Assert.Single(translation.Translate(0x0002, 0));
-        Assert.Equal((0x0202u, 0), (up.Id, up.Keys));
+        var events = new MouseTranslation().Translate(0, 0, 552, 156, T0);
+        var move = Assert.Single(events);
+        Assert.Equal(("mouseMoved", 552.0, 156.0, "none", 0), (move.Type, move.X, move.Y, move.Button, move.Buttons));
     }
 
     [Fact]
-    public void WheelCarriesSignedDelta()
+    public void ClickPressesAndReleasesTheLeftButton()
     {
-        var wheel = Assert.Single(new MouseTranslation().Translate(0x0400, unchecked((ushort)-120)));
-        Assert.Equal(0x020Au, wheel.Id);
-        Assert.Equal(-120, wheel.WheelDelta);
+        var translation = new MouseTranslation();
+        var down = translation.Translate(0x0001, 0, 10, 20, T0);
+        Assert.Equal(["mouseMoved", "mousePressed"], down.Select(e => e.Type));
+        Assert.Equal(("left", 1, 1), (down[1].Button, down[1].Buttons, down[1].ClickCount));
+        Assert.Equal(1, translation.Buttons);
+        var up = translation.Translate(0x0002, 0, 10, 20, T0.AddMilliseconds(80));
+        Assert.Equal(("mouseMoved", "left"), (up[0].Type, up[0].Button));
+        Assert.Equal(("mouseReleased", "left", 0, 1), (up[1].Type, up[1].Button, up[1].Buttons, up[1].ClickCount));
     }
 
     [Fact]
-    public void MoveWithoutButtonsProducesNoButtonMessages() =>
-        Assert.Empty(new MouseTranslation().Translate(0, 0));
-
-    [Fact]
-    public void ResetForgetsHeldButtons()
+    public void QuickSecondClickInPlaceIsADoubleClick()
     {
         var translation = new MouseTranslation();
-        translation.Translate(0x0004, 0);
-        translation.Reset();
-        Assert.Equal(0, translation.Keys);
+        translation.Translate(0x0001, 0, 10, 20, T0);
+        translation.Translate(0x0002, 0, 10, 20, T0.AddMilliseconds(50));
+        var second = translation.Translate(0x0001, 0, 11, 21, T0.AddMilliseconds(200));
+        Assert.Equal(2, second[1].ClickCount);
+        var later = translation.Translate(0x0001, 0, 11, 21, T0.AddSeconds(5));
+        Assert.Equal(1, later[1].ClickCount);
+    }
+
+    [Fact]
+    public void WheelUpScrollsUpInTheBrowser()
+    {
+        var wheel = new MouseTranslation().Translate(0x0400, 120, 0, 0, T0)[1];
+        Assert.Equal(("mouseWheel", -120.0), (wheel.Type, wheel.DeltaY));
+    }
+
+    [Fact]
+    public void LeaveMovesOutsideTheViewportAndForgetsButtons()
+    {
+        var translation = new MouseTranslation();
+        translation.Translate(0x0004, 0, 5, 5, T0);
+        var leave = translation.Leave();
+        Assert.True(leave.X < 0 && leave.Y < 0);
+        Assert.Equal(0, translation.Buttons);
+    }
+
+    [Fact]
+    public void SerializesDevToolsParameters()
+    {
+        var json = new MouseTranslation.CdpMouseEvent("mousePressed", 1.5, 2, "left", 1, 1).ToJson();
+        Assert.Contains("\"type\":\"mousePressed\"", json);
+        Assert.Contains("\"x\":1.5", json);
+        Assert.Contains("\"clickCount\":1", json);
     }
 }
 

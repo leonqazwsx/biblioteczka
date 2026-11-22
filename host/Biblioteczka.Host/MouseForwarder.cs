@@ -3,13 +3,15 @@ namespace Biblioteczka.Host;
 /// <summary>
 /// Forwards mouse input to the wallpaper while the cursor is over the bare desktop. The desktop icon
 /// layer sits above the wallpaper and receives all input, so the page would otherwise never see hover
-/// or clicks. Messages are posted to WebView2's Chromium input window, as Lively Wallpaper does.
+/// or clicks. Events go through WebView2's DevTools protocol (see <see cref="MouseTranslation"/>),
+/// one at a time and in order; consecutive moves are coalesced so the page never lags behind.
 /// </summary>
 internal sealed class MouseForwarder
 {
     private readonly Func<WallpaperWindow?> _wallpaper;
     private readonly MouseTranslation _translation = new();
-    private bool _inside;
+    private readonly LinkedList<MouseTranslation.CdpMouseEvent> _queue = new();
+    private bool _inside, _pumping;
 
     public MouseForwarder(ShellWindow shell, Func<WallpaperWindow?> wallpaper)
     {
@@ -20,31 +22,54 @@ internal sealed class MouseForwarder
     private void OnRawMouse(ushort flags, ushort data)
     {
         var wallpaper = _wallpaper();
-        if (wallpaper is null || wallpaper.IsPaused || !Native.GetCursorPos(out var screen)) return;
-        var target = wallpaper.RefreshInputWindow();
-        var over = target != IntPtr.Zero &&
-            wallpaper.ScreenBounds.Contains(screen.X, screen.Y) &&
-            IsDesktopUnder(screen);
+        if (wallpaper is null || wallpaper.IsPaused || !wallpaper.IsReady || !Native.GetCursorPos(out var screen)) return;
+        var over = wallpaper.ScreenBounds.Contains(screen.X, screen.Y) && IsDesktopUnder(screen);
         if (!over)
         {
-            if (_inside && target != IntPtr.Zero) Native.PostMessage(target, Native.WM_MOUSELEAVE, IntPtr.Zero, IntPtr.Zero);
+            if (_inside) Enqueue(_translation.Leave());
             _inside = false;
-            _translation.Reset();
             return;
         }
 
         _inside = true;
-        var client = screen;
-        Native.ScreenToClient(target, ref client);
-        var clientParam = Native.MakeLParam(client.X, client.Y);
-        Native.PostMessage(target, Native.WM_MOUSEMOVE, _translation.Keys, clientParam);
-        foreach (var message in _translation.Translate(flags, data))
+        var scale = wallpaper.DpiScale;
+        var x = (screen.X - wallpaper.ScreenBounds.X) / scale;
+        var y = (screen.Y - wallpaper.ScreenBounds.Y) / scale;
+        foreach (var e in _translation.Translate(flags, data, x, y, DateTime.UtcNow)) Enqueue(e);
+    }
+
+    private void Enqueue(MouseTranslation.CdpMouseEvent e)
+    {
+        // A newer position supersedes a move that has not been sent yet.
+        if (e.Type == "mouseMoved" && _queue.Last is { Value.Type: "mouseMoved" } last) last.Value = e;
+        else _queue.AddLast(e);
+        if (!_pumping) _ = PumpAsync();
+    }
+
+    private async Task PumpAsync()
+    {
+        _pumping = true;
+        try
         {
-            if (message.Id == Native.WM_MOUSEWHEEL)
-                Native.PostMessage(target, message.Id, Native.MakeLParam(message.Keys, message.WheelDelta),
-                    Native.MakeLParam(screen.X, screen.Y));
-            else
-                Native.PostMessage(target, message.Id, message.Keys, clientParam);
+            while (_queue.First is { } first)
+            {
+                _queue.RemoveFirst();
+                var wallpaper = _wallpaper();
+                if (wallpaper is null || !wallpaper.IsReady) { _queue.Clear(); break; }
+                try
+                {
+                    await wallpaper.DispatchMouseAsync(first.Value.ToJson());
+                }
+                catch (Exception error)
+                {
+                    Log.Error("Mouse dispatch failed", error);
+                    _queue.Clear();
+                }
+            }
+        }
+        finally
+        {
+            _pumping = false;
         }
     }
 

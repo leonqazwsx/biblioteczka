@@ -26,7 +26,8 @@ internal sealed class HostContext : ApplicationContext
         _shell.ExplorerRestarted += () =>
         {
             Log.Info("Explorer restarted (TaskbarCreated).");
-            _ = RebuildWallpaperAsync();
+            // The watchdog usually rebuilds first; only rebuild if the wallpaper is still not attached.
+            if (!IsAttached()) _ = RebuildWallpaperAsync();
         };
         _server.Restarted += () => _shell_Invoke(() => _wallpaper?.Reload());
         _server.GaveUp += () => _shell_Invoke(() =>
@@ -77,9 +78,18 @@ internal sealed class HostContext : ApplicationContext
         _rebuilding = true;
         try
         {
-            _wallpaper?.Dispose();
+            var old = _wallpaper;
             _wallpaper = null;
             _target = null;
+            try
+            {
+                old?.Dispose();
+            }
+            catch (Exception error)
+            {
+                // After Explorer dies, the window and WebView2 may already be half torn down.
+                Log.Info("Old wallpaper was already torn down: " + error.Message);
+            }
             // Explorer may still be starting after a restart; wait for the desktop to exist.
             for (var attempt = 0; attempt < 20 && DesktopLayer.Find() is null; attempt++) await Task.Delay(500);
             var bounds = Screen.PrimaryScreen?.Bounds ?? throw new InvalidOperationException("Brak monitora.");
@@ -100,25 +110,37 @@ internal sealed class HostContext : ApplicationContext
         }
     }
 
+    private bool IsAttached() =>
+        _wallpaper is { IsDisposed: false, IsHandleCreated: true } wallpaper && _target is not null &&
+        Native.IsWindow(_target.Parent) && Native.GetAncestor(wallpaper.Handle, 1 /* GA_PARENT */) == _target.Parent;
+
+    private IntPtr _lastForeground;
+
     private void Watch()
     {
         if (_rebuilding || _exiting) return;
-        var wallpaper = _wallpaper;
-        if (wallpaper is null || wallpaper.IsDisposed || _target is null || !Native.IsWindow(_target.Parent) ||
-            Native.GetAncestor(wallpaper.Handle, 1 /* GA_PARENT */) != _target.Parent)
+        if (!IsAttached())
         {
             Log.Info("Wallpaper lost its desktop parent; rebuilding.");
             _ = RebuildWallpaperAsync();
             return;
         }
 
+        var wallpaper = _wallpaper!;
         var foreground = Native.GetForegroundWindow();
         if (foreground == IntPtr.Zero) return;
         Native.GetWindowThreadProcessId(foreground, out var pid);
+        var windowClass = Native.ClassName(foreground);
+        Native.GetWindowRect(foreground, out var rect);
+        var monitor = Native.MonitorBounds(foreground);
         var covered = pid != _ownProcessId && Native.IsWindowVisible(foreground) &&
-            Native.GetWindowRect(foreground, out var rect) &&
-            FullscreenRule.CoversWallpaper(Native.ClassName(foreground), rect.ToRectangle(),
-                Native.MonitorBounds(foreground), wallpaper.ScreenBounds);
+            FullscreenRule.CoversWallpaper(windowClass, rect.ToRectangle(), monitor, wallpaper.ScreenBounds);
+        if (foreground != _lastForeground)
+        {
+            // Diagnostics only: window class and geometry, never titles.
+            _lastForeground = foreground;
+            Log.Info($"Foreground {windowClass} rect {rect.ToRectangle()} monitor {monitor} covers={covered}");
+        }
         if (covered) _ = wallpaper.PauseAsync();
         else wallpaper.Resume();
     }

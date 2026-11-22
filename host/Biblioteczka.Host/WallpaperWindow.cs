@@ -30,8 +30,11 @@ internal sealed class WallpaperWindow : Form
 
     public bool IsPaused => _paused;
 
-    /// <summary>The Chromium child window that receives mouse input, once WebView2 created it.</summary>
-    public IntPtr InputWindow { get; private set; }
+    /// <summary>True once the page loaded and can receive input.</summary>
+    public bool IsReady { get; private set; }
+
+    /// <summary>Physical pixels per CSS pixel on this monitor.</summary>
+    public double DpiScale => DeviceDpi / 96.0;
 
     protected override bool ShowWithoutActivation => true;
 
@@ -61,33 +64,21 @@ internal sealed class WallpaperWindow : Form
         _web.CoreWebView2.NavigationCompleted += (_, e) =>
         {
             Log.Info("Wallpaper navigation " + (e.IsSuccess ? "succeeded" : "failed: " + e.WebErrorStatus));
-            InputWindow = FindInputWindow();
+            IsReady = e.IsSuccess;
         };
         _web.CoreWebView2.Navigate(_url);
     }
 
     public void Reload()
     {
-        if (_web.CoreWebView2 is not null) _web.CoreWebView2.Reload();
+        if (!IsDisposed && _web.CoreWebView2 is not null) _web.CoreWebView2.Reload();
     }
 
-    public IntPtr RefreshInputWindow()
-    {
-        if (InputWindow == IntPtr.Zero || !Native.IsWindow(InputWindow)) InputWindow = FindInputWindow();
-        return InputWindow;
-    }
-
-    private IntPtr FindInputWindow()
-    {
-        var found = IntPtr.Zero;
-        Native.EnumChildWindows(Handle, (child, _) =>
-        {
-            if (Native.ClassName(child) != "Chrome_RenderWidgetHostHWND") return true;
-            found = child;
-            return false;
-        }, IntPtr.Zero);
-        return found;
-    }
+    /// <summary>Injects one DevTools <c>Input.dispatchMouseEvent</c> call. Must run on the UI thread.</summary>
+    public Task DispatchMouseAsync(string parametersJson) =>
+        IsDisposed || _web.CoreWebView2 is null
+            ? Task.CompletedTask
+            : _web.CoreWebView2.CallDevToolsProtocolMethodAsync("Input.dispatchMouseEvent", parametersJson);
 
     /// <summary>Hides and suspends the page, e.g. while a fullscreen app covers the desktop.</summary>
     public async Task PauseAsync()
