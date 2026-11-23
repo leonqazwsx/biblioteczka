@@ -21,10 +21,9 @@ Stałe decyzje:
 
 - `src/` – serwer Node 24 (bez zależności npm): magazyn kolekcji, katalogi (Open Library, BN, Inventaire), okładki, import Goodreads, kopie JSON.
 - `public/manager/` – panel kolekcji; `public/wallpaper/` – tapeta; `public/shared/` – wspólna logika (układ pokojów, oświetlenie, grzbiety).
-- `scripts/` – obecny launcher, zasobnik (z obsługą Lively) i instalator w PowerShell/C#. Zostaną zastąpione przez host .NET w kroku 3; do tego czasu nie rozbudowuj ich.
-- Działająca instalacja użytkownika jest w OneDrive (`Bookshelf Wallpaper\Biblioteczka`). Nie uruchamiaj `scripts/package.ps1` ani instalatora z tego repozytorium bez wyraźnej prośby — mogłoby to podmienić jego codzienną wersję.
+- Działająca instalacja użytkownika (stara wersja z Lively) jest w OneDrive (`Bookshelf Wallpaper\Biblioteczka`). Nie kopiuj nic do tego folderu i nie zmieniaj jego danych bez wyraźnej prośby. Stary launcher, zasobnik i instalator w PowerShellu usunięto w kroku 3; nowa paczka powstanie w kroku 5.
 - `tests/` – `node --test`, bez sieci i płatnych wywołań.
-- `host/` – host Windows w C#/.NET 10 (WinForms + WebView2): tapeta za ikonami, serwer Node jako proces potomny. Testy: `dotnet test host/Biblioteczka.slnx`. Prototyp domyślnie używa portu 47832 i danych w `output/host-prototype-data`, żeby nie kolidować z instalacją użytkownika (47831).
+- `host/` – host Windows w C#/.NET 10 (WinForms + WebView2): tapeta za ikonami, serwer Node jako proces potomny. Testy: `dotnet test host/Biblioteczka.slnx`. Uruchomiony z repozytorium (folder z .git) działa w trybie deweloperskim: port 47832, dane w `output/host-prototype-data`, dziennik w `output/host-state/host.log`. Wersja zainstalowana: port 47831, kolekcja w `Dokumenty\Biblioteczka`. Serwer dostaje `--host-exe`, a funkcje Windows (autostart, otwarcie panelu) wywołuje przez `Biblioteczka.exe --control …` (`src/windows.mjs`).
 
 ## Polecenia
 

@@ -5,12 +5,6 @@ import path from 'node:path';
 import os from 'node:os';
 import http from 'node:http';
 import { run } from '../src/main.mjs';
-test('Windows PowerShell launchers have UTF-8 BOM for Polish text', async () => {
-  for (const file of ['scripts/start.ps1', 'scripts/package.ps1']) {
-    const bytes = await fs.readFile(new URL('../' + file, import.meta.url));
-    assert.deepEqual([...bytes.subarray(0, 3)], [239, 187, 191], file);
-  }
-});
 test('service restart restores local state and repeated start reuses original', async (t) => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'bookshelf app test '));
   t.after(() => fs.rm(root, { recursive: true, force: true }));

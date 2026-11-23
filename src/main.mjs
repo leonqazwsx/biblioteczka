@@ -14,21 +14,13 @@ import { createStorageGate, guardStorage, openAssetMaintenance } from './asset-m
 import { createInventaireCoverLookup } from './inventaire-covers.mjs';
 import { createCoverImageLoader } from './cover-images.mjs';
 import { createCoverDiscovery } from './cover-discovery.mjs';
-import { writeStopIntent } from './runtime-intent.mjs';
 export async function run({
   appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
   port = 47831,
   dataDir = path.join(appRoot, 'data'),
   catalog: createAppCatalog = createCatalog(),
-  recoveryNonce,
   hostExe = null,
 } = {}) {
-  if (
-    recoveryNonce !== undefined &&
-    (typeof recoveryNonce !== 'string' ||
-      !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(recoveryNonce))
-  )
-    throw new Error('Nieprawidłowa próba odzyskania.');
   if (!Number.isSafeInteger(port) || port < 0 || port > 65535)
     throw problem('INVALID', 'Nieprawidłowy port.');
   const identity = installationId(appRoot, dataDir);
@@ -52,30 +44,11 @@ export async function run({
     }
   }
   const lock = await acquireDataLock(dataDir);
-  let closing,
-    server,
-    started = false,
-    stopIntentPromise;
+  let closing, server;
   const runtimeSessionId = crypto.randomUUID();
-  function markStopping() {
-    if (!stopIntentPromise) {
-      const pending = writeStopIntent(dataDir, {
-        installationId: identity,
-        pid: process.pid,
-        sessionId: runtimeSessionId,
-        recoveryNonce,
-      });
-      stopIntentPromise = pending;
-      pending.catch(() => {
-        if (stopIntentPromise === pending) stopIntentPromise = null;
-      });
-    }
-    return stopIntentPromise;
-  }
   function close() {
     if (!closing) {
       closing = (async () => {
-        if (started) await markStopping();
         try {
           const finished = server
             ? new Promise((resolve) => server.close(() => resolve()))
@@ -140,7 +113,6 @@ export async function run({
       publicDir: path.join(appRoot, 'public'),
       installationId: identity,
       runtimeSessionId,
-      onStopping: markStopping,
       onShutdown: () => close(),
     });
     await new Promise((resolve, reject) => {
@@ -153,7 +125,6 @@ export async function run({
       );
       server.listen(port, '127.0.0.1', resolve);
     });
-    started = true;
     return { origin: 'http://127.0.0.1:' + server.address().port, alreadyRunning: false, close };
   } catch (error) {
     await close();
@@ -170,7 +141,6 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const app = await run({
       port: value('--port') == null ? 47831 : Number(value('--port')),
       dataDir: value('--data-dir') == null ? undefined : path.resolve(value('--data-dir')),
-      recoveryNonce: value('--recovery-nonce'),
       hostExe: value('--host-exe') ?? null,
     });
     console.log('Biblioteczka: ' + app.origin + '/manager');

@@ -7,7 +7,7 @@ product
 Czytelnicy korzystający z Windows na laptopie lub dużym monitorze. Chcą widzieć własne książki na pulpicie i łatwo organizować kolekcję, zamiast oglądać drobne miniatury na telefonie.
 
 ## Product Purpose
-Własna biblioteczka jako interaktywna tapeta w osobno zainstalowanym Lively, z wygodnym lokalnym panelem. Sukces: dodanie książki i zobaczenie jej czytelnego grzbietu na swojej półce, także po restarcie i bez internetu. Źródło: zatwierdzona specyfikacja oraz rozmowa użytkownika o dwóch motywach, wyszukiwaniu i osobnym panelu.
+Własna biblioteczka jako interaktywna tapeta wyświetlana przez samodzielną aplikację Windows, z wygodnym lokalnym panelem. Sukces: dodanie książki i zobaczenie jej czytelnego grzbietu na swojej półce, także po restarcie i bez internetu. Źródło: zatwierdzona specyfikacja oraz rozmowa użytkownika o dwóch motywach, wyszukiwaniu i osobnym panelu.
 
 ## Brand Personality
 Spokojna, przytulna, czytelna. Odpowiednik osobistej drewnianej biblioteczki. UI mówi po polsku prostymi instrukcjami.
