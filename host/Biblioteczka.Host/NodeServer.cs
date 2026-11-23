@@ -53,6 +53,9 @@ internal sealed partial class NodeServer : IDisposable
         info.ArgumentList.Add(_options.Port.ToString());
         info.ArgumentList.Add("--data-dir");
         info.ArgumentList.Add(_options.DataDir);
+        // Lets the server reach Windows features (autostart, opening the panel) through this executable.
+        info.ArgumentList.Add("--host-exe");
+        info.ArgumentList.Add(_options.ExecutablePath);
         var process = new Process { StartInfo = info, EnableRaisingEvents = true };
         process.OutputDataReceived += (_, e) => { if (e.Data is not null) Log.Info("node: " + e.Data); };
         process.ErrorDataReceived += (_, e) => { if (e.Data is not null) Log.Error("node: " + e.Data); };

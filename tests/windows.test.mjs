@@ -1,168 +1,127 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-const windows = await import('../src/windows.mjs').catch(() => ({}));
-test(
-  'Windows Startup shortcut remains controllable and safely migrates owned legacy registrations',
-  { skip: process.platform !== 'win32' },
-  async () => {
-    const { execFile } = await import('node:child_process'),
-      { promisify } = await import('node:util'),
-      path = await import('node:path');
-    const { stdout } = await promisify(execFile)(
-      'powershell.exe',
-      [
-        '-NoProfile',
-        '-NonInteractive',
-        '-ExecutionPolicy',
-        'Bypass',
-        '-File',
-        path.resolve('tests/windows-control.ps1'),
-      ],
-      { windowsHide: true, timeout: 20000 },
-    );
-    assert.match(stdout, /WINDOWS_STARTUP_OK/);
-  },
-);
-test('unsupported platforms do not invoke Windows or enable autostart', async () => {
-  const bridge = windows.createWindowsIntegration({
-    appRoot: '/tmp/Biblioteczka',
-    port: 47831,
-    platform: 'linux',
-    execute: () => {
-      throw new Error('must not run');
+import { createWindowsIntegration } from '../src/windows.mjs';
+
+const HOST = 'C:\\Program Files\\Biblioteczka\\Biblioteczka.exe';
+
+function fakeHost(reply) {
+  const calls = [];
+  return {
+    calls,
+    execute: async (file, args, options) => {
+      calls.push({ file, args, options });
+      const value = typeof reply === 'function' ? await reply(args) : reply;
+      return { stdout: typeof value === 'string' ? value : JSON.stringify(value) };
     },
-  });
-  assert.deepEqual(await bridge.status(), {
-    supported: false,
-    autostart: false,
-    conflict: false,
-    canEnable: false,
-  });
-  await assert.rejects(
-    () => bridge.setAutostart(true),
-    (e) => e.code === 'WINDOWS_UNAVAILABLE',
-  );
+  };
+}
+
+test('without the .NET host Windows features are reported as unavailable and nothing runs', async () => {
+  for (const options of [
+    { hostExe: null, platform: 'win32' },
+    { hostExe: HOST, platform: 'linux' },
+  ]) {
+    const host = fakeHost({});
+    const windows = createWindowsIntegration({ ...options, port: 47831, execute: host.execute });
+    assert.deepEqual(await windows.status(), {
+      supported: false,
+      autostart: false,
+      conflict: false,
+      canEnable: false,
+    });
+    await assert.rejects(windows.setAutostart(true), (e) => e.code === 'WINDOWS_UNAVAILABLE');
+    await assert.rejects(windows.openSettings(), (e) => e.code === 'WINDOWS_UNAVAILABLE');
+    assert.equal(host.calls.length, 0);
+  }
 });
-test('Windows control passes paths as literal arguments and rejects nonboolean settings', async () => {
-  const appRoot = "C:\\Readers & books\\Anna's room\\Biblioteczka";
-  const bridge = windows.createWindowsIntegration({
-    appRoot,
+
+test('autostart goes through the host control command with literal arguments', async () => {
+  const host = fakeHost((args) => ({
+    supported: true,
+    autostart: args[1] === 'enable',
+    conflict: false,
+    canEnable: true,
+  }));
+  const windows = createWindowsIntegration({
+    hostExe: HOST,
     port: 47831,
     platform: 'win32',
-    execute: async (file, args) => {
-      assert.equal(file.toLowerCase().endsWith('powershell.exe'), true);
-      assert.equal(args[args.indexOf('-AppRoot') + 1], appRoot);
-      const action = args[args.indexOf('-Action') + 1];
-      return {
-        stdout: JSON.stringify({
-          supported: true,
-          autostart: action === 'enable',
-          conflict: false,
-          canEnable: true,
-        }),
-      };
-    },
+    execute: host.execute,
   });
-  assert.equal((await bridge.status()).autostart, false);
-  assert.equal((await bridge.setAutostart(true)).autostart, true);
-  await assert.rejects(
-    () => bridge.setAutostart('true'),
-    (e) => e.code === 'INVALID',
-  );
+  assert.equal((await windows.setAutostart(true)).autostart, true);
+  assert.equal((await windows.setAutostart(false)).autostart, false);
+  assert.deepEqual(host.calls[0].args, ['--control', 'enable', '--port', '47831']);
+  assert.equal(host.calls[0].file, HOST);
+  assert.equal(host.calls[0].options.windowsHide, true);
+  await assert.rejects(windows.setAutostart('yes'), (e) => e.code === 'INVALID');
+  assert.equal(host.calls.length, 2);
 });
-test('Windows control failures become a useful error rather than malformed JSON', async () => {
-  const bridge = windows.createWindowsIntegration({
-    appRoot: 'C:\\Biblioteczka',
+
+test('host errors and malformed replies become useful errors', async () => {
+  const cases = [
+    [{ error: 'Brak dostępu do rejestru.' }, /Brak dostępu do rejestru/],
+    ['not json', /Nie udało się odczytać ustawień Windows/],
+    [[1, 2], /Nieprawidłowa odpowiedź/],
+  ];
+  for (const [reply, message] of cases) {
+    const host = fakeHost(reply);
+    const windows = createWindowsIntegration({
+      hostExe: HOST,
+      port: 47831,
+      platform: 'win32',
+      execute: host.execute,
+    });
+    await assert.rejects(
+      windows.status(),
+      (e) => e.code === 'WINDOWS_UNAVAILABLE' && message.test(e.message),
+    );
+  }
+  const failing = createWindowsIntegration({
+    hostExe: HOST,
     port: 47831,
     platform: 'win32',
     execute: async () => {
-      throw Object.assign(new Error('failed'), { stderr: 'Obca wartość autostartu.' });
+      throw Object.assign(new Error('spawn failed'), { code: 'ENOENT' });
     },
   });
-  await assert.rejects(
-    () => bridge.setAutostart(false),
-    (e) => e.code === 'WINDOWS_UNAVAILABLE' && e.message.includes('Obca wartość'),
-  );
+  await assert.rejects(failing.status(), (e) => e.code === 'WINDOWS_UNAVAILABLE');
 });
 
-test('settings launch is a fixed Windows action and concurrent clicks share one operation', async () => {
-  let calls = 0,
-    release;
-  const pending = new Promise((r) => (release = r)),
-    appRoot = "C:\\Readers & books\\Anna's room\\Biblioteczka";
-  const bridge = windows.createWindowsIntegration({
-    appRoot,
+test('opening the panel asks the running app once even for concurrent clicks', async () => {
+  let release;
+  const host = fakeHost(
+    () => new Promise((resolve) => (release = () => resolve({ opened: true }))),
+  );
+  const windows = createWindowsIntegration({
+    hostExe: HOST,
     port: 47831,
     platform: 'win32',
-    execute: async (file, args, opts) => {
-      calls++;
-      assert.equal(args[args.indexOf('-Action') + 1], 'open-settings');
-      assert.equal(args[args.indexOf('-Port') + 1], '47831');
-      assert.equal(args[args.indexOf('-AppRoot') + 1], appRoot);
-      assert.equal(opts.windowsHide, true);
-      await pending;
-      return { stdout: '{"opened":true}' };
-    },
+    execute: host.execute,
   });
-  const a = bridge.openSettings(),
-    b = bridge.openSettings();
-  assert.equal(calls, 1);
+  const first = windows.openSettings(),
+    second = windows.openSettings();
+  await new Promise((r) => setImmediate(r));
   release();
-  assert.deepEqual(await a, { opened: true });
-  assert.deepEqual(await b, { opened: true });
+  assert.deepEqual(await first, { opened: true });
+  assert.deepEqual(await second, { opened: true });
+  assert.equal(host.calls.length, 1);
+  assert.deepEqual(host.calls[0].args, ['--control', 'open-settings', '--port', '47831']);
 });
-test('settings launch rejects unsupported systems and invalid ports before executing', async () => {
-  let calls = 0;
-  const execute = async () => {
-    calls++;
-    return { stdout: '{}' };
-  };
-  await assert.rejects(
-    () =>
-      windows
-        .createWindowsIntegration({
-          appRoot: 'C:\\Biblioteczka',
-          port: 47831,
-          platform: 'linux',
-          execute,
-        })
-        .openSettings(),
-    (e) => e.code === 'WINDOWS_UNAVAILABLE',
-  );
-  for (const port of [0, 65536, 47831.5, '47831'])
-    await assert.rejects(
-      () =>
-        windows
-          .createWindowsIntegration({
-            appRoot: 'C:\\Biblioteczka',
-            port,
-            platform: 'win32',
-            execute,
-          })
-          .openSettings(),
-      (e) => e.code === 'INVALID',
-    );
-  assert.equal(calls, 0);
+
+test('opening the panel reports when no running app answered and rejects invalid ports', async () => {
+  const host = fakeHost({ opened: false });
+  const windows = createWindowsIntegration({
+    hostExe: HOST,
+    port: 47831,
+    platform: 'win32',
+    execute: host.execute,
+  });
+  await assert.rejects(windows.openSettings(), (e) => e.code === 'WINDOWS_UNAVAILABLE');
+  const invalid = createWindowsIntegration({
+    hostExe: HOST,
+    port: 0,
+    platform: 'win32',
+    execute: host.execute,
+  });
+  await assert.rejects(invalid.openSettings(), (e) => e.code === 'INVALID');
 });
-test(
-  'Windows settings PowerShell opens only the validated loopback settings URL',
-  { skip: process.platform !== 'win32' },
-  async () => {
-    const { execFile } = await import('node:child_process'),
-      { promisify } = await import('node:util'),
-      path = await import('node:path');
-    const { stdout } = await promisify(execFile)(
-      'powershell.exe',
-      [
-        '-NoProfile',
-        '-NonInteractive',
-        '-ExecutionPolicy',
-        'Bypass',
-        '-File',
-        path.resolve('tests/windows-settings.ps1'),
-      ],
-      { windowsHide: true, timeout: 15000 },
-    );
-    assert.match(stdout, /WINDOWS_SETTINGS_OK/);
-  },
-);

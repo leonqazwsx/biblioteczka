@@ -894,7 +894,7 @@ function renderSettings(main) {
     const shortcut = section(
       main,
       'Podgląd i rozmieszczenie',
-      'Ustaw własny układ lub sprawdź tapetę przed dodaniem do Lively.',
+      'Ustaw własny układ książek na półkach.',
     );
     shortcut.append(button('Otwórz podgląd tapety', () => navigate('wallpaper')));
     renderAnnualSettings(main);
@@ -1038,34 +1038,17 @@ function renderSettings(main) {
     const ai = section(main, 'Ilustracje AI', '');
     ai.id = 'ai-settings';
     paintAiSettings(ai);
-    const windows = section(main, 'Windows', 'Szybki dostęp z ikony w zasobniku systemowym.');
-    renderWindowsSettings(windows);
-    const local = section(
+    const windows = section(
       main,
-      'Aplikacja lokalna',
-      'Kolekcja jest zapisywana w folderze data obok programu. Lively i panel wymagają działającej aplikacji w tle.',
+      'Windows',
+      'Kolekcja jest zapisywana w folderze Dokumenty\\Biblioteczka. Ikona w zasobniku otwiera panel, przeładowuje tapetę i zamyka aplikację.',
     );
-    local.append(
-      button(
-        'Zatrzymaj aplikację',
-        async () => {
-          if (
-            confirm(
-              'Zatrzymać aplikację? Tapeta przestanie otrzymywać aktualizacje do ponownego uruchomienia.',
-            )
-          ) {
-            await request('/api/shutdown', { method: 'POST', body: {} });
-            notice('Aplikacja zatrzymana. Uruchom ponownie Start-Bookshelf.cmd.');
-          }
-        },
-        'secondary',
-      ),
-    );
+    renderWindowsSettings(windows);
   }
 }
 
 function renderWallpaper(main) {
-  heading('Podgląd tapety', 'Sprawdź wygląd i otwórz biblioteczkę w Lively.');
+  heading('Podgląd tapety', 'Ułóż książki na półkach; tapeta na pulpicie zmienia się od razu.');
   layoutPanel ??= createRoomLayoutPanel({
     state,
     onSave: command,
@@ -1079,31 +1062,11 @@ function renderWallpaper(main) {
   layoutPanel.mount(panel, state);
   const s = section(
     main,
-    'Dodaj do Lively',
-    'Uruchom aplikację Biblioteczka przed włączeniem tej tapety.',
+    'Tapeta na pulpicie',
+    'Biblioteczka wyświetla tapetę na głównym monitorze, pod ikonami pulpitu. Jeśli jej nie widać, wybierz „Przeładuj tapetę” w menu ikony w zasobniku.',
   );
-  const url = location.origin + '/wallpaper',
-    input = el('input');
-  input.readOnly = true;
-  input.value = url;
-  input.setAttribute('aria-label', 'Adres tapety');
-  s.append(
-    input,
-    button('Kopiuj adres', async () => {
-      await navigator.clipboard.writeText(url);
-      notice('Adres tapety skopiowany.');
-    }),
-  );
-  const steps = el('ol');
-  for (const t of [
-    'Otwórz Lively Wallpaper i wybierz „Dodaj tapetę”.',
-    'Wklej adres URL i kliknij małą strzałkę po prawej stronie pola.',
-    'W oknie z podglądem kliknij Zatwierdź, potem wybierz tapetę z biblioteki.',
-  ])
-    steps.append(el('li', '', t));
-  s.append(steps);
-  const a = el('a', 'text-button', 'Otwórz tapetę w nowej karcie ↗');
-  a.href = url;
+  const a = el('a', 'text-button', 'Otwórz podgląd tapety w przeglądarce ↗');
+  a.href = location.origin + '/wallpaper';
   a.target = '_blank';
   a.rel = 'noopener';
   s.append(a);
@@ -1906,7 +1869,7 @@ try {
       if (connected && $('notice').textContent.startsWith('Brak połączenia')) notice('');
       if (!connected)
         notice(
-          'Brak połączenia z aplikacją. Uruchom Start-Bookshelf.cmd, aby zapisywać zmiany.',
+          'Brak połączenia z aplikacją. Uruchom Biblioteczkę ponownie, aby zapisywać zmiany.',
           true,
         );
     },

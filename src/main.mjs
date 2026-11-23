@@ -21,6 +21,7 @@ export async function run({
   dataDir = path.join(appRoot, 'data'),
   catalog: createAppCatalog = createCatalog(),
   recoveryNonce,
+  hostExe = null,
 } = {}) {
   if (
     recoveryNonce !== undefined &&
@@ -135,7 +136,7 @@ export async function run({
       storage,
       coverDiscovery,
       catalog: createAppCatalog,
-      windows: createWindowsIntegration({ appRoot, port }),
+      windows: createWindowsIntegration({ hostExe, port }),
       publicDir: path.join(appRoot, 'public'),
       installationId: identity,
       runtimeSessionId,
@@ -170,6 +171,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       port: value('--port') == null ? 47831 : Number(value('--port')),
       dataDir: value('--data-dir') == null ? undefined : path.resolve(value('--data-dir')),
       recoveryNonce: value('--recovery-nonce'),
+      hostExe: value('--host-exe') ?? null,
     });
     console.log('Biblioteczka: ' + app.origin + '/manager');
     if (!app.alreadyRunning) {

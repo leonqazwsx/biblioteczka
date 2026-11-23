@@ -1,65 +1,59 @@
-import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { problem } from './domain.mjs';
+
 const executeDefault = promisify(execFile);
+const ACTIONS = new Set(['status', 'enable', 'disable', 'open-settings']);
+
+/**
+ * Windows features (start with Windows, opening the panel window) belong to the .NET host
+ * (host/Biblioteczka.Host). The server asks it through `Biblioteczka.exe --control <action>`,
+ * which prints one JSON object. Without a host (e.g. `npm start`) these features are unavailable.
+ */
 export function createWindowsIntegration({
-  appRoot,
+  hostExe = null,
   port,
   platform = process.platform,
   execute = executeDefault,
 }) {
   const unsupported = { supported: false, autostart: false, conflict: false, canEnable: false };
+  const available = platform === 'win32' && typeof hostExe === 'string' && hostExe.length > 0;
   let opening;
+
   async function control(action) {
-    if (platform !== 'win32') {
+    if (!ACTIONS.has(action)) throw problem('INVALID', 'Nieznane polecenie Windows.');
+    if (!available) {
       if (action === 'status') return { ...unsupported };
       throw problem(
         'WINDOWS_UNAVAILABLE',
         action === 'open-settings'
-          ? 'Otwieranie ustawień jest dostępne w Windows.'
-          : 'Autostart jest dostępny w Windows.',
+          ? 'Panel otwiera się z aplikacji Biblioteczka.'
+          : 'Autostart jest dostępny w aplikacji Biblioteczka dla Windows.',
       );
     }
-    const executable = path.join(
-      process.env.SystemRoot ?? 'C:\\Windows',
-      'System32',
-      'WindowsPowerShell',
-      'v1.0',
-      'powershell.exe',
-    );
+    let result;
     try {
-      const { stdout } = await execute(
-        executable,
-        [
-          '-NoProfile',
-          '-NonInteractive',
-          '-ExecutionPolicy',
-          'Bypass',
-          '-File',
-          path.join(appRoot, 'scripts', 'windows.ps1'),
-          '-AppRoot',
-          appRoot,
-          '-Port',
-          String(port),
-          '-Action',
-          action,
-        ],
-        { windowsHide: true, timeout: 10000, maxBuffer: 65536, encoding: 'utf8' },
-      );
-      return JSON.parse(stdout.replace(/^\uFEFF/, ''));
-    } catch (e) {
+      const { stdout } = await execute(hostExe, ['--control', action, '--port', String(port)], {
+        windowsHide: true,
+        timeout: 10000,
+        maxBuffer: 65536,
+        encoding: 'utf8',
+      });
+      result = JSON.parse(stdout.replace(/^﻿/, ''));
+    } catch {
       throw problem(
         'WINDOWS_UNAVAILABLE',
-        String(
-          e.stderr?.trim() ||
-            (action === 'open-settings'
-              ? 'Nie udało się otworzyć ustawień w przeglądarce. Spróbuj ponownie.'
-              : 'Nie udało się odczytać ustawień Windows. Spróbuj uruchomić Biblioteczkę ponownie.'),
-        ),
+        action === 'open-settings'
+          ? 'Nie udało się otworzyć panelu. Spróbuj ponownie.'
+          : 'Nie udało się odczytać ustawień Windows. Spróbuj uruchomić Biblioteczkę ponownie.',
       );
     }
+    if (!result || typeof result !== 'object' || Array.isArray(result))
+      throw problem('WINDOWS_UNAVAILABLE', 'Nieprawidłowa odpowiedź aplikacji.');
+    if (typeof result.error === 'string') throw problem('WINDOWS_UNAVAILABLE', result.error);
+    return result;
   }
+
   return {
     status: () => control('status'),
     setAutostart: async (enabled) => {
@@ -70,19 +64,18 @@ export function createWindowsIntegration({
     openSettings: async () => {
       if (!Number.isSafeInteger(port) || port < 1 || port > 65535)
         throw problem('INVALID', 'Nieprawidłowy port.');
-      if (!opening)
-        opening = control('open-settings')
-          .then((result) => {
-            if (result?.opened !== true)
-              throw problem(
-                'WINDOWS_UNAVAILABLE',
-                'Nie udało się otworzyć ustawień w przeglądarce. Spróbuj ponownie.',
-              );
-            return { opened: true };
-          })
-          .finally(() => {
-            opening = null;
-          });
+      opening ??= control('open-settings')
+        .then((result) => {
+          if (result.opened !== true)
+            throw problem(
+              'WINDOWS_UNAVAILABLE',
+              'Nie udało się otworzyć panelu. Spróbuj ponownie.',
+            );
+          return { opened: true };
+        })
+        .finally(() => {
+          opening = null;
+        });
       return opening;
     },
   };

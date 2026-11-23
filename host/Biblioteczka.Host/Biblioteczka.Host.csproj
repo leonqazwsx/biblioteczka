@@ -21,6 +21,14 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <ApplicationIcon>Assets\biblioteczka.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\biblioteczka.ico" LogicalName="biblioteczka.ico" />
+  </ItemGroup>
+
   <ItemGroup>
     <InternalsVisibleTo Include="Biblioteczka.Host.Tests" />
   </ItemGroup>

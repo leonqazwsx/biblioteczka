@@ -1,13 +1,32 @@
 namespace Biblioteczka.Host;
 
-/// <summary>Command-line options. Defaults keep the prototype away from the user's real installation.</summary>
-internal sealed record HostOptions(string AppRoot, string NodePath, int Port, string DataDir, string LogFile)
+/// <summary>
+/// Command-line options and locations.
+/// <para>Development mode (the app root is a git checkout) keeps everything inside <c>output/</c> and uses
+/// port 47832, so it never touches a real installation. Production mode stores the collection in
+/// <c>Documents\Biblioteczka</c> (it survives uninstalling) and runtime files in LocalAppData.</para>
+/// </summary>
+internal sealed record HostOptions(
+    string AppRoot,
+    string NodePath,
+    int Port,
+    string DataDir,
+    string StateDir,
+    bool Development,
+    string? Control)
 {
-    public const int DefaultPrototypePort = 47832;
+    public const int ProductionPort = 47831;
+    public const int DevelopmentPort = 47832;
 
     public string Origin => "http://127.0.0.1:" + Port;
 
-    public static HostOptions Parse(string[] args)
+    public string LogFile => Path.Combine(StateDir, "host.log");
+
+    public string WebViewDataDir => Path.Combine(StateDir, "WebView2");
+
+    public string ExecutablePath => Environment.ProcessPath ?? Path.Combine(AppContext.BaseDirectory, "Biblioteczka.exe");
+
+    public static HostOptions Parse(string[] args, string? documents = null, string? localAppData = null)
     {
         string? Value(string name)
         {
@@ -16,12 +35,23 @@ internal sealed record HostOptions(string AppRoot, string NodePath, int Port, st
         }
 
         var appRoot = Path.GetFullPath(Value("--app-root") ?? FindAppRoot(AppContext.BaseDirectory)
-            ?? throw new InvalidOperationException("Nie znaleziono folderu aplikacji (src/main.mjs). Podaj --app-root."));
-        var port = int.TryParse(Value("--port"), out var p) && p is > 0 and < 65536 ? p : DefaultPrototypePort;
-        var dataDir = Path.GetFullPath(Value("--data-dir") ?? Path.Combine(appRoot, "output", "host-prototype-data"));
-        var node = Value("--node") ?? "node";
-        var log = Path.GetFullPath(Value("--log") ?? Path.Combine(appRoot, "output", "host-prototype.log"));
-        return new HostOptions(appRoot, node, port, dataDir, log);
+            ?? throw new InvalidOperationException("Nie znaleziono plików aplikacji (src/main.mjs)."));
+        var development = Directory.Exists(Path.Combine(appRoot, ".git")) || File.Exists(Path.Combine(appRoot, ".git"));
+        documents ??= Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        localAppData ??= Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+        var port = int.TryParse(Value("--port"), out var p) && p is > 0 and < 65536
+            ? p
+            : development ? DevelopmentPort : ProductionPort;
+        var dataDir = Value("--data-dir") ?? (development
+            ? Path.Combine(appRoot, "output", "host-prototype-data")
+            : Path.Combine(documents, "Biblioteczka"));
+        // Not LocalAppData\Biblioteczka: the previous installer suggested that folder for the whole old app.
+        var stateDir = development ? Path.Combine(appRoot, "output", "host-state") : Path.Combine(localAppData, "BiblioteczkaApp");
+        var bundledNode = Path.Combine(AppContext.BaseDirectory, "runtime", "node.exe");
+        var node = Value("--node") ?? (File.Exists(bundledNode) ? bundledNode : "node");
+        return new HostOptions(appRoot, node, port, Path.GetFullPath(dataDir), Path.GetFullPath(stateDir),
+            development, Value("--control"));
     }
 
     /// <summary>Walks up from <paramref name="start"/> to the folder that contains src/main.mjs.</summary>

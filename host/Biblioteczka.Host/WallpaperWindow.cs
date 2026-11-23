@@ -7,15 +7,15 @@ namespace Biblioteczka.Host;
 internal sealed class WallpaperWindow : Form
 {
     private readonly string _url;
-    private readonly string _userDataFolder;
+    private readonly CoreWebView2Environment _environment;
     private readonly Rectangle _bounds;
     private readonly WebView2 _web = new() { Dock = DockStyle.Fill, DefaultBackgroundColor = Color.Black };
     private bool _paused;
 
-    public WallpaperWindow(string url, string userDataFolder, Rectangle screenBounds)
+    public WallpaperWindow(string url, CoreWebView2Environment environment, Rectangle screenBounds)
     {
         _url = url;
-        _userDataFolder = userDataFolder;
+        _environment = environment;
         _bounds = screenBounds;
         Text = "Biblioteczka – tapeta";
         FormBorderStyle = FormBorderStyle.None;
@@ -50,8 +50,7 @@ internal sealed class WallpaperWindow : Form
 
     public async Task InitializeAsync()
     {
-        var environment = await CoreWebView2Environment.CreateAsync(null, _userDataFolder);
-        await _web.EnsureCoreWebView2Async(environment);
+        await _web.EnsureCoreWebView2Async(_environment);
         var settings = _web.CoreWebView2.Settings;
         settings.AreDefaultContextMenusEnabled = false;
         settings.AreDevToolsEnabled = false;
