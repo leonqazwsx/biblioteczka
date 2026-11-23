@@ -18,7 +18,7 @@ export async function renderWindowsSettings(root) {
     root.append(label);
     statusLine.textContent =
       status.message ||
-      'Wyłączony domyślnie. Ustawienie dotyczy tej instalacji i nie trafia do kopii kolekcji.';
+      'Włączany przy pierwszym uruchomieniu, żeby tapeta wracała po restarcie komputera. Ustawienie dotyczy tego komputera i nie trafia do kopii kolekcji.';
     control.onchange = async () => {
       control.disabled = true;
       try {

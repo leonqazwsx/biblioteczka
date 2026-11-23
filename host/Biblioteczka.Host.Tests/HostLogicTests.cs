@@ -272,3 +272,22 @@ public class LegacyImportTests : IDisposable
 
     public void Dispose() => Directory.Delete(_root, recursive: true);
 }
+
+public class FirstRunTests
+{
+    [Fact]
+    public void ClaimsEachActionOnlyOnceEvenAfterRestart()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "biblioteczka-firstrun-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            Assert.True(new FirstRun(dir).TryClaim("autostart-default"));
+            Assert.False(new FirstRun(dir).TryClaim("autostart-default"));
+            Assert.True(new FirstRun(dir).TryClaim("other"));
+        }
+        finally
+        {
+            if (Directory.Exists(dir)) Directory.Delete(dir, recursive: true);
+        }
+    }
+}

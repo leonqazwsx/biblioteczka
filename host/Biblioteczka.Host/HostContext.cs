@@ -87,6 +87,7 @@ internal sealed class HostContext : ApplicationContext
             await RebuildWallpaperAsync();
             _ready = true;
             _watchdog.Start();
+            EnableAutostartOnFirstRun();
             if (_openPanelOnStart) OpenPanel();
         }
         catch (Exception error)
@@ -286,6 +287,29 @@ internal sealed class HostContext : ApplicationContext
         {
             Log.Error("Reading autostart failed", error);
             return null;
+        }
+    }
+
+    /// <summary>
+    /// A wallpaper that does not start with Windows leaves an empty desktop after every reboot, so the
+    /// installed app turns autostart on once, says so, and never touches it again. Development builds don't.
+    /// </summary>
+    private void EnableAutostartOnFirstRun()
+    {
+        if (_options.Development || !new FirstRun(_options.StateDir).TryClaim("autostart-default")) return;
+        try
+        {
+            var status = Autostart.For(_options).Set(true);
+            Log.Info("First run: autostart " + (status.Autostart ? "enabled" : "left unchanged (conflict)") + ".");
+            var text = status.Autostart
+                ? "Biblioteczka będzie się uruchamiać razem z Windows. Zmienisz to w menu tej ikony."
+                : "Nie udało się włączyć autostartu.";
+            if (status.Message is not null) text += " " + status.Message;
+            Notify(text, status.Autostart && status.Message is null ? ToolTipIcon.Info : ToolTipIcon.Warning);
+        }
+        catch (Exception error)
+        {
+            Log.Error("Enabling autostart on first run failed", error);
         }
     }
 

@@ -25,7 +25,7 @@ internal sealed class Autostart(string valueName, string executable, string runK
             return new Status(true, false, false, true, LegacyShortcutMessage());
         var ours = string.Equals(current, Command, StringComparison.OrdinalIgnoreCase);
         return ours
-            ? new Status(true, true, false, true, null)
+            ? new Status(true, true, false, true, LegacyShortcutMessage())
             : new Status(true, false, true, false,
                 "Autostart wskazuje inną kopię Biblioteczki. Wyłącz go tam albo usuń wpis „" + valueName + "” w Menedżerze zadań → Aplikacje autostartu.");
     }
