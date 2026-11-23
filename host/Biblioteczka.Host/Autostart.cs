@@ -4,16 +4,18 @@ namespace Biblioteczka.Host;
 
 /// <summary>
 /// Start-with-Windows for the unpackaged app, through the current user's Run key.
-/// (The Microsoft Store package will use an MSIX StartupTask instead.)
+/// The Microsoft Store package uses <see cref="PackagedAutostart"/> instead.
 /// </summary>
-internal sealed class Autostart(string valueName, string executable, string runKeyPath = Autostart.RunKey)
+internal sealed class Autostart(string valueName, string executable, string runKeyPath = Autostart.RunKey) : IAutostart
 {
     public const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
 
     internal sealed record Status(bool Supported, bool Autostart, bool Conflict, bool CanEnable, string? Message);
 
-    public static Autostart For(HostOptions options) =>
-        new(options.Development ? "Biblioteczka (dev)" : "Biblioteczka", options.ExecutablePath);
+    public static IAutostart For(HostOptions options) =>
+        PackagedAutostart.IsPackaged()
+            ? new PackagedAutostart()
+            : new Autostart(options.Development ? "Biblioteczka (dev)" : "Biblioteczka", options.ExecutablePath);
 
     public string Command => "\"" + executable + "\" --autostart";
 

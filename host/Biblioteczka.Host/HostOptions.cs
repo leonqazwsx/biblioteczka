@@ -14,7 +14,8 @@ internal sealed record HostOptions(
     string StateDir,
     bool Development,
     string? Control,
-    string Language)
+    string Language,
+    bool SmokeTest = false)
 {
     public const int ProductionPort = 47831;
     public const int DevelopmentPort = 47832;
@@ -48,11 +49,13 @@ internal sealed record HostOptions(
             ? Path.Combine(appRoot, "output", "host-prototype-data")
             : Path.Combine(documents, "Biblioteczka"));
         // Not LocalAppData\Biblioteczka: the previous installer suggested that folder for the whole old app.
-        var stateDir = development ? Path.Combine(appRoot, "output", "host-state") : Path.Combine(localAppData, "BiblioteczkaApp");
+        var stateDir = Value("--state-dir") ?? (development ? Path.Combine(appRoot, "output", "host-state") : Path.Combine(localAppData, "BiblioteczkaApp"));
         var bundledNode = Path.Combine(AppContext.BaseDirectory, "runtime", "node.exe");
         var node = Value("--node") ?? (File.Exists(bundledNode) ? bundledNode : "node");
         return new HostOptions(appRoot, node, port, Path.GetFullPath(dataDir), Path.GetFullPath(stateDir),
-            development, Value("--control"), L.Detect(Value("--lang")));
+            development, Value("--control"), L.Detect(Value("--lang")),
+            // Release smoke tests: no first-run prompts and no changes to start-with-Windows.
+            SmokeTest: Array.IndexOf(args, "--smoke-test") >= 0);
     }
 
     /// <summary>Walks up from <paramref name="start"/> to the folder that contains src/main.mjs.</summary>

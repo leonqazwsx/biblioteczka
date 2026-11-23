@@ -34,7 +34,8 @@ internal static class Program
         Log.Open(options.LogFile);
         Log.Info($"Host starting ({(options.Development ? "development" : "production")}); port {options.Port}, language {options.Language}");
         SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
-        Application.Run(new HostContext(options, openPanelOnStart: Array.IndexOf(args, "--autostart") < 0));
+        var autostarted = Array.IndexOf(args, "--autostart") >= 0 || PackagedAutostart.WasStartedByStartupTask();
+        Application.Run(new HostContext(options, openPanelOnStart: !autostarted));
         return 0;
     }
 

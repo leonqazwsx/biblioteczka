@@ -291,3 +291,22 @@ public class FirstRunTests
         }
     }
 }
+
+public class PackagedAutostartTests
+{
+    [Fact]
+    public void UserAndPolicyDecisionsCannotBeOverriddenFromTheApp()
+    {
+        var enabled = PackagedAutostart.Map(Windows.ApplicationModel.StartupTaskState.Enabled);
+        Assert.True(enabled.Autostart && enabled.CanEnable);
+        var off = PackagedAutostart.Map(Windows.ApplicationModel.StartupTaskState.Disabled);
+        Assert.True(!off.Autostart && off.CanEnable);
+        var byUser = PackagedAutostart.Map(Windows.ApplicationModel.StartupTaskState.DisabledByUser);
+        Assert.True(!byUser.Autostart && !byUser.CanEnable && byUser.Message is not null);
+        var byPolicy = PackagedAutostart.Map(Windows.ApplicationModel.StartupTaskState.DisabledByPolicy);
+        Assert.False(byPolicy.CanEnable);
+    }
+
+    [Fact]
+    public void TestsRunUnpackaged() => Assert.False(PackagedAutostart.IsPackaged());
+}

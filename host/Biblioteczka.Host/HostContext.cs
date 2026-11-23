@@ -80,7 +80,7 @@ internal sealed class HostContext : ApplicationContext
     {
         try
         {
-            if (!LegacyImport.HasCollection(_options.DataDir)) OfferLegacyImport();
+            if (!_options.SmokeTest && !LegacyImport.HasCollection(_options.DataDir)) OfferLegacyImport();
             WarnAboutSyncConflicts();
             await _server.StartAsync();
             _environment = await CoreWebView2Environment.CreateAsync(null, _options.WebViewDataDir,
@@ -297,7 +297,8 @@ internal sealed class HostContext : ApplicationContext
     /// </summary>
     private void EnableAutostartOnFirstRun()
     {
-        if (_options.Development || !new FirstRun(_options.StateDir).TryClaim("autostart-default")) return;
+        // The Store package declares its StartupTask enabled by default, so only the portable app needs this.
+        if (_options.Development || _options.SmokeTest || PackagedAutostart.IsPackaged() || !new FirstRun(_options.StateDir).TryClaim("autostart-default")) return;
         try
         {
             var status = Autostart.For(_options).Set(true);

@@ -57,3 +57,17 @@ foreach ($img in $images) { $writer.Write($img) }
 $writer.Flush()
 [System.IO.File]::WriteAllBytes($out, $stream.ToArray())
 "wrote $out"
+
+# MSIX package images (Store listing, Start menu, taskbar).
+$assets = Join-Path $PSScriptRoot '..\package\Assets'
+New-Item -ItemType Directory -Force -Path $assets | Out-Null
+$square = @{ 'StoreLogo.png' = 50; 'Square44x44Logo.png' = 44; 'Square150x150Logo.png' = 150;
+  'Square44x44Logo.targetsize-24_altform-unplated.png' = 24; 'Square44x44Logo.targetsize-48_altform-unplated.png' = 48 }
+foreach ($name in $square.Keys) { [System.IO.File]::WriteAllBytes((Join-Path $assets $name), (New-IconPng $square[$name])) }
+$wide = New-Object System.Drawing.Bitmap 310, 150
+$g = [System.Drawing.Graphics]::FromImage($wide)
+$icon = [System.Drawing.Image]::FromStream((New-Object System.IO.MemoryStream (,(New-IconPng 150))))
+$g.DrawImage($icon, 80, 0, 150, 150)
+$wide.Save((Join-Path $assets 'Wide310x150Logo.png'), [System.Drawing.Imaging.ImageFormat]::Png)
+$g.Dispose(); $wide.Dispose()
+"wrote $assets"
