@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { t } from '../public/shared/i18n.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
@@ -25,6 +26,7 @@ function editor() {
     },
     searches = [];
   const c = vm.createContext({
+    t,
     $,
     operation: 0,
     uploading: false,

@@ -2,6 +2,7 @@ import { parseCsv } from './csv.mjs';
 import { normalizeIsbn } from './catalog.mjs';
 import { normalizeReadDate } from '../public/shared/calendar-date.mjs';
 import { suggestShelf } from '../public/shared/categories.mjs';
+import { t } from '../public/shared/i18n.mjs';
 const statusMap = new Map([
   ['read', 'read'],
   ['currently-reading', 'reading'],
@@ -12,43 +13,44 @@ const failure = (code, message) => {
   throw Object.assign(new Error(message), { code });
 };
 export function parseGoodreadsCsv(bytes) {
-  if (!(bytes instanceof Uint8Array)) failure('INVALID_CSV', 'Wybierz plik CSV w UTF8.');
+  if (!(bytes instanceof Uint8Array)) failure('INVALID_CSV', t('Wybierz plik CSV w UTF8.'));
   if (bytes.byteLength > 10 * 1024 * 1024)
-    failure('TOO_LARGE', 'Plik CSV może mieć maksymalnie 10 MiB.');
+    failure('TOO_LARGE', t('Plik CSV może mieć maksymalnie 10 MiB.'));
   let text;
   try {
     text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
   } catch {
-    failure('INVALID_CSV', 'Zapisz plik CSV w kodowaniu UTF8.');
+    failure('INVALID_CSV', t('Zapisz plik CSV w kodowaniu UTF8.'));
   }
   const parsed = parseCsv(text),
     columns = new Map(parsed.headers.map((h, i) => [h.toLocaleLowerCase('pl'), i]));
   if (!columns.has('title') || !columns.has('author'))
-    failure('INVALID_CSV', 'CSV musi zawierać kolumny Title i Author.');
+    failure('INVALID_CSV', t('CSV musi zawierać kolumny Title i Author.'));
   const notices = [];
   if (!columns.has('exclusive shelf') && !columns.has('bookshelves'))
-    notices.push('Brak oznaczenia przeczytania w pliku. Książki bez niego zostaną pominięte.');
-  if (!columns.has('date read')) notices.push('Brak kolumny Date Read; daty pozostaną puste.');
+    notices.push(t('Brak oznaczenia przeczytania w pliku. Książki bez niego zostaną pominięte.'));
+  if (!columns.has('date read')) notices.push(t('Brak kolumny Date Read; daty pozostaną puste.'));
   const records = parsed.records.map(({ recordNumber, cells }) => {
     const value = (name) => (columns.has(name) ? cells[columns.get(name)].trim() : '');
     const errors = [],
       warnings = [];
     function bounded(name, label, max, required = false) {
       const v = value(name);
-      if ((required && !v) || v.length > max) errors.push(`Nieprawidłowe pole: ${label}.`);
+      if ((required && !v) || v.length > max)
+        errors.push(t('Nieprawidłowe pole: {label}.', { label }));
       return v || null;
     }
-    const title = bounded('title', 'tytuł', 500, true),
+    const title = bounded('title', t('tytuł'), 500, true),
       author = bounded('author', 'autor', 200, true),
       additional = bounded('additional authors', 'dodatkowi autorzy', 200);
     const authors = [author, ...(additional ? [additional] : [])];
     if (additional)
       warnings.push(
-        'Dodatkowych autorów zachowano jako jeden wpis. Sprawdź podział w edytorze książki.',
+        t('Dodatkowych autorów zachowano jako jeden wpis. Sprawdź podział w edytorze książki.'),
       );
     const publisher = bounded('publisher', 'wydawca', 500),
       goodreadsId = value('book id') || null;
-    if (goodreadsId && !/^\d{1,32}$/.test(goodreadsId)) errors.push('Nieprawidłowy Book Id.');
+    if (goodreadsId && !/^\d{1,32}$/.test(goodreadsId)) errors.push(t('Nieprawidłowy Book Id.'));
     const isbnValues = ['isbn13', 'isbn'].map((name) => {
       let v = value(name);
       const wrapper = /^="([^\"]*)"$/.exec(v);
@@ -67,8 +69,8 @@ export function parseGoodreadsCsv(bytes) {
       null;
     if (isbnValues.some((v) => v.invalid)) {
       if (isbn)
-        warnings.push('Dodatkowy ISBN jest nieprawidłowy; użyto drugiego poprawnego numeru.');
-      else errors.push('Nieprawidłowy ISBN.');
+        warnings.push(t('Dodatkowy ISBN jest nieprawidłowy; użyto drugiego poprawnego numeru.'));
+      else errors.push(t('Nieprawidłowy ISBN.'));
     }
     const rawTags = value('bookshelves')
         .split(',')
@@ -83,7 +85,7 @@ export function parseGoodreadsCsv(bytes) {
       subjects.push(tag);
     }
     if (subjects.length > 80 || subjects.some((t) => t.length > 160))
-      errors.push('Półki z pliku przekraczają limit 80 tematów po 160 znaków.');
+      errors.push(t('Półki z pliku przekraczają limit 80 tematów po 160 znaków.'));
     const exclusive = key(value('exclusive shelf')),
       shelfStatuses = [...new Set(rawTags.map(key).filter((v) => statusMap.has(v)))];
     let status = 'to-read';
@@ -91,7 +93,7 @@ export function parseGoodreadsCsv(bytes) {
     else if (!exclusive && shelfStatuses.length === 1) status = statusMap.get(shelfStatuses[0]);
     else if (exclusive || shelfStatuses.length !== 1)
       warnings.push(
-        'Nieznane lub niejednoznaczne oznaczenie przeczytania; pozycja zostanie pominięta.',
+        t('Nieznane lub niejednoznaczne oznaczenie przeczytania; pozycja zostanie pominięta.'),
       );
     let readDate = null;
     const date = value('date read');
@@ -101,7 +103,7 @@ export function parseGoodreadsCsv(bytes) {
           /^\d{4}\/\d{2}\/\d{2}$/.test(date) ? date.replaceAll('/', '-') : date,
         );
       } catch {
-        errors.push('Nieprawidłowa data przeczytania.');
+        errors.push(t('Nieprawidłowa data przeczytania.'));
       }
     }
     function numeric(name, label, max) {
@@ -109,7 +111,7 @@ export function parseGoodreadsCsv(bytes) {
       if (!v) return null;
       const n = Number(v);
       if (!/^\d+$/.test(v) || !Number.isSafeInteger(n) || n < 1 || n > max) {
-        errors.push(`Nieprawidłowe pole: ${label}.`);
+        errors.push(t('Nieprawidłowe pole: {label}.', { label }));
         return null;
       }
       return n;

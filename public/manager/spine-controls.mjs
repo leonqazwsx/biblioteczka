@@ -1,19 +1,22 @@
 import { el, request } from '../shared/api.mjs';
 import { createImageUrlControl } from './image-url.mjs';
+import { t } from '../shared/i18n.mjs';
 const controls = new WeakMap();
 const waitingMessages = new Set([
-  'Ilustracja czeka na odnowienie limitu',
-  'Automatyczne ilustracje są obecnie niedostępne.',
+  t('Ilustracja czeka na odnowienie limitu'),
+  t('Automatyczne ilustracje są obecnie niedostępne.'),
 ]);
 
 export function renderAiSettings(root) {
   root.replaceChildren(
-    el('h2', '', 'Ilustracje grzbietów'),
-    el('p', '', 'Grzbiety korzystają z grafiki zapisanych okładek.'),
+    el('h2', '', t('Ilustracje grzbietów')),
+    el('p', '', t('Grzbiety korzystają z grafiki zapisanych okładek.')),
     el(
       'p',
       'muted',
-      'Zapisane ilustracje działają również bez internetu. W danych książki możesz dodać obraz z pliku lub linku i dopasować kadr.',
+      t(
+        'Zapisane ilustracje działają również bez internetu. W danych książki możesz dodać obraz z pliku lub linku i dopasować kadr.',
+      ),
     ),
   );
 }
@@ -33,12 +36,12 @@ export function renderSpineControls(root, params) {
       const label = el(
           'label',
           'spine-upload',
-          'Wgraj ilustrację grzbietu · JPEG, PNG, WebP do 5 MiB',
+          t('Wgraj ilustrację grzbietu · JPEG, PNG, WebP do 5 MiB'),
         ),
         file = el('input');
       file.type = 'file';
       file.accept = 'image/jpeg,image/png,image/webp';
-      file.setAttribute('aria-label', 'Wgraj ilustrację grzbietu');
+      file.setAttribute('aria-label', t('Wgraj ilustrację grzbietu'));
       file.onchange = async () => {
         const selected = file.files[0];
         if (!selected) return;
@@ -52,7 +55,7 @@ export function renderSpineControls(root, params) {
             !['image/jpeg', 'image/png', 'image/webp'].includes(selected.type) ||
             selected.size > 5 * 1024 * 1024
           )
-            throw new Error('Wybierz JPEG, PNG lub WebP do 5 MiB.');
+            throw new Error(t('Wybierz JPEG, PNG lub WebP do 5 MiB.'));
           const bytes = new Uint8Array(await selected.arrayBuffer());
           let binary = '';
           for (let i = 0; i < bytes.length; i += 32768)
@@ -76,7 +79,7 @@ export function renderSpineControls(root, params) {
       label.append(file);
       root.append(label);
       view.urlControl = createImageUrlControl(root, {
-        label: 'Link do ilustracji grzbietu',
+        label: t('Link do ilustracji grzbietu'),
         onStart: () => {
           file.disabled = true;
         },
@@ -101,21 +104,23 @@ export function renderSpineControls(root, params) {
   view.info.className = 'spine-job';
   view.info.textContent = book?.spine
     ? book.spine.kind === 'ai'
-      ? 'Ilustracja zapisana lokalnie.'
-      : 'Własna ilustracja zapisana lokalnie.'
+      ? t('Ilustracja zapisana lokalnie.')
+      : t('Własna ilustracja zapisana lokalnie.')
     : status.connection === 'offline' && job
-      ? 'Ilustracja pojawi się po odzyskaniu połączenia'
+      ? t('Ilustracja pojawi się po odzyskaniu połączenia')
       : ['queued', 'generating'].includes(job?.state)
         ? waitingMessages.has(job.message)
           ? job.message
-          : 'Ilustracja w przygotowaniu'
+          : t('Ilustracja w przygotowaniu')
         : !book
           ? status.available
-            ? 'Po zapisaniu książki ilustracja przygotuje się automatycznie.'
-            : 'Po zapisaniu możesz dodać własną ilustrację.'
+            ? t('Po zapisaniu książki ilustracja przygotuje się automatycznie.')
+            : t('Po zapisaniu możesz dodać własną ilustrację.')
           : book.coverId
-            ? 'Grafika z okładki. Możesz dodać własną ilustrację.'
-            : 'Dodaj okładkę, aby pojawiła się grafika grzbietu. Możesz też wgrać własną ilustrację.';
+            ? t('Grafika z okładki. Możesz dodać własną ilustrację.')
+            : t(
+                'Dodaj okładkę, aby pojawiła się grafika grzbietu. Możesz też wgrać własną ilustrację.',
+              );
 }
 export function cancelSpineImageImport(root) {
   controls.get(root)?.urlControl?.cancel();

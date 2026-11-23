@@ -5,6 +5,7 @@ import { renderScene } from './scene-renderer.mjs';
 import { readingDateLabel } from '../shared/reading-date.mjs';
 import { watchLighting } from '../shared/lighting-clock.mjs';
 import { createBookPicker } from './book-picker.mjs';
+import { t } from '../shared/i18n.mjs';
 let state,
   page = 0,
   loading = false,
@@ -73,7 +74,7 @@ function details(b) {
   if (b.coverId) {
     const img = el('img');
     img.src = '/covers/' + b.coverId;
-    img.alt = 'Okładka książki ' + b.title;
+    img.alt = t('Okładka książki ') + b.title;
     content.append(img);
   }
   const text = el('div');

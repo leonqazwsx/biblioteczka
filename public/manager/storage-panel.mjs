@@ -1,5 +1,6 @@
 import { el } from '../shared/api.mjs';
-const names = { covers: 'Okładki', spines: 'Grzbiety', quarantine: 'Kwarantanna' };
+import { t } from '../shared/i18n.mjs';
+const names = { covers: t('Okładki'), spines: t('Grzbiety'), quarantine: t('Kwarantanna') };
 function bytes(value) {
   return value >= 1048576
     ? (value / 1048576).toLocaleString('pl', {
@@ -16,8 +17,8 @@ export async function renderStorageSettings(
     busy = false;
   const header = () => {
     root.replaceChildren(
-      el('h2', '', 'Obrazy na dysku'),
-      el('p', '', 'Sprawdź zajęte miejsce i bezpiecznie uporządkuj nieużywane ilustracje.'),
+      el('h2', '', t('Obrazy na dysku')),
+      el('p', '', t('Sprawdź zajęte miejsce i bezpiecznie uporządkuj nieużywane ilustracje.')),
     );
   };
   const showError = (error) => {
@@ -68,7 +69,7 @@ export async function renderStorageSettings(
       const data = report.totals[kind];
       totals.append(
         el('dt', '', names[kind]),
-        el('dd', '', data.count + ' obrazów · ' + bytes(data.bytes)),
+        el('dd', '', data.count + t(' obrazów · ') + bytes(data.bytes)),
       );
     }
     root.append(totals);
@@ -76,64 +77,72 @@ export async function renderStorageSettings(
       el(
         'p',
         'muted',
-        'Chronimy obrazy używane przez kolekcję, kopię zapasową i AI. Nowe pliki pozostają chronione przez ' +
+        t(
+          'Chronimy obrazy używane przez kolekcję, kopię zapasową i AI. Nowe pliki pozostają chronione przez ',
+        ) +
           report.graceDays +
-          ' dni. Kwarantanna pozwala cofnąć porządkowanie; na tym etapie miejsce na dysku nie jest jeszcze zwalniane.',
+          t(
+            ' dni. Kwarantanna pozwala cofnąć porządkowanie; na tym etapie miejsce na dysku nie jest jeszcze zwalniane.',
+          ),
       ),
     );
     if (!report.cleanupAllowed) {
       const blockers = el('div', 'error');
       blockers.setAttribute('role', 'alert');
-      blockers.append(el('p', '', 'Porządkowanie jest wstrzymane:'));
+      blockers.append(el('p', '', t('Porządkowanie jest wstrzymane:')));
       for (const message of report.blockers) blockers.append(el('p', '', message));
       root.append(blockers);
     } else if (report.candidates.length) {
       const total = report.candidates.reduce((sum, asset) => sum + asset.bytes, 0);
       root.append(
-        el('p', '', 'Nieużywane obrazy: ' + report.candidates.length + ' · ' + bytes(total)),
+        el('p', '', t('Nieużywane obrazy: ') + report.candidates.length + ' · ' + bytes(total)),
       );
       root.append(
-        action('Przenieś do kwarantanny', () =>
+        action(t('Przenieś do kwarantanny'), () =>
           change('/api/storage/quarantine', {
             assets: report.candidates.map(({ kind, id }) => ({ kind, id })),
           }),
         ),
       );
-    } else root.append(el('p', 'muted', 'Brak obrazów kwalifikujących się do porządkowania.'));
+    } else root.append(el('p', 'muted', t('Brak obrazów kwalifikujących się do porządkowania.')));
     root.append(
       el(
         'p',
         'muted',
-        'Trwałe usunięcie jest dostępne dopiero po ' +
+        t('Trwałe usunięcie jest dostępne dopiero po ') +
           report.retentionDays +
-          ' dni i ponownym sprawdzeniu wszystkich odniesień.',
+          t(' dni i ponownym sprawdzeniu wszystkich odniesień.'),
       ),
     );
     for (const batch of report.quarantine) {
       const row = el('div', 'storage-batch');
       const date = new Date(batch.createdAt);
-      const label = Number.isFinite(+date) ? date.toLocaleDateString('pl') : 'data niedostępna';
+      const label = Number.isFinite(+date) ? date.toLocaleDateString('pl') : t('data niedostępna');
       row.append(
-        el('p', '', 'Kopia z ' + label + ' · ' + batch.count + ' obrazów · ' + bytes(batch.bytes)),
+        el(
+          'p',
+          '',
+          t('Kopia z ') + label + ' · ' + batch.count + t(' obrazów · ') + bytes(batch.bytes),
+        ),
       );
       if (batch.count)
         row.append(
-          action('Przywróć obrazy', () =>
+          action(t('Przywróć obrazy'), () =>
             change('/api/storage/restore', { quarantineId: batch.id }),
           ),
         );
       if (batch.purgeEligible && report.cleanupAllowed)
         row.append(
           action(
-            'Usuń na stałe · ' + bytes(batch.eligibleBytes),
+            t('Usuń na stałe · ') + bytes(batch.eligibleBytes),
             async () => {
               if (
                 confirm(
-                  'Usunąć na stałe ' +
+                  t('Usunąć na stałe ') +
                     batch.count +
-                    ' obrazów (' +
+                    t(' obrazów (') +
                     bytes(batch.eligibleBytes) +
-                    ') z kwarantanny? Tej operacji nie można cofnąć.',
+                    t(') z kwarantanny? Tej operacji nie można cofnąć.'),
                 )
               )
                 await change('/api/storage/purge', { quarantineId: batch.id });
@@ -143,10 +152,10 @@ export async function renderStorageSettings(
         );
       root.append(row);
     }
-    root.append(action('Odśwież raport', load));
+    root.append(action(t('Odśwież raport'), load));
   };
   header();
-  root.append(el('p', 'muted', 'Sprawdzam lokalne obrazy…'));
+  root.append(el('p', 'muted', t('Sprawdzam lokalne obrazy…')));
   try {
     await load();
   } catch (error) {

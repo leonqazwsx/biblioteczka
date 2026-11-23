@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import { imageMime } from './covers.mjs';
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 export async function openSpineStore(dataDir, { fsAdapter = fs } = {}) {
   const root = path.join(dataDir, 'spines'),
     f = fsAdapter;
@@ -11,14 +12,15 @@ export async function openSpineStore(dataDir, { fsAdapter = fs } = {}) {
   const hash = (b) => createHash('sha256').update(b).digest('hex');
   function file(id) {
     if (typeof id !== 'string' || !/^[a-f0-9]{64}$/.test(id))
-      throw problem('INVALID', 'Nieprawidłowy identyfikator ilustracji.');
+      throw problem('INVALID', t('Nieprawidłowy identyfikator ilustracji.'));
     return path.join(root, id);
   }
   return {
     async put(bytes, mime) {
       if (!Buffer.isBuffer(bytes) || bytes.length > 5 * 1024 * 1024)
-        throw problem('TOO_LARGE', 'Ilustracja może mieć maksymalnie 5 MB.');
-      if (imageMime(bytes) !== mime) throw problem('INVALID', 'Nieprawidłowy format ilustracji.');
+        throw problem('TOO_LARGE', t('Ilustracja może mieć maksymalnie 5 MB.'));
+      if (imageMime(bytes) !== mime)
+        throw problem('INVALID', t('Nieprawidłowy format ilustracji.'));
       const assetId = hash(bytes),
         target = file(assetId);
       try {
@@ -48,7 +50,7 @@ export async function openSpineStore(dataDir, { fsAdapter = fs } = {}) {
       if (hash(bytes) !== assetId)
         throw problem(
           'INVALID',
-          'Ilustracja jest uszkodzona. Dodaj ją ponownie lub przywróć kopię.',
+          t('Ilustracja jest uszkodzona. Dodaj ją ponownie lub przywróć kopię.'),
         );
       return { bytes, mime: imageMime(bytes) };
     },

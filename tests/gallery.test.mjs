@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { t } from '../public/shared/i18n.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
@@ -64,6 +65,7 @@ function library(
     return node;
   };
   const context = vm.createContext({
+    t,
     state,
     selectionMode: false,
     selectedBooks: new Set(),
@@ -175,6 +177,7 @@ test('theme controls persist the selected theme through existing settings comman
     return fields.get(id);
   };
   const context = vm.createContext({
+    t,
     $,
     navigate() {},
     showEditor() {},

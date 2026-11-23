@@ -1,12 +1,13 @@
 import { request, el } from '../shared/api.mjs';
+import { t } from '../shared/i18n.mjs';
 export async function renderWindowsSettings(root) {
-  const statusLine = el('p', 'muted', 'Odczytywanie ustawień Windows…');
+  const statusLine = el('p', 'muted', t('Odczytywanie ustawień Windows…'));
   root.append(statusLine);
   try {
     let status = await request('/api/windows');
     if (!root.isConnected) return;
     if (!status.supported) {
-      statusLine.textContent = 'Autostart i ikona w zasobniku są dostępne w wersji Windows.';
+      statusLine.textContent = t('Autostart i ikona w zasobniku są dostępne w wersji Windows.');
       return;
     }
     const label = el('label', 'checkbox-label'),
@@ -14,11 +15,13 @@ export async function renderWindowsSettings(root) {
     control.type = 'checkbox';
     control.checked = status.autostart;
     control.disabled = status.conflict || (!status.autostart && !status.canEnable);
-    label.append(control, el('span', '', 'Uruchamiaj Biblioteczkę po zalogowaniu do Windows'));
+    label.append(control, el('span', '', t('Uruchamiaj Biblioteczkę po zalogowaniu do Windows')));
     root.append(label);
     statusLine.textContent =
       status.message ||
-      'Włączany przy pierwszym uruchomieniu, żeby tapeta wracała po restarcie komputera. Ustawienie dotyczy tego komputera i nie trafia do kopii kolekcji.';
+      t(
+        'Włączany przy pierwszym uruchomieniu, żeby tapeta wracała po restarcie komputera. Ustawienie dotyczy tego komputera i nie trafia do kopii kolekcji.',
+      );
     control.onchange = async () => {
       control.disabled = true;
       try {
@@ -28,8 +31,8 @@ export async function renderWindowsSettings(root) {
         });
         control.checked = status.autostart;
         statusLine.textContent = status.autostart
-          ? 'Autostart jest włączony.'
-          : 'Autostart jest wyłączony.';
+          ? t('Autostart jest włączony.')
+          : t('Autostart jest wyłączony.');
       } catch (e) {
         control.checked = status.autostart;
         statusLine.textContent = e.message;

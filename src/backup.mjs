@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { problem } from './domain.mjs';
 import { migrateState } from './migrations.mjs';
 import { imageMime } from './covers.mjs';
+import { t } from '../public/shared/i18n.mjs';
 export async function createBackup(state, covers, spines) {
   const images = [],
     spineImages = [];
@@ -17,7 +18,9 @@ export async function createBackup(state, covers, spines) {
   if (Buffer.byteLength(JSON.stringify(backup, null, 2), 'utf8') > 64 * 1024 * 1024)
     throw problem(
       'TOO_LARGE',
-      'Kopia przekracza limit 64 MB. Zatrzymaj aplikację i skopiuj cały folder data, aby zachować kolekcję i obrazy.',
+      t(
+        'Kopia przekracza limit 64 MB. Zatrzymaj aplikację i skopiuj cały folder data, aby zachować kolekcję i obrazy.',
+      ),
     );
   return backup;
 }
@@ -29,7 +32,7 @@ export function validateBackup(input) {
     !Array.isArray(input.images) ||
     (input.version === 2 && !Array.isArray(input.spineImages))
   )
-    throw problem('INVALID', 'Nieobsługiwany format kopii.');
+    throw problem('INVALID', t('Nieobsługiwany format kopii.'));
   const state = migrateState(input.state);
   function decode(list, key) {
     const seen = new Set();
@@ -39,7 +42,7 @@ export function validateBackup(input) {
         x.base64.length > 7 * 1024 * 1024 ||
         !/^[A-Za-z0-9+/]*={0,2}$/.test(x.base64)
       )
-        throw problem('INVALID', 'Nieprawidłowy obraz w kopii.');
+        throw problem('INVALID', t('Nieprawidłowy obraz w kopii.'));
       const bytes = Buffer.from(x.base64, 'base64'),
         hash = createHash('sha256').update(bytes).digest('hex');
       if (
@@ -48,7 +51,7 @@ export function validateBackup(input) {
         seen.has(hash) ||
         imageMime(bytes) !== x.mime
       )
-        throw problem('INVALID', 'Uszkodzony obraz w kopii.');
+        throw problem('INVALID', t('Uszkodzony obraz w kopii.'));
       seen.add(hash);
       return { [key]: hash, mime: x.mime, bytes };
     });
@@ -62,7 +65,7 @@ export function validateBackup(input) {
       (b) => (b.coverId && !coverIds.has(b.coverId)) || (b.spine && !spineIds.has(b.spine.assetId)),
     )
   )
-    throw problem('INVALID', 'Kopia nie zawiera wszystkich obrazów.');
+    throw problem('INVALID', t('Kopia nie zawiera wszystkich obrazów.'));
   return {
     state,
     images,

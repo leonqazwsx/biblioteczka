@@ -2,12 +2,15 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const inUse = () =>
   problem(
     'DATA_IN_USE',
-    'Ten folder danych jest już używany albo jego właściciela nie można bezpiecznie potwierdzić. Zamknij drugą Biblioteczkę i spróbuj ponownie.',
+    t(
+      'Ten folder danych jest już używany albo jego właściciela nie można bezpiecznie potwierdzić. Zamknij drugą Biblioteczkę i spróbuj ponownie.',
+    ),
   );
 
 // Each owner is published as a complete, nonempty directory. Removing only an

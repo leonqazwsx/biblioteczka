@@ -3,6 +3,7 @@ import { getRoomScene, fitScene } from './room-scene.mjs';
 import { sortBooks } from './book-order.mjs';
 import { buildCustomPages } from './custom-layout.mjs';
 import { buildAnnualPages } from './annual-reading.mjs';
+import { t } from './i18n.mjs';
 // State snapshots are immutable between revisions. Keep one plan per consumer so
 // page changes and the lighting clock never traverse the whole collection again.
 export function createPagePlanner() {
@@ -55,7 +56,7 @@ export function buildPages(state, { width, height, scene = getRoomScene(state.se
     ];
   });
   if (!slots.length || (annual && (scene.slots.length !== 12 || slots.length !== 12)))
-    throw Object.assign(new Error('Powiększ podgląd, aby zobaczyć książki.'), {
+    throw Object.assign(new Error(t('Powiększ podgląd, aby zobaczyć książki.')), {
       code: 'VIEWPORT_TOO_SMALL',
     });
   const rows = [];
@@ -129,7 +130,7 @@ export function buildPages(state, { width, height, scene = getRoomScene(state.se
     }
     rows.push(row);
   }
-  if (!rows.length) rows.push(nextRow({ id: 'empty', name: 'Twoja biblioteczka' }, 0));
+  if (!rows.length) rows.push(nextRow({ id: 'empty', name: t('Twoja biblioteczka') }, 0));
   const pages = [];
   for (let i = 0; i < rows.length; i += slots.length)
     pages.push({ rows: rows.slice(i, i + slots.length) });

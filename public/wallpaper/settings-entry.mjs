@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n.mjs';
 // The corner is detected from pointer coordinates, never by a clickable overlay.
 export function createSettingsEntry({
   root,
@@ -109,7 +110,7 @@ export function createSettingsEntry({
     if (disposed || busy || blocked()) return;
     clearNotice();
     busy = true;
-    status.textContent = 'Otwieram ustawienia…';
+    status.textContent = t('Otwieram ustawienia…');
     paint();
     try {
       const result = await openSettings();
@@ -118,8 +119,9 @@ export function createSettingsEntry({
       status.textContent = '';
     } catch {
       if (disposed) return;
-      status.textContent =
-        'Nie udało się otworzyć ustawień. Kliknij zębatkę, aby spróbować ponownie.';
+      status.textContent = t(
+        'Nie udało się otworzyć ustawień. Kliknij zębatkę, aby spróbować ponownie.',
+      );
       root.dataset.error = 'true';
       notice = true;
       noticeTimer = clock.setTimeout(() => {

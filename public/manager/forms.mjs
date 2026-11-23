@@ -1,5 +1,6 @@
 import { normalizeReadDate } from '../shared/calendar-date.mjs';
 import { cleanSubjects } from '../shared/categories.mjs';
+import { t } from '../shared/i18n.mjs';
 function validIsbn(v) {
   if (!/^([0-9]{13}|[0-9]{9}[0-9X])$/.test(v)) return false;
   const sum = [...v].reduce(
@@ -16,27 +17,27 @@ export function validateBookForm(v) {
           ?.split(';')
           .map((a) => a.trim())
           .filter(Boolean);
-  if (!title || title.length > 500) throw new Error('Podaj tytuł książki (do 500 znaków).');
+  if (!title || title.length > 500) throw new Error(t('Podaj tytuł książki (do 500 znaków).'));
   if (
     !authors?.length ||
     authors.length > 20 ||
     authors.some((a) => typeof a !== 'string' || !a.trim() || a.length > 200)
   )
-    throw new Error('Podaj autora. Wielu autorów oddziel średnikiem.');
+    throw new Error(t('Podaj autora. Wielu autorów oddziel średnikiem.'));
   const isbn = v.isbn?.replace(/[\s-]/g, '').toUpperCase() || null;
-  if (isbn && !validIsbn(isbn)) throw new Error('Sprawdź ISBN książki.');
+  if (isbn && !validIsbn(isbn)) throw new Error(t('Sprawdź ISBN książki.'));
   const pageCount = v.pageCount == null || v.pageCount === '' ? null : Number(v.pageCount);
   if (
     pageCount !== null &&
     (!Number.isSafeInteger(pageCount) || pageCount < 1 || pageCount > 100000)
   )
-    throw new Error('Liczba stron musi być dodatnią liczbą całkowitą.');
+    throw new Error(t('Liczba stron musi być dodatnią liczbą całkowitą.'));
   if (
     !Array.isArray(v.palette ?? []) ||
     (v.palette ?? []).length > 5 ||
     (v.palette ?? []).some((c) => typeof c !== 'string' || !/^#[\da-fA-F]{6}$/.test(c))
   )
-    throw new Error('Nieprawidłowy kolor grzbietu.');
+    throw new Error(t('Nieprawidłowy kolor grzbietu.'));
   return {
     title,
     authors,

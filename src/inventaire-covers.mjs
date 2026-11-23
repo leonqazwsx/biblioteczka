@@ -2,6 +2,7 @@ import { canonicalIsbn } from '../public/shared/book-identity.mjs';
 import { createCatalogRequest } from './catalog-request.mjs';
 import { downloadRemoteImage } from './remote-image.mjs';
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 const isbnValue = (value) =>
   canonicalIsbn(typeof value === 'string' ? value.replace(/[\s-]/g, '').toUpperCase() : null);
@@ -17,7 +18,7 @@ export function createInventaireCoverLookup({
   return async function lookup(value, { signal } = {}) {
     signal?.throwIfAborted();
     const isbn = isbnValue(value);
-    if (!isbn) throw problem('INVALID_ISBN', 'Podaj poprawny ISBN książki.');
+    if (!isbn) throw problem('INVALID_ISBN', t('Podaj poprawny ISBN książki.'));
     const key = 'isbn:' + isbn,
       data = await request('/api/entities/by-uris?uris=' + encodeURIComponent(key), signal),
       uri = data?.redirects?.[key];

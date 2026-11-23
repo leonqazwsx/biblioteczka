@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n.mjs';
 export function paletteFromImage(image) {
   const canvas = document.createElement('canvas');
   canvas.width = 40;
@@ -24,7 +25,7 @@ export async function readCoverFile(file) {
     !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
     file.size > 10 * 1024 * 1024
   )
-    throw new Error('Wybierz JPEG, PNG lub WebP do 10 MB.');
+    throw new Error(t('Wybierz JPEG, PNG lub WebP do 10 MB.'));
   const bitmap = await createImageBitmap(file);
   try {
     const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height)),

@@ -13,7 +13,7 @@ import { createEditorCoverPicker } from './cover-editor.mjs';
 import { renderWindowsSettings } from './windows-settings.mjs';
 import { createClientUpgrade } from './client-upgrade.mjs';
 import { editorCategory, resolveCategoryChoice } from './editor-category.mjs';
-import { CATEGORY_PRESETS } from '../shared/categories.mjs';
+import { CATEGORY_PRESETS, OTHER_CATEGORY, shelfForCategory } from '../shared/categories.mjs';
 import { SORT_OPTIONS, sortBooks } from '../shared/book-order.mjs';
 import { formatReadDate, localCalendarDate } from '../shared/calendar-date.mjs';
 import { validateBookForm } from './forms.mjs';
@@ -38,6 +38,7 @@ import {
   readingYearValue,
 } from './annual-settings.mjs';
 import { summarizeReadingYear } from '../shared/annual-reading.mjs';
+import { t } from '../shared/i18n.mjs';
 const $ = (id) => document.getElementById(id);
 let connectionSession = null,
   refreshSequence = 0,
@@ -134,9 +135,11 @@ function receiveSessionMetadata(info) {
   banner.hidden = !info.recovery || info.recovery === 'none';
   banner.textContent =
     info.recovery === 'backup'
-      ? 'Odczytano poprzednią kopię kolekcji. Sprawdź książki przed zapisaniem zmian.'
+      ? t('Odczytano poprzednią kopię kolekcji. Sprawdź książki przed zapisaniem zmian.')
       : info.recovery === 'unrecoverable'
-        ? 'Kolekcja wymaga przywrócenia z kopii. Zapis jest wstrzymany. Otwórz Ustawienia → Kolekcja.'
+        ? t(
+            'Kolekcja wymaga przywrócenia z kopii. Zapis jest wstrzymany. Otwórz Ustawienia → Kolekcja.',
+          )
         : '';
   if (changed) {
     revisionFeed.sessionChanged();
@@ -193,7 +196,9 @@ async function requestImport(route, options) {
     if (!revisionFeed.isCurrent(mutation) || state.collectionId !== collection)
       throw Object.assign(
         new Error(
-          'Sesja lub kolekcja zmieniła się podczas importu. Podgląd zachowano. Sprawdź kolekcję i wczytaj plik ponownie.',
+          t(
+            'Sesja lub kolekcja zmieniła się podczas importu. Podgląd zachowano. Sprawdź kolekcję i wczytaj plik ponownie.',
+          ),
         ),
         { code: 'CONFLICT' },
       );
@@ -213,12 +218,12 @@ async function command(cmd, expectedRevision = state.revision, baseline = {}) {
       (baseline.book !== undefined &&
         bookSnapshot(state.books.find((b) => b.id === cmd.id)) !== baseline.book)
     )
-      throw Object.assign(new Error('Książka lub sesja zmieniła się. Wpisane dane zachowano.'), {
+      throw Object.assign(new Error(t('Książka lub sesja zmieniła się. Wpisane dane zachowano.')), {
         code: 'CONFLICT',
       });
     const next = await api.command(cmd, expectedRevision);
     if (!revisionFeed.isCurrent(mutation))
-      throw Object.assign(new Error('Sesja aplikacji zmieniła się podczas zapisu.'), {
+      throw Object.assign(new Error(t('Sesja aplikacji zmieniła się podczas zapisu.')), {
         code: 'CONFLICT',
       });
     if (
@@ -236,7 +241,9 @@ async function command(cmd, expectedRevision = state.revision, baseline = {}) {
       await refresh();
       throw Object.assign(
         new Error(
-          'Kolekcja zmieniła się w drugim oknie. Wpisane dane zachowano. Otwórz aktualną wersję przed ponowną edycją.',
+          t(
+            'Kolekcja zmieniła się w drugim oknie. Wpisane dane zachowano. Otwórz aktualną wersję przed ponowną edycją.',
+          ),
         ),
         { code: 'CONFLICT' },
       );
@@ -255,9 +262,13 @@ function navigate(next, filter = null) {
   render();
   window.scrollTo(0, 0);
   if (importPanel?.isDirty())
-    notice('Podgląd importu zachowano. Wróć do Ustawień → Kolekcja, aby go dołączyć lub odrzucić.');
+    notice(
+      t('Podgląd importu zachowano. Wróć do Ustawień → Kolekcja, aby go dołączyć lub odrzucić.'),
+    );
   else if (layoutPanel?.isDirty())
-    notice('Szkic rozmieszczenia zachowano. Wróć do zakładki Tapeta, aby go zapisać lub cofnąć.');
+    notice(
+      t('Szkic rozmieszczenia zachowano. Wróć do zakładki Tapeta, aby go zapisać lub cofnąć.'),
+    );
 }
 function syncRoute(replace = true) {
   if (!navigationReady) return;
@@ -391,11 +402,14 @@ function renderBooks(main, toolRoot = main) {
     page: galleryPage,
   });
   galleryPage = result.page;
-  const countLabel = { one: 'książka', few: 'książki', many: 'książek', other: 'książki' }[
-    new Intl.PluralRules('pl').select(result.total)
-  ];
+  const countLabel = {
+    one: t('książka'),
+    few: t('książki'),
+    many: t('książek'),
+    other: t('książki'),
+  }[new Intl.PluralRules('pl').select(result.total)];
   heading(
-    shelfFilter ? state.shelves.find((s) => s.id === shelfFilter)?.name : 'Moja biblioteczka',
+    shelfFilter ? state.shelves.find((s) => s.id === shelfFilter)?.name : t('Moja biblioteczka'),
     result.total + ' ' + countLabel,
   );
   const bar = el('div', 'collection-toolbar'),
@@ -404,8 +418,8 @@ function renderBooks(main, toolRoot = main) {
   search.type = 'search';
   search.maxLength = 500;
   search.value = collectionQuery;
-  search.placeholder = 'Tytuł, autor lub ISBN';
-  search.setAttribute('aria-label', 'Szukaj w biblioteczce');
+  search.placeholder = t('Tytuł, autor lub ISBN');
+  search.setAttribute('aria-label', t('Szukaj w biblioteczce'));
   search.oninput = () => {
     collectionQuery = search.value;
     galleryPage = 0;
@@ -413,7 +427,7 @@ function renderBooks(main, toolRoot = main) {
   };
   const sorting = select(SORT_OPTIONS, state.settings.sort);
   sorting.id = 'book-sort';
-  sorting.setAttribute('aria-label', 'Sortuj książki');
+  sorting.setAttribute('aria-label', t('Sortuj książki'));
   sorting.onchange = () => {
     galleryPage = 0;
     return command({ type: 'updateSettings', patch: { sort: sorting.value } }).catch((e) =>
@@ -422,20 +436,20 @@ function renderBooks(main, toolRoot = main) {
   };
   const mode = select(
     [
-      ['gallery', 'Galeria'],
-      ['list', 'Lista'],
+      ['gallery', t('Galeria')],
+      ['list', t('Lista')],
     ],
     collectionMode,
   );
   mode.id = 'collection-mode';
-  mode.setAttribute('aria-label', 'Widok kolekcji');
+  mode.setAttribute('aria-label', t('Widok kolekcji'));
   mode.onchange = () => {
     collectionMode = mode.value;
     render();
   };
   bar.append(search, sorting, mode);
   toolRoot.append(bar);
-  const selection = button(selectionMode ? 'Zakończ zaznaczanie' : 'Wybierz książki', () => {
+  const selection = button(selectionMode ? t('Zakończ zaznaczanie') : t('Wybierz książki'), () => {
     selectionMode = !selectionMode;
     if (!selectionMode) {
       selectedBooks.clear();
@@ -451,15 +465,19 @@ function renderBooks(main, toolRoot = main) {
   if (!result.total) {
     const empty = el('div', 'empty-state');
     empty.append(
-      el('h2', '', state.books.length ? 'Brak książek w tym widoku' : 'Dodaj pierwszą książkę'),
+      el(
+        'h2',
+        '',
+        state.books.length ? t('Brak książek w tym widoku') : t('Dodaj pierwszą książkę'),
+      ),
       el(
         'p',
         '',
         state.books.length
-          ? 'Zmień wyszukiwanie lub filtr.'
-          : 'Wyszukaj tytuł lub ISBN. Możesz też dodać książkę ręcznie.',
+          ? t('Zmień wyszukiwanie lub filtr.')
+          : t('Wyszukaj tytuł lub ISBN. Możesz też dodać książkę ręcznie.'),
       ),
-      button('Dodaj książkę', () => showEditor(), 'primary'),
+      button(t('Dodaj książkę'), () => showEditor(), 'primary'),
     );
     main.append(empty);
     return;
@@ -487,7 +505,7 @@ function renderBooks(main, toolRoot = main) {
       onEdit: () => showEditor(b),
       onDelete: async () => {
         try {
-          if (confirm('Usunąć „' + b.title + '” z biblioteczki?'))
+          if (confirm(t('Usunąć „') + b.title + '” z biblioteczki?'))
             await command({ type: 'deleteBook', id: b.id });
         } catch (e) {
           notice(e.message, true);
@@ -515,15 +533,15 @@ function renderBooks(main, toolRoot = main) {
   main.append(list);
   if (result.pages > 1) {
     const paging = el('nav', 'collection-paging');
-    paging.setAttribute('aria-label', 'Strony kolekcji');
-    const previous = button('Poprzednia', () => {
+    paging.setAttribute('aria-label', t('Strony kolekcji'));
+    const previous = button(t('Poprzednia'), () => {
       galleryPage--;
       render();
       window.scrollTo(0, 0);
     });
     previous.id = 'collection-previous';
     previous.disabled = result.page === 0;
-    const next = button('Następna', () => {
+    const next = button(t('Następna'), () => {
       galleryPage++;
       render();
       window.scrollTo(0, 0);
@@ -532,7 +550,7 @@ function renderBooks(main, toolRoot = main) {
     next.disabled = result.page === result.pages - 1;
     paging.append(
       previous,
-      el('span', '', 'Strona ' + (result.page + 1) + ' / ' + result.pages),
+      el('span', '', t('Strona ') + (result.page + 1) + ' / ' + result.pages),
       next,
     );
     main.append(paging);
@@ -541,13 +559,13 @@ function renderBooks(main, toolRoot = main) {
 
 function renderBulkControls(root, books) {
   const form = el('form', 'bulk-controls'),
-    count = el('strong', '', 'Zaznaczone: ' + selectedBooks.size);
+    count = el('strong', '', t('Zaznaczone: ') + selectedBooks.size);
   const shelf = select(
-    [['', 'Półka: bez zmian'], ...state.shelves.map((s) => [s.id, s.name])],
+    [['', t('Półka: bez zmian')], ...state.shelves.map((s) => [s.id, s.name])],
     bulkDraft.shelfId,
   );
   shelf.id = 'bulk-shelf';
-  shelf.setAttribute('aria-label', 'Półka zaznaczonych książek');
+  shelf.setAttribute('aria-label', t('Półka zaznaczonych książek'));
   shelf.onchange = () => {
     bulkDraft.shelfId = shelf.value;
   };
@@ -557,19 +575,19 @@ function renderBulkControls(root, books) {
   date.max = '9999-12-31';
   date.id = 'bulk-date';
   date.value = bulkDraft.readDate;
-  date.setAttribute('aria-label', 'Data ostatniego przeczytania zaznaczonych książek');
+  date.setAttribute('aria-label', t('Data ostatniego przeczytania zaznaczonych książek'));
   date.oninput = () => {
     bulkDraft.readDate = date.value;
   };
-  const apply = el('button', 'primary', 'Zastosuj do zaznaczonych');
+  const apply = el('button', 'primary', t('Zastosuj do zaznaczonych'));
   apply.type = 'submit';
   apply.disabled = !selectedBooks.size;
-  const all = button('Zaznacz tę stronę', () => {
+  const all = button(t('Zaznacz tę stronę'), () => {
     books.forEach((book) => selectedBooks.add(book.id));
     render();
   });
   all.id = 'select-page';
-  const clear = button('Wyczyść zaznaczenie', () => {
+  const clear = button(t('Wyczyść zaznaczenie'), () => {
     selectedBooks.clear();
     render();
   });
@@ -577,7 +595,7 @@ function renderBulkControls(root, books) {
   const note = el(
     'small',
     'muted',
-    'Pusta data zachowa obecne daty. Zmiany obejmą zaznaczenie ze wszystkich stron.',
+    t('Pusta data zachowa obecne daty. Zmiany obejmą zaznaczenie ze wszystkich stron.'),
   );
   form.append(count, all, clear, shelf, date, note, apply);
   form.onsubmit = async (event) => {
@@ -586,7 +604,7 @@ function renderBulkControls(root, books) {
     if (shelf.value) patch.shelfId = shelf.value;
     if (date.value) patch.readDate = date.value;
     if (!Object.keys(patch).length) {
-      notice('Wybierz gatunek lub datę do zmiany.', true);
+      notice(t('Wybierz gatunek lub datę do zmiany.'), true);
       return;
     }
     apply.disabled = true;
@@ -597,7 +615,7 @@ function renderBulkControls(root, books) {
       selectedBooks.clear();
       bulkDraft = { shelfId: '', readDate: '' };
       render();
-      notice('Zapisano zmiany ' + count + ' książek.');
+      notice(t('Zapisano zmiany ') + count + t(' książek.'));
     } catch (error) {
       notice(error.message, true);
     } finally {
@@ -609,23 +627,23 @@ function renderBulkControls(root, books) {
 
 function renderShelves(main) {
   heading(
-    'Twoje półki',
-    'Porządkuj przeczytane książki według gatunku. Możesz dodać własne nazwy.',
+    t('Twoje półki'),
+    t('Porządkuj przeczytane książki według gatunku. Możesz dodać własne nazwy.'),
   );
   const available = CATEGORY_PRESETS.filter(
     (name) => resolveCategoryChoice('new:' + name, state.shelves)?.newShelfName,
   );
   if (available.length) {
     const form = el('form', 'category-presets'),
-      label = el('label', '', 'Dodaj kategorię'),
+      label = el('label', '', t('Dodaj kategorię')),
       choice = select(
-        [['', 'Wybierz z proponowanych kategorii'], ...available.map((name) => [name, name])],
+        [['', t('Wybierz z proponowanych kategorii')], ...available.map((name) => [name, name])],
         '',
       );
     choice.id = 'new-category-preset';
     choice.required = true;
     label.htmlFor = choice.id;
-    const add = el('button', 'secondary', 'Dodaj kategorię');
+    const add = el('button', 'secondary', t('Dodaj kategorię'));
     add.type = 'submit';
     form.append(label, choice, add);
     form.onsubmit = async (event) => {
@@ -633,11 +651,11 @@ function renderShelves(main) {
       try {
         const result = resolveCategoryChoice('new:' + choice.value, state.shelves);
         if (!result?.newShelfName) {
-          notice('Ta kategoria jest już w biblioteczce.');
+          notice(t('Ta kategoria jest już w biblioteczce.'));
           return;
         }
         await command({ type: 'addShelf', name: result.newShelfName });
-        notice('Kategoria dodana.');
+        notice(t('Kategoria dodana.'));
       } catch (e) {
         notice(e.message, true);
       }
@@ -650,10 +668,10 @@ function renderShelves(main) {
       name = el('input');
     name.value = s.name;
     name.maxLength = 100;
-    name.setAttribute('aria-label', 'Nazwa półki ' + s.name);
+    name.setAttribute('aria-label', t('Nazwa półki ') + s.name);
     row.append(
       name,
-      button('Zapisz', () => command({ type: 'renameShelf', id: s.id, name: name.value })),
+      button(t('Zapisz'), () => command({ type: 'renameShelf', id: s.id, name: name.value })),
     );
     const actions = el('div');
     for (const [text, delta] of [
@@ -676,14 +694,14 @@ function renderShelves(main) {
     let target;
     actions.append(
       button(
-        'Usuń',
+        t('Usuń'),
         async () => {
-          if (count && !target?.value) throw new Error('Wybierz półkę docelową dla książek.');
+          if (count && !target?.value) throw new Error(t('Wybierz półkę docelową dla książek.'));
           if (
             confirm(
               count
-                ? `Usunąć półkę „${s.name}” i przenieść ${count} książek?`
-                : `Usunąć pustą półkę „${s.name}”?`,
+                ? t('Usunąć półkę „{name}” i przenieść {count} książek?', { name: s.name, count })
+                : t('Usunąć pustą półkę „{name}”?', { name: s.name }),
             )
           )
             await command({ type: 'deleteShelf', id: s.id, targetId: target?.value });
@@ -696,31 +714,34 @@ function renderShelves(main) {
       const dest = el('div', 'shelf-destination');
       target = select(
         [
-          ['', 'Wybierz półkę docelową'],
+          ['', t('Wybierz półkę docelową')],
           ...sorted.filter((x) => x.id !== s.id).map((x) => [x.id, x.name]),
         ],
         '',
       );
-      target.setAttribute('aria-label', 'Półka docelowa');
-      dest.append(el('span', '', `${count} książek · przy usuwaniu przenieś do:`), target);
+      target.setAttribute('aria-label', t('Półka docelowa'));
+      dest.append(
+        el('span', '', t('{count} książek · przy usuwaniu przenieś do:', { count })),
+        target,
+      );
       row.append(dest);
     }
     main.append(row);
   }
   const add = el('form', 'setting-line'),
     input = el('input');
-  input.placeholder = 'Nazwa nowej półki';
+  input.placeholder = t('Nazwa nowej półki');
   input.required = true;
   input.maxLength = 100;
-  input.setAttribute('aria-label', 'Nowa półka');
-  const submit = el('button', 'primary', 'Dodaj półkę');
+  input.setAttribute('aria-label', t('Nowa półka'));
+  const submit = el('button', 'primary', t('Dodaj półkę'));
   submit.type = 'submit';
   add.append(input, submit);
   add.onsubmit = async (e) => {
     e.preventDefault();
     try {
       await command({ type: 'addShelf', name: input.value });
-      notice('Półka dodana.');
+      notice(t('Półka dodana.'));
     } catch (e) {
       notice(e.message, true);
     }
@@ -738,18 +759,20 @@ function renderAnnualSettings(main) {
   if (!scene.annual) return;
   const annual = section(
     main,
-    'Widok książek',
-    'Miesiące układają książki według daty przeczytania, w 12 stałych wnękach. Widok gatunków pozwala też ustawić własne rozmieszczenie.',
+    t('Widok książek'),
+    t(
+      'Miesiące układają książki według daty przeczytania, w 12 stałych wnękach. Widok gatunków pozwala też ustawić własne rozmieszczenie.',
+    ),
   );
   const grouping = select(
     [
-      ['months', 'Miesiące wybranego roku'],
-      ['shelves', 'Gatunki'],
+      ['months', t('Miesiące wybranego roku')],
+      ['shelves', t('Gatunki')],
     ],
     isMonthlyView(state.settings, scene) ? 'months' : 'shelves',
   );
   grouping.id = 'settings-grouping';
-  grouping.setAttribute('aria-label', 'Grupowanie książek na tapecie');
+  grouping.setAttribute('aria-label', t('Grupowanie książek na tapecie'));
   grouping.onchange = () =>
     command({ type: 'updateSettings', patch: { grouping: grouping.value } }).catch((e) =>
       notice(e.message, true),
@@ -757,9 +780,9 @@ function renderAnnualSettings(main) {
   annual.append(grouping);
   const year = readingYearValue(state.settings),
     form = el('form', 'setting-line'),
-    label = el('label', '', 'Rok przeczytania'),
+    label = el('label', '', t('Rok przeczytania')),
     input = el('input'),
-    save = el('button', 'primary', 'Zapisz rok');
+    save = el('button', 'primary', t('Zapisz rok'));
   input.id = 'settings-reading-year';
   input.type = 'number';
   input.min = '1';
@@ -776,7 +799,12 @@ function renderAnnualSettings(main) {
     count = el(
       'p',
       'muted',
-      `Rok ${year}: ${summary.total} książek · Bez daty: ${summary.undated} · Inne lata: ${summary.otherYears}`,
+      t('Rok {year}: {total} książek · Bez daty: {undated} · Inne lata: {other}', {
+        year,
+        total: summary.total,
+        undated: summary.undated,
+        other: summary.otherYears,
+      }),
     );
   count.id = 'annual-reading-summary';
   count.setAttribute('role', 'status');
@@ -785,9 +813,11 @@ function renderAnnualSettings(main) {
     el(
       'p',
       'muted',
-      'Książki bez daty pozostają w kolekcji i widoku gatunków. Uzupełnij datę przeczytania w Książkach, aby pokazać je w odpowiednim miesiącu.',
+      t(
+        'Książki bez daty pozostają w kolekcji i widoku gatunków. Uzupełnij datę przeczytania w Książkach, aby pokazać je w odpowiednim miesiącu.',
+      ),
     ),
-    button('Otwórz książki', () => {
+    button(t('Otwórz książki'), () => {
       collectionQuery = '';
       navigate('books');
     }),
@@ -797,7 +827,7 @@ function renderAnnualSettings(main) {
     save.disabled = true;
     try {
       await command({ type: 'updateSettings', patch: readingYearPatch(input.value) });
-      notice('Rok przeczytania zapisany.');
+      notice(t('Rok przeczytania zapisany.'));
     } catch (error) {
       notice(error.message, true);
     } finally {
@@ -815,9 +845,9 @@ function download(data) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function renderSettings(main) {
-  heading('Ustawienia', 'Dopasuj biblioteczkę do swojego pulpitu.');
+  heading(t('Ustawienia'), t('Dopasuj biblioteczkę do swojego pulpitu.'));
   const navigation = el('nav', 'settings-navigation');
-  navigation.setAttribute('aria-label', 'Grupy ustawień');
+  navigation.setAttribute('aria-label', t('Grupy ustawień'));
   for (const [id, label] of SETTINGS_GROUPS) {
     const tab = button(label, () => {
       settingsGroup = id;
@@ -833,8 +863,8 @@ function renderSettings(main) {
   if (settingsGroup === 'appearance') {
     const rooms = section(
         main,
-        'Pokój',
-        'Wybierz miejsce dla swoich książek. Możesz je zmieniać w dowolnym momencie.',
+        t('Pokój'),
+        t('Wybierz miejsce dla swoich książek. Możesz je zmieniać w dowolnym momencie.'),
       ),
       choices = el('div', 'room-options');
     rooms.classList.add('room-settings');
@@ -855,15 +885,19 @@ function renderSettings(main) {
       photo.decoding = 'async';
       const copy = el('span', 'room-choice-copy');
       copy.append(el('strong', '', scene.name), el('small', '', scene.description));
-      b.append(photo, copy, el('span', 'room-choice-selected', chosen ? 'Wybrany' : 'Wybierz'));
+      b.append(
+        photo,
+        copy,
+        el('span', 'room-choice-selected', chosen ? t('Wybrany') : t('Wybierz')),
+      );
       choices.append(b);
     }
     rooms.append(choices);
-    const themes = section(main, 'Motyw panelu', 'Jasny lub ciemny panel i elementy tapety.'),
+    const themes = section(main, t('Motyw panelu'), t('Jasny lub ciemny panel i elementy tapety.')),
       options = el('div', 'theme-options');
     for (const [theme, name] of [
-      ['light', 'Jasny'],
-      ['dark', 'Ciemny'],
+      ['light', t('Jasny')],
+      ['dark', t('Ciemny')],
     ]) {
       const b = button(
         '',
@@ -878,12 +912,14 @@ function renderSettings(main) {
     themes.append(options);
     const light = section(
       main,
-      'Światło w pokoju',
-      'Wybierz porę dnia niezależnie od panelu. Automatycznie: dzień od 07:00 do 19:00 według zegara komputera, poza tym wieczór.',
+      t('Światło w pokoju'),
+      t(
+        'Wybierz porę dnia niezależnie od panelu. Automatycznie: dzień od 07:00 do 19:00 według zegara komputera, poza tym wieczór.',
+      ),
     );
     const lightMode = select(LIGHTING_OPTIONS, state.settings.lighting ?? 'theme');
     lightMode.id = 'settings-lighting';
-    lightMode.setAttribute('aria-label', 'Światło w pokoju');
+    lightMode.setAttribute('aria-label', t('Światło w pokoju'));
     lightMode.onchange = () =>
       command({ type: 'updateSettings', patch: { lighting: lightMode.value } }).catch((e) =>
         notice(e.message, true),
@@ -893,15 +929,15 @@ function renderSettings(main) {
   if (settingsGroup === 'wallpaper') {
     const shortcut = section(
       main,
-      'Podgląd i rozmieszczenie',
-      'Ustaw własny układ książek na półkach.',
+      t('Podgląd i rozmieszczenie'),
+      t('Ustaw własny układ książek na półkach.'),
     );
-    shortcut.append(button('Otwórz podgląd tapety', () => navigate('wallpaper')));
+    shortcut.append(button(t('Otwórz podgląd tapety'), () => navigate('wallpaper')));
     renderAnnualSettings(main);
     const layout = section(
       main,
-      'Układ tapety',
-      'Pokój wypełnia ekran. Zarezerwuj po lewej obszar bez książek dla ikon.',
+      t('Układ tapety'),
+      t('Pokój wypełnia ekran. Zarezerwuj po lewej obszar bez książek dla ikon.'),
     );
     const slider = el('input');
     slider.id = 'settings-icon-space';
@@ -909,23 +945,23 @@ function renderSettings(main) {
     slider.min = 0;
     slider.max = 30;
     slider.value = Math.round(state.settings.iconSpace * 100);
-    slider.setAttribute('aria-label', 'Miejsce na ikony');
-    const caption = el('p', 'muted', slider.value + '% szerokości pulpitu');
-    slider.oninput = () => (caption.textContent = slider.value + '% szerokości pulpitu');
+    slider.setAttribute('aria-label', t('Miejsce na ikony'));
+    const caption = el('p', 'muted', slider.value + t('% szerokości pulpitu'));
+    slider.oninput = () => (caption.textContent = slider.value + t('% szerokości pulpitu'));
     layout.append(
-      el('label', '', 'Miejsce na ikony'),
+      el('label', '', t('Miejsce na ikony')),
       slider,
       caption,
       button(
-        'Zapisz układ',
+        t('Zapisz układ'),
         () => command({ type: 'updateSettings', patch: { iconSpace: Number(slider.value) / 100 } }),
         'primary',
       ),
     );
     const sizing = section(
       main,
-      'Rozmiar książek',
-      'Proporcje dobrane do mebli. Regulacja jest zapamiętywana osobno dla każdego pokoju.',
+      t('Rozmiar książek'),
+      t('Proporcje dobrane do mebli. Regulacja jest zapamiętywana osobno dla każdego pokoju.'),
     );
     const size = el('input');
     size.id = 'settings-book-scale';
@@ -934,7 +970,7 @@ function renderSettings(main) {
     size.max = 140;
     size.step = 5;
     size.value = Math.round((state.settings.bookScales?.[state.settings.room] ?? 1) * 100);
-    size.setAttribute('aria-label', 'Rozmiar książek');
+    size.setAttribute('aria-label', t('Rozmiar książek'));
     const sizeCaption = el('p', 'muted', size.value + '% rozmiaru dopasowanego do pokoju');
     size.oninput = () =>
       (sizeCaption.textContent = size.value + '% rozmiaru dopasowanego do pokoju');
@@ -946,19 +982,21 @@ function renderSettings(main) {
     sizing.append(
       size,
       sizeCaption,
-      button('Zapisz rozmiar', () => saveScale(Number(size.value) / 100), 'primary'),
-      button('Przywróć 100%', () => saveScale(1)),
+      button(t('Zapisz rozmiar'), () => saveScale(Number(size.value) / 100), 'primary'),
+      button(t('Przywróć 100%'), () => saveScale(1)),
     );
     const sorting = section(
       main,
-      'Kolejność książek',
+      t('Kolejność książek'),
       isMonthlyView(state.settings, getRoomScene(state.settings.room ?? DEFAULT_ROOM_ID))
-        ? 'Wszystkie książki w panelu sortujemy wspólnie. Tapeta zachowuje kolejność miesięcy i sortuje książki wewnątrz każdego miesiąca.'
-        : 'Wszystkie książki w panelu sortujemy wspólnie. Tapeta układa książki według gatunku.',
+        ? t(
+            'Wszystkie książki w panelu sortujemy wspólnie. Tapeta zachowuje kolejność miesięcy i sortuje książki wewnątrz każdego miesiąca.',
+          )
+        : t('Wszystkie książki w panelu sortujemy wspólnie. Tapeta układa książki według gatunku.'),
     );
     const sort = select(SORT_OPTIONS, state.settings.sort);
     sort.id = 'settings-book-sort';
-    sort.setAttribute('aria-label', 'Kolejność książek w panelu i na tapecie');
+    sort.setAttribute('aria-label', t('Kolejność książek w panelu i na tapecie'));
     sort.onchange = () =>
       command({ type: 'updateSettings', patch: { sort: sort.value } }).catch((e) =>
         notice(e.message, true),
@@ -968,8 +1006,8 @@ function renderSettings(main) {
   if (settingsGroup === 'collection') {
     const csv = section(
       main,
-      'Dołącz z Goodreads (CSV)',
-      'Dołączenie zachowa obecną kolekcję. Duplikaty zostaną pominięte.',
+      t('Dołącz z Goodreads (CSV)'),
+      t('Dołączenie zachowa obecną kolekcję. Duplikaty zostaną pominięte.'),
     );
     csv.classList.add('goodreads-import');
     const importRoot = el('div');
@@ -989,31 +1027,36 @@ function renderSettings(main) {
     importPanel.mount(importRoot, state);
     const backup = section(
       main,
-      'Kopia kolekcji',
-      'Eksport zawiera książki, półki, ustawienia, lokalne okładki i ilustracje grzbietów. Import zastępuje obecną kolekcję po potwierdzeniu.',
+      t('Kopia kolekcji'),
+      t(
+        'Eksport zawiera książki, półki, ustawienia, lokalne okładki i ilustracje grzbietów. Import zastępuje obecną kolekcję po potwierdzeniu.',
+      ),
     );
     backup.append(
-      button('Eksportuj JSON', async () => {
+      button(t('Eksportuj JSON'), async () => {
         download(await request('/api/export'));
-        notice('Kopia została pobrana.');
+        notice(t('Kopia została pobrana.'));
       }),
     );
     const file = el('input');
     file.type = 'file';
     file.accept = '.json,application/json';
-    file.setAttribute('aria-label', 'Importuj kopię kolekcji');
+    file.setAttribute('aria-label', t('Importuj kopię kolekcji'));
     file.onchange = async () => {
       try {
         if (!file.files[0]) return;
         if (file.files[0].size > 64 * 1024 * 1024)
-          throw new Error('Kopia może mieć maksymalnie 64 MB.');
+          throw new Error(t('Kopia może mieć maksymalnie 64 MB.'));
         const preview = await request('/api/import/preview', {
           method: 'POST',
           body: JSON.parse(await file.files[0].text()),
         });
         if (
           confirm(
-            `Zastąpić obecną kolekcję?\nKopia: ${preview.summary.books} książek, ${preview.summary.shelves} półek.\nPoprzedni stan zostanie zachowany w library.backup.json.`,
+            t(
+              'Zastąpić obecną kolekcję?\nKopia: {books} książek, {shelves} półek.\nPoprzedni stan zostanie zachowany w library.backup.json.',
+              { books: preview.summary.books, shelves: preview.summary.shelves },
+            ),
           )
         ) {
           state = await requestImport('/api/import/confirm', {
@@ -1021,7 +1064,7 @@ function renderSettings(main) {
             body: { importId: preview.importId, expectedRevision: state.revision },
           });
           render();
-          notice('Kopia została przywrócona.');
+          notice(t('Kopia została przywrócona.'));
         }
       } catch (e) {
         notice(e.message, true);
@@ -1029,26 +1072,31 @@ function renderSettings(main) {
         file.value = '';
       }
     };
-    backup.append(el('label', '', 'Importuj JSON'), file);
-    const storage = section(main, 'Obrazy na dysku', '');
+    backup.append(el('label', '', t('Importuj JSON')), file);
+    const storage = section(main, t('Obrazy na dysku'), '');
     storage.id = 'storage-settings';
     renderStorageSettings(storage, { request });
   }
   if (settingsGroup === 'advanced') {
-    const ai = section(main, 'Ilustracje AI', '');
+    const ai = section(main, t('Ilustracje AI'), '');
     ai.id = 'ai-settings';
     paintAiSettings(ai);
     const windows = section(
       main,
       'Windows',
-      'Kolekcja jest zapisywana w folderze Dokumenty\\Biblioteczka. Ikona w zasobniku otwiera panel, przeładowuje tapetę i zamyka aplikację.',
+      t(
+        'Kolekcja jest zapisywana w folderze Dokumenty\\Biblioteczka. Ikona w zasobniku otwiera panel, przeładowuje tapetę i zamyka aplikację.',
+      ),
     );
     renderWindowsSettings(windows);
   }
 }
 
 function renderWallpaper(main) {
-  heading('Podgląd tapety', 'Ułóż książki na półkach; tapeta na pulpicie zmienia się od razu.');
+  heading(
+    t('Podgląd tapety'),
+    t('Ułóż książki na półkach; tapeta na pulpicie zmienia się od razu.'),
+  );
   layoutPanel ??= createRoomLayoutPanel({
     state,
     onSave: command,
@@ -1062,10 +1110,12 @@ function renderWallpaper(main) {
   layoutPanel.mount(panel, state);
   const s = section(
     main,
-    'Tapeta na pulpicie',
-    'Biblioteczka wyświetla tapetę na głównym monitorze, pod ikonami pulpitu. Jeśli jej nie widać, wybierz „Przeładuj tapetę” w menu ikony w zasobniku.',
+    t('Tapeta na pulpicie'),
+    t(
+      'Biblioteczka wyświetla tapetę na głównym monitorze, pod ikonami pulpitu. Jeśli jej nie widać, wybierz „Przeładuj tapetę” w menu ikony w zasobniku.',
+    ),
   );
-  const a = el('a', 'text-button', 'Otwórz podgląd tapety w przeglądarce ↗');
+  const a = el('a', 'text-button', t('Otwórz podgląd tapety w przeglądarce ↗'));
   a.href = location.origin + '/wallpaper';
   a.target = '_blank';
   a.rel = 'noopener';
@@ -1170,7 +1220,7 @@ function showBookDetails(book) {
   const header = el('header', 'detail-header'),
     title = el('h2', '', book.title);
   title.id = 'detail-title';
-  header.append(title, button('Zamknij', closeBookDetails));
+  header.append(title, button(t('Zamknij'), closeBookDetails));
   dialog.append(header);
   dialog.append(
     el('p', '', book.authors.join(', ')),
@@ -1183,12 +1233,12 @@ function showBookDetails(book) {
   date.min = '0001-01-01';
   date.max = '9999-12-31';
   date.value = book.readDate ?? '';
-  const dateLabel = el('label', '', 'Data ostatniego przeczytania');
+  const dateLabel = el('label', '', t('Data ostatniego przeczytania'));
   dateLabel.htmlFor = date.id;
   const error = el('p', 'error');
   error.setAttribute('role', 'alert');
   error.hidden = true;
-  const submit = el('button', 'primary', 'Zapisz datę');
+  const submit = el('button', 'primary', t('Zapisz datę'));
   submit.type = 'submit';
   const actions = el('div', 'detail-actions');
   const save = async (patch) => {
@@ -1201,7 +1251,7 @@ function showBookDetails(book) {
       });
       detailsGuard.saved(detailFields());
       dialog.close();
-      notice('Data przeczytania zapisana.');
+      notice(t('Data przeczytania zapisana.'));
     } catch (e) {
       error.hidden = false;
       error.textContent = e.message;
@@ -1218,7 +1268,7 @@ function showBookDetails(book) {
   };
   actions.append(
     submit,
-    button('Edytuj wszystkie dane', () => {
+    button(t('Edytuj wszystkie dane'), () => {
       if (!detailsGuard.canClose(detailFields(), confirm)) return;
       detailsGuard.reset();
       dialog.close();
@@ -1273,11 +1323,11 @@ function populate(draft = {}, manualShelfId = null) {
     $('shelf').append(option);
   }
   const presets = el('optgroup');
-  presets.label = 'Nowa kategoria — dodana przy zapisie';
-  for (const name of [...CATEGORY_PRESETS, 'Pozostałe']) {
+  presets.label = t('Nowa kategoria — dodana przy zapisie');
+  for (const name of [...CATEGORY_PRESETS, OTHER_CATEGORY]) {
     const choice = resolveCategoryChoice('new:' + name, state.shelves);
     if (!choice?.newShelfName) continue;
-    const option = el('option', '', name + ' (nowa półka)');
+    const option = el('option', '', name + t(' (nowa półka)'));
     option.value = choice.value;
     presets.append(option);
   }
@@ -1289,22 +1339,22 @@ function populate(draft = {}, manualShelfId = null) {
     draft.shelfId ??
     category?.value ??
     shelfFilter ??
-    state.shelves.find((s) => s.name === 'Pozostałe')?.id ??
+    shelfForCategory(OTHER_CATEGORY, state.shelves)?.id ??
     state.shelves[0]?.id ??
-    'new:Pozostałe';
+    'new:' + OTHER_CATEGORY;
   categoryNote.textContent =
     category?.message ??
     (draft.id
-      ? 'Półka wybrana dla tej książki. Możesz ją zmienić.'
-      : 'Wybierz półkę lub nową kategorię. Katalog może zaproponować gatunek.');
+      ? t('Półka wybrana dla tej książki. Możesz ją zmienić.')
+      : t('Wybierz półkę lub nową kategorię. Katalog może zaproponować gatunek.'));
   $('spine-color').value = makeSpine({
     ...draft,
     title: draft.title ?? '',
     authors: draft.authors ?? [],
   }).palette[0];
-  $('editor-title').textContent = editing ? 'Edytuj książkę' : 'Dodaj książkę';
+  $('editor-title').textContent = editing ? t('Edytuj książkę') : t('Dodaj książkę');
   $('search-area').hidden = !!editing;
-  $('save-book').textContent = editing ? 'Zapisz zmiany' : 'Dodaj do biblioteczki';
+  $('save-book').textContent = editing ? t('Zapisz zmiany') : t('Dodaj do biblioteczki');
   $('form-error').hidden = true;
   $('form-error').textContent = '';
   $('edit-duplicate').hidden = true;
@@ -1373,17 +1423,17 @@ $('shelf').setAttribute('aria-describedby', 'category-note');
 $('shelf').after(categoryNote);
 $('shelf').onchange = () => {
   shelfTouched = true;
-  categoryNote.textContent = 'Wybrana przez Ciebie półka. Możesz ją zmienić.';
+  categoryNote.textContent = t('Wybrana przez Ciebie półka. Możesz ją zmienić.');
 };
 const reloadLatest = button(
-  'Otwórz aktualną wersję',
+  t('Otwórz aktualną wersję'),
   () => {
     const current = state.books.find((b) => b.id === editing);
     if (!current) {
-      notice('Ta książka została usunięta w drugim oknie.', true);
+      notice(t('Ta książka została usunięta w drugim oknie.'), true);
       return;
     }
-    if (confirm('Otworzyć aktualną wersję? Niezapisane zmiany formularza zostaną zastąpione.')) {
+    if (confirm(t('Otworzyć aktualną wersję? Niezapisane zmiany formularza zostaną zastąpione.'))) {
       cancelEditorWork();
       populate(current);
       draftGuard.start(editorFields());
@@ -1398,9 +1448,9 @@ const spinePanel = el('section', 'spine-preview-panel'),
   spinePreview = el('div', 'spine-preview-stage'),
   spineCopy = el('div', 'spine-preview-copy');
 spineCopy.append(
-  el('h3', '', 'Twój grzbiet'),
-  el('p', '', 'Ten sam grzbiet zobaczysz na tapecie.'),
-  el('small', '', 'Kolor oprawy możesz zmienić w danych wydania.'),
+  el('h3', '', t('Twój grzbiet')),
+  el('p', '', t('Ten sam grzbiet zobaczysz na tapecie.')),
+  el('small', '', t('Kolor oprawy możesz zmienić w danych wydania.')),
 );
 spinePanel.append(spinePreview, spineCopy);
 $('book-form').querySelector('details').append(spinePanel);
@@ -1427,7 +1477,7 @@ function updateSpineControls() {
       if (selectedOperation !== operation || editing !== id || $('editor').hidden) return;
       const saved = state.books.find((b) => b.id === id);
       if (!saved || saved.coverId !== coverId)
-        throw new Error('Zapisz zmianę okładki przed wgraniem grzbietu.');
+        throw new Error(t('Zapisz zmianę okładki przed wgraniem grzbietu.'));
       await request('/api/spines/upload', {
         method: 'POST',
         body: { bookId: id, expectedRevision: state.revision, ...image },
@@ -1441,7 +1491,9 @@ spinePreview.addEventListener('spine-image-error', () => {
   const message = el(
     'p',
     'ai-error',
-    'Nie udało się odczytać ilustracji. Wyświetlam lokalny grzbiet. Możesz wgrać obraz ponownie.',
+    t(
+      'Nie udało się odczytać ilustracji. Wyświetlam lokalny grzbiet. Możesz wgrać obraz ponownie.',
+    ),
   );
   message.setAttribute('role', 'alert');
   spineControls.append(message);
@@ -1452,7 +1504,7 @@ function spineDraft() {
   return {
     coverId,
     spine: image ? { ...image, frame: frameEditor.value(image) } : null,
-    title: $('title').value.trim() || 'Tytuł książki',
+    title: $('title').value.trim() || t('Tytuł książki'),
     authors: $('authors')
       .value.split(';')
       .map((a) => a.trim())
@@ -1549,7 +1601,7 @@ async function applyCoverFile(file, current) {
   palette = image.palette;
   $('spine-color').value = palette[0];
   updateCover();
-  $('cover-note').textContent = 'Okładka zapisana lokalnie.';
+  $('cover-note').textContent = t('Okładka zapisana lokalnie.');
 }
 $('cover-file').onchange = async () => {
   const file = $('cover-file').files[0];
@@ -1575,7 +1627,7 @@ $('cover-file').onchange = async () => {
 const coverUrlRoot = el('div');
 $('cover-file').after(coverUrlRoot);
 coverUrlImport = createImageUrlControl(coverUrlRoot, {
-  label: 'Link do okładki',
+  label: t('Link do okładki'),
   onStart: () => {
     const current = beginCoverImport();
     $('cover-file').disabled = true;
@@ -1619,9 +1671,9 @@ coverPicker = createEditorCoverPicker(coverPickerRoot, {
     updateCover();
     updateSpineControls();
     $('cover-note').textContent =
-      'Okładka z ' +
+      t('Okładka z ') +
       (saved.source === 'inventaire' ? 'Inventaire' : 'Open Library') +
-      '. Grzbiet gotowy; zapisz książkę, aby zachować zmianę.';
+      t('. Grzbiet gotowy; zapisz książkę, aby zachować zmianę.');
   },
   setBusy: (busy) => {
     uploading = busy;
@@ -1641,16 +1693,16 @@ async function chooseCatalogBook(item) {
   const selected = ++operation;
   uploading = true;
   $('save-book').disabled = true;
-  $('search-feedback').textContent = 'Pobieram dane książki…';
+  $('search-feedback').textContent = t('Pobieram dane książki…');
   try {
     let edition = null,
       warning = '';
     if (item.editionId && item.provider !== 'bn')
       try {
         edition = await request('/api/edition?id=' + encodeURIComponent(item.editionId));
-        if (!edition) warning = 'Brak pełnych danych wydania. Sprawdź dostępne informacje.';
+        if (!edition) warning = t('Brak pełnych danych wydania. Sprawdź dostępne informacje.');
       } catch {
-        warning = 'Pełne dane wydania są niedostępne. Sprawdź dostępne informacje.';
+        warning = t('Pełne dane wydania są niedostępne. Sprawdź dostępne informacje.');
       }
     if (selected !== operation) return;
     const manualShelfId = shelfTouched ? $('shelf').value : null;
@@ -1660,7 +1712,10 @@ async function chooseCatalogBook(item) {
     $('title').focus();
     const remoteCover = edition?.coverId ?? item.coverId;
     catalogImageId = Number.isInteger(remoteCover) && remoteCover > 0 ? remoteCover : null;
-    $('cover-note').textContent = [warning, 'Okładkę możesz wybrać z propozycji, pliku lub linku.']
+    $('cover-note').textContent = [
+      warning,
+      t('Okładkę możesz wybrać z propozycji, pliku lub linku.'),
+    ]
       .filter(Boolean)
       .join(' ');
     coverPicker?.reset();
@@ -1684,29 +1739,30 @@ function showSuggestions(result) {
     String(['loading', 'loading-more'].includes(result.status)),
   );
   const messages = {
-    idle: 'Wpisz co najmniej 2 znaki tytułu, autora lub ISBN.',
-    waiting: 'Czekam, aż skończysz pisać…',
-    loading: 'Szukam książek…',
-    error: (result.message ?? 'Katalog jest niedostępny.') + ' Możesz wpisać dane ręcznie.',
+    idle: t('Wpisz co najmniej 2 znaki tytułu, autora lub ISBN.'),
+    waiting: t('Czekam, aż skończysz pisać…'),
+    loading: t('Szukam książek…'),
+    error: (result.message ?? t('Katalog jest niedostępny.')) + t(' Możesz wpisać dane ręcznie.'),
   };
   const ready = ['ready', 'loading-more'].includes(result.status);
   const feedback = ready
     ? result.items.length
-      ? result.items.length + ' wyników. Wybierz książkę, aby uzupełnić dane.'
+      ? result.items.length + t(' wyników. Wybierz książkę, aby uzupełnić dane.')
       : result.warnings?.length
-        ? 'Brak wyników w dostępnej części katalogu. Spróbuj ponownie.'
-        : 'Brak wyników. Spróbuj autora, innego tytułu lub ISBN.'
+        ? t('Brak wyników w dostępnej części katalogu. Spróbuj ponownie.')
+        : t('Brak wyników. Spróbuj autora, innego tytułu lub ISBN.')
     : messages[result.status];
   $('search-feedback').textContent = [
     feedback,
     ...(result.warnings ?? []),
-    result.message && ready ? result.message + ' Spróbuj ponownie przyciskiem poniżej.' : null,
+    result.message && ready ? result.message + t(' Spróbuj ponownie przyciskiem poniżej.') : null,
   ]
     .filter(Boolean)
     .join(' ');
   loadMore.hidden = !result.nextCursor;
   loadMore.disabled = result.status === 'loading-more';
-  loadMore.textContent = result.status === 'loading-more' ? 'Wczytuję…' : 'Pokaż więcej wyników';
+  loadMore.textContent =
+    result.status === 'loading-more' ? t('Wczytuję…') : t('Pokaż więcej wyników');
   for (const item of result.items) {
     const b = button('', () => chooseCatalogBook(item), 'search-result');
     const thumbnail = el('div', 'search-cover');
@@ -1725,15 +1781,15 @@ function showSuggestions(result) {
     const info = el('div', 'search-result-info');
     info.append(
       el('strong', '', item.title),
-      el('small', '', item.authors?.join(', ') || 'Autor nieznany'),
+      el('small', '', item.authors?.join(', ') || t('Autor nieznany')),
       el(
         'small',
         '',
         [
           item.provider === 'bn' ? 'Biblioteka Narodowa' : 'Open Library',
-          item.language === 'pol' ? 'Polskie wydanie' : item.language,
+          item.language === 'pol' ? t('Polskie wydanie') : item.language,
           item.publicationYear
-            ? (item.provider === 'bn' ? 'Rok wydania: ' : 'Pierwsze wydanie: ') +
+            ? (item.provider === 'bn' ? t('Rok wydania: ') : t('Pierwsze wydanie: ')) +
               item.publicationYear
             : null,
         ]
@@ -1745,7 +1801,7 @@ function showSuggestions(result) {
     $('search-results').append(b);
   }
 }
-const loadMore = button('Pokaż więcej wyników', () => suggestions.more(), 'secondary');
+const loadMore = button(t('Pokaż więcej wyników'), () => suggestions.more(), 'secondary');
 loadMore.hidden = true;
 $('search-results').after(loadMore);
 const suggestions = createSearchController({
@@ -1830,7 +1886,7 @@ $('book-form').onsubmit = async (e) => {
     );
     draftGuard.saved(editorFields());
     closeEditor();
-    notice('Książka zapisana. Tapeta zaktualizuje się automatycznie.');
+    notice(t('Książka zapisana. Tapeta zaktualizuje się automatycznie.'));
   } catch (e) {
     $('form-error').hidden = false;
     $('form-error').textContent = e.message;
@@ -1859,17 +1915,17 @@ try {
   if (info.recovery !== 'none' && info.recovery !== undefined)
     notice(
       info.recovery === 'backup'
-        ? 'Odczytano poprzednią kopię. Sprawdź kolekcję przed zapisaniem.'
-        : 'Kolekcja wymaga przywrócenia. Zaimportuj kopię w Ustawieniach.',
+        ? t('Odczytano poprzednią kopię. Sprawdź kolekcję przed zapisaniem.')
+        : t('Kolekcja wymaga przywrócenia. Zaimportuj kopię w Ustawieniach.'),
       true,
     );
   api.events(
     (revision) => revisionFeed.receive(revision),
     (connected) => {
-      if (connected && $('notice').textContent.startsWith('Brak połączenia')) notice('');
+      if (connected && $('notice').textContent.startsWith(t('Brak połączenia'))) notice('');
       if (!connected)
         notice(
-          'Brak połączenia z aplikacją. Uruchom Biblioteczkę ponownie, aby zapisywać zmiany.',
+          t('Brak połączenia z aplikacją. Uruchom Biblioteczkę ponownie, aby zapisywać zmiany.'),
           true,
         );
     },

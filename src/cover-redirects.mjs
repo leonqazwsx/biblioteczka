@@ -1,7 +1,8 @@
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 const invalid = () => {
-  throw problem('INVALID', 'Niedozwolone przekierowanie okładki.');
+  throw problem('INVALID', t('Niedozwolone przekierowanie okładki.'));
 };
 const dataHost = /^(?:ia|dn)[0-9]{6}\.(?:us|ca|eu)\.archive\.org$/;
 function destination(location, base) {

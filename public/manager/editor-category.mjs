@@ -1,10 +1,16 @@
-import { CATEGORY_PRESETS, shelfForCategory, suggestShelf } from '../shared/categories.mjs';
+import {
+  CATEGORY_PRESETS,
+  OTHER_CATEGORY,
+  shelfForCategory,
+  suggestShelf,
+} from '../shared/categories.mjs';
+import { t } from '../shared/i18n.mjs';
 export function resolveCategoryChoice(value, shelves) {
   const existing = shelves.find((shelf) => shelf.id === value);
   if (existing) return { value: existing.id, shelfId: existing.id, newShelfName: null };
   if (typeof value !== 'string' || !value.startsWith('new:')) return null;
   const name = value.slice(4);
-  if (name !== 'Pozostałe' && !CATEGORY_PRESETS.includes(name)) return null;
+  if (name !== OTHER_CATEGORY && !CATEGORY_PRESETS.includes(name)) return null;
   const shelf = shelfForCategory(name, shelves);
   return {
     value: shelf?.id ?? 'new:' + name,
@@ -14,7 +20,7 @@ export function resolveCategoryChoice(value, shelves) {
 }
 export function editorCategory(subjects, shelves, { manualShelfId = null } = {}) {
   const manual = resolveCategoryChoice(manualShelfId, shelves);
-  if (manual) return { ...manual, message: 'Wybrana przez Ciebie półka. Możesz ją zmienić.' };
+  if (manual) return { ...manual, message: t('Wybrana przez Ciebie półka. Możesz ją zmienić.') };
   const proposal = suggestShelf(subjects, shelves);
   return { ...proposal, value: proposal.shelfId ?? 'new:' + proposal.newShelfName };
 }

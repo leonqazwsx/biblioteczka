@@ -5,6 +5,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { setTimeout as delay } from 'node:timers/promises';
 import { migrateState } from './migrations.mjs';
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 const hashId = /^[a-f0-9]{64}$/,
   uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
@@ -56,17 +57,17 @@ export function createStorageGate() {
 
 async function safeDirectory(f, root, directory, { create = false } = {}) {
   if (!inside(root, path.resolve(directory)))
-    throw unavailable('Folder obrazów wychodzi poza folder danych.');
+    throw unavailable(t('Folder obrazów wychodzi poza folder danych.'));
   if (create) await f.mkdir(directory, { recursive: true });
   const stat = await f.lstat(directory);
   if (!stat.isDirectory() || stat.isSymbolicLink() || !inside(root, await f.realpath(directory)))
-    throw unavailable('Folder obrazów jest dowiązaniem lub ma niebezpieczną ścieżkę.');
+    throw unavailable(t('Folder obrazów jest dowiązaniem lub ma niebezpieczną ścieżkę.'));
   return directory;
 }
 async function safeFile(f, root, file) {
   const stat = await f.lstat(file);
   if (!stat.isFile() || stat.isSymbolicLink() || !inside(root, await f.realpath(file)))
-    throw unavailable('Plik obrazów lub indeksu ma niebezpieczną ścieżkę.');
+    throw unavailable(t('Plik obrazów lub indeksu ma niebezpieczną ścieżkę.'));
   return stat;
 }
 
@@ -122,7 +123,7 @@ export function guardStorage({
             if (key === 'put' || key === 'fetchCatalogCover') {
               const id = result.coverId ?? result.assetId;
               if (!hashId.test(id))
-                throw unavailable('Nieprawidłowy identyfikator zapisanego obrazu.');
+                throw unavailable(t('Nieprawidłowy identyfikator zapisanego obrazu.'));
               const file = path.join(directory, id);
               await safeFile(fs, root, file);
               const now = clock();
@@ -156,7 +157,7 @@ export async function openAssetMaintenance({
   const key = (asset) => asset.kind + ':' + asset.id;
   function checkRevision(expected) {
     if (expected !== store.read().revision)
-      throw problem('CONFLICT', 'Kolekcja zmieniła się. Odśwież raport miejsca.');
+      throw problem('CONFLICT', t('Kolekcja zmieniła się. Odśwież raport miejsca.'));
   }
   function validateAsset(asset) {
     if (
@@ -165,7 +166,7 @@ export async function openAssetMaintenance({
       typeof asset.id !== 'string' ||
       !hashId.test(asset.id)
     )
-      throw problem('INVALID', 'Nieprawidłowy identyfikator obrazu.');
+      throw problem('INVALID', t('Nieprawidłowy identyfikator obrazu.'));
     return { kind: asset.kind, id: asset.id };
   }
   async function readJson(file, { optional = false } = {}) {
@@ -182,7 +183,7 @@ export async function openAssetMaintenance({
       blockers = [];
     const protect = (kind, id) => {
       if (typeof id !== 'string' || !hashId.test(id))
-        throw new Error('Nieprawidłowa referencja obrazu.');
+        throw new Error(t('Nieprawidłowa referencja obrazu.'));
       refs[kind].add(id);
     };
     const library = (state) => {
@@ -196,11 +197,11 @@ export async function openAssetMaintenance({
       }
     };
     if (store.recovery === 'unrecoverable')
-      blockers.push('Kolekcja wymaga odzyskania; porządkowanie jest zablokowane.');
+      blockers.push(t('Kolekcja wymaga odzyskania; porządkowanie jest zablokowane.'));
     try {
       library(store.read());
     } catch {
-      blockers.push('Nie można sprawdzić bieżącej kolekcji.');
+      blockers.push(t('Nie można sprawdzić bieżącej kolekcji.'));
     }
     for (const filename of ['library.json', 'library.backup.json', 'library.schema1.backup.json']) {
       try {
@@ -209,7 +210,7 @@ export async function openAssetMaintenance({
         });
         if (value) library(value);
       } catch {
-        blockers.push('Nie można sprawdzić referencji w ' + filename + '.');
+        blockers.push(t('Nie można sprawdzić referencji w ') + filename + '.');
       }
     }
     try {
@@ -229,7 +230,7 @@ export async function openAssetMaintenance({
         }
       }
     } catch {
-      blockers.push('Nie można sprawdzić indeksu zapisanych ilustracji AI.');
+      blockers.push(t('Nie można sprawdzić indeksu zapisanych ilustracji AI.'));
     }
     try {
       const ledger = await readJson(path.join(root, 'ai-usage.json'), { optional: true });
@@ -248,7 +249,7 @@ export async function openAssetMaintenance({
         }
       }
     } catch {
-      blockers.push('Nie można sprawdzić zapisanych zadań AI.');
+      blockers.push(t('Nie można sprawdzić zapisanych zadań AI.'));
     }
     return { refs, blockers };
   }
@@ -274,7 +275,7 @@ export async function openAssetMaintenance({
   }
   async function batchFile(id) {
     if (typeof id !== 'string' || !uuid.test(id))
-      throw problem('INVALID', 'Nieprawidłowa kopia obrazów.');
+      throw problem('INVALID', t('Nieprawidłowa kopia obrazów.'));
     await safeDirectory(f, root, quarantineRoot);
     const directory = path.join(quarantineRoot, id);
     await safeDirectory(f, root, directory);
@@ -294,18 +295,18 @@ export async function openAssetMaintenance({
         manifest.state,
       )
     )
-      throw unavailable('Dziennik kopii obrazów jest uszkodzony.');
+      throw unavailable(t('Dziennik kopii obrazów jest uszkodzony.'));
     const seen = new Set();
     for (const asset of manifest.assets) {
       validateAsset(asset);
-      if (seen.has(key(asset))) throw unavailable('Dziennik kopii zawiera duplikaty.');
+      if (seen.has(key(asset))) throw unavailable(t('Dziennik kopii zawiera duplikaty.'));
       seen.add(key(asset));
       if (
         !Number.isSafeInteger(asset.bytes) ||
         asset.bytes < 0 ||
         !['planned', 'quarantined', 'restored', 'purge-planned', 'purged'].includes(asset.state)
       )
-        throw unavailable('Dziennik kopii obrazów jest uszkodzony.');
+        throw unavailable(t('Dziennik kopii obrazów jest uszkodzony.'));
     }
     return { ...location, manifest };
   }
@@ -400,7 +401,7 @@ export async function openAssetMaintenance({
               } else empty = false;
             }
           } catch {}
-        if (!empty) blockers.push('Nie można sprawdzić kopii obrazów ' + entry.name + '.');
+        if (!empty) blockers.push(t('Nie można sprawdzić kopii obrazów ') + entry.name + '.');
       }
     }
     return { list, blockers };
@@ -437,7 +438,7 @@ export async function openAssetMaintenance({
           });
         }
       } catch {
-        blockers.push('Nie można bezpiecznie sprawdzić folderu ' + kind + '.');
+        blockers.push(t('Nie można bezpiecznie sprawdzić folderu ') + kind + '.');
       }
     }
     try {
@@ -465,7 +466,7 @@ export async function openAssetMaintenance({
       };
     } catch {
       const state = store.read();
-      blockers.push('Nie można sprawdzić kopii usuniętych obrazów.');
+      blockers.push(t('Nie można sprawdzić kopii usuniętych obrazów.'));
       return {
         collectionId: state.collectionId,
         revision: state.revision,
@@ -483,18 +484,18 @@ export async function openAssetMaintenance({
     return gate(async () => {
       checkRevision(expectedRevision);
       if (!Array.isArray(assets) || !assets.length || assets.length > 10000)
-        throw problem('INVALID', 'Wybierz obrazy do przeniesienia.');
+        throw problem('INVALID', t('Wybierz obrazy do przeniesienia.'));
       const selected = assets.map(validateAsset);
       if (new Set(selected.map(key)).size !== selected.length)
-        throw problem('INVALID', 'Obraz wybrano więcej niż raz.');
+        throw problem('INVALID', t('Obraz wybrano więcej niż raz.'));
       const report = await inspect();
       if (!report.cleanupAllowed)
         throw unavailable(
-          'Nie można potwierdzić wszystkich referencji. Porządkowanie jest zablokowane.',
+          t('Nie można potwierdzić wszystkich referencji. Porządkowanie jest zablokowane.'),
         );
       const available = new Map(report.candidates.map((asset) => [key(asset), asset]));
       if (selected.some((asset) => !available.has(key(asset))))
-        throw problem('CONFLICT', 'Lista nieużywanych obrazów zmieniła się. Odśwież raport.');
+        throw problem('CONFLICT', t('Lista nieużywanych obrazów zmieniła się. Odśwież raport.'));
       const id = crypto.randomUUID(),
         directory = path.join(quarantineRoot, id);
       await safeDirectory(f, root, directory, { create: true });
@@ -519,9 +520,9 @@ export async function openAssetMaintenance({
           checkRevision(expectedRevision);
           const current = await references();
           if (current.blockers.length)
-            throw unavailable('Referencje obrazów zmieniły się; porządkowanie przerwano.');
+            throw unavailable(t('Referencje obrazów zmieniły się; porządkowanie przerwano.'));
           if (current.refs[asset.kind].has(asset.id))
-            throw problem('CONFLICT', 'Obraz jest już potrzebny kolekcji.');
+            throw problem('CONFLICT', t('Obraz jest już potrzebny kolekcji.'));
           const p = await position(batch, asset);
           if (
             !p.original ||
@@ -530,7 +531,7 @@ export async function openAssetMaintenance({
             p.original.size !== asset.bytes ||
             digest(await f.readFile(p.source)) !== asset.id
           )
-            throw problem('CONFLICT', 'Obraz zmienił się. Odśwież raport.');
+            throw problem('CONFLICT', t('Obraz zmienił się. Odśwież raport.'));
           await rename(p.source, p.destination);
           asset.state = 'quarantined';
           moved.push({ kind: asset.kind, id: asset.id, bytes: asset.bytes });
@@ -545,7 +546,7 @@ export async function openAssetMaintenance({
           error.code === 'CONFLICT'
             ? error
             : unavailable(
-                'Przenoszenie przerwano. Kopia obrazów pozostaje dostępna do przywrócenia.',
+                t('Przenoszenie przerwano. Kopia obrazów pozostaje dostępna do przywrócenia.'),
               ),
           { details: { quarantineId: id } },
         );
@@ -567,17 +568,17 @@ export async function openAssetMaintenance({
           const p = await position(batch, asset);
           if (p.saved) {
             if (digest(await f.readFile(p.destination)) !== asset.id)
-              throw unavailable('Kopia obrazu jest uszkodzona.');
+              throw unavailable(t('Kopia obrazu jest uszkodzona.'));
             if (p.original) {
               if (digest(await f.readFile(p.source)) !== asset.id)
-                throw unavailable('Istniejący obraz jest uszkodzony; nie zostanie zastąpiony.');
+                throw unavailable(t('Istniejący obraz jest uszkodzony; nie zostanie zastąpiony.'));
             } else {
               await rename(p.destination, p.source);
               const now = clock();
               await f.utimes(p.source, now, now);
             }
             restored.push({ kind: asset.kind, id: asset.id });
-          } else if (!p.original) throw unavailable('Nie znaleziono obrazu ani jego kopii.');
+          } else if (!p.original) throw unavailable(t('Nie znaleziono obrazu ani jego kopii.'));
           asset.state = 'restored';
           await atomic(batch.file, batch.manifest);
         }
@@ -585,7 +586,7 @@ export async function openAssetMaintenance({
         await atomic(batch.file, batch.manifest);
       } catch (error) {
         throw Object.assign(
-          unavailable('Przywracanie przerwano. Kopia pozostaje dostępna; spróbuj ponownie.'),
+          unavailable(t('Przywracanie przerwano. Kopia pozostaje dostępna; spróbuj ponownie.')),
           { details: { quarantineId } },
         );
       }
@@ -599,16 +600,16 @@ export async function openAssetMaintenance({
         report = await inspect();
       if (!report.cleanupAllowed)
         throw unavailable(
-          'Nie można potwierdzić wszystkich referencji. Trwałe usuwanie jest zablokowane.',
+          t('Nie można potwierdzić wszystkich referencji. Trwałe usuwanie jest zablokowane.'),
         );
       if (+clock() - Date.parse(batch.manifest.createdAt) < batch.manifest.retentionDays * day)
-        throw problem('CONFLICT', 'Kopia musi pozostać przez co najmniej 30 dni.');
+        throw problem('CONFLICT', t('Kopia musi pozostać przez co najmniej 30 dni.'));
       const known = await references();
-      if (known.blockers.length) throw unavailable('Nie można sprawdzić referencji obrazów.');
+      if (known.blockers.length) throw unavailable(t('Nie można sprawdzić referencji obrazów.'));
       if (batch.manifest.assets.some((asset) => known.refs[asset.kind].has(asset.id)))
         throw problem(
           'CONFLICT',
-          'Obraz z tej kopii jest ponownie potrzebny kolekcji, cache lub zadaniu.',
+          t('Obraz z tej kopii jest ponownie potrzebny kolekcji, cache lub zadaniu.'),
         );
       batch.manifest.state = 'purging';
       await atomic(batch.file, batch.manifest);
@@ -620,16 +621,19 @@ export async function openAssetMaintenance({
           checkRevision(expectedRevision);
           const current = await references();
           if (current.blockers.length)
-            throw unavailable('Referencje są niedostępne; trwałe usuwanie przerwano.');
+            throw unavailable(t('Referencje są niedostępne; trwałe usuwanie przerwano.'));
           if (current.refs[asset.kind].has(asset.id))
-            throw problem('CONFLICT', 'Obraz jest ponownie potrzebny; trwałe usuwanie przerwano.');
+            throw problem(
+              'CONFLICT',
+              t('Obraz jest ponownie potrzebny; trwałe usuwanie przerwano.'),
+            );
           const p = await position(batch, asset);
           if (p.saved) {
             if (
               p.saved.size !== asset.bytes ||
               digest(await f.readFile(p.destination)) !== asset.id
             )
-              throw unavailable('Kopia obrazu zmieniła się; nie zostanie usunięta.');
+              throw unavailable(t('Kopia obrazu zmieniła się; nie zostanie usunięta.'));
             asset.state = 'purge-planned';
             await atomic(batch.file, batch.manifest);
             await safeFile(f, root, p.destination);
@@ -647,7 +651,7 @@ export async function openAssetMaintenance({
         throw Object.assign(
           error.code === 'CONFLICT'
             ? error
-            : unavailable('Trwałe usuwanie przerwano. Pozostałe pliki są zachowane w kopii.'),
+            : unavailable(t('Trwałe usuwanie przerwano. Pozostałe pliki są zachowane w kopii.')),
           { details: { quarantineId, deletedBytes, deleted } },
         );
       }

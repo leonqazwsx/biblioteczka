@@ -1,3 +1,4 @@
+import { t } from './i18n.mjs';
 let token, appVersion, appSession;
 export async function request(route, { method = 'GET', body, signal } = {}) {
   const r = await fetch(route, {
@@ -11,7 +12,7 @@ export async function request(route, { method = 'GET', body, signal } = {}) {
   try {
     data = await r.json();
   } catch {
-    throw new Error('Aplikacja nie odpowiedziała. Sprawdź, czy działa w tle.');
+    throw new Error(t('Aplikacja nie odpowiedziała. Sprawdź, czy działa w tle.'));
   }
   if (!r.ok)
     throw Object.assign(new Error(data.message), { code: data.code, details: data.details });

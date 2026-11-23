@@ -1,3 +1,4 @@
+import { t } from './i18n.mjs';
 export const DEFAULT_SPINE_FRAME = Object.freeze({ x: 50, y: 50, zoom: 1 });
 export function normalizeSpineFrame(value) {
   if (value == null) return null;
@@ -16,7 +17,7 @@ export function normalizeSpineFrame(value) {
     value.zoom < 1 ||
     value.zoom > 3
   )
-    throw new Error('Nieprawidłowy kadr ilustracji.');
+    throw new Error(t('Nieprawidłowy kadr ilustracji.'));
   return value.x === 50 && value.y === 50 && value.zoom === 1
     ? null
     : { x: value.x, y: value.y, zoom: value.zoom };

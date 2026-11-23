@@ -1,7 +1,9 @@
 import { createRevisionFeed } from '../public/manager/revision-feed.mjs';
+import { t } from '../public/shared/i18n.mjs';
 import { topLevelStatement } from './helpers/source.mjs';
 function clientContext(globals) {
   const context = vm.createContext({
+    t,
     coverPicker: null,
     catalogImageId: null,
     connectionSession: null,
@@ -32,7 +34,11 @@ import { applyCommand, createInitialState } from '../src/domain.mjs';
 import { makeSpine } from '../public/shared/spines.mjs';
 import { validateBookForm } from '../public/manager/forms.mjs';
 import { catalogDraft } from '../public/manager/catalog-selection.mjs';
-import { CATEGORY_PRESETS } from '../public/shared/categories.mjs';
+import {
+  CATEGORY_PRESETS,
+  OTHER_CATEGORY,
+  shelfForCategory,
+} from '../public/shared/categories.mjs';
 import { resolveCategoryChoice } from '../public/manager/editor-category.mjs';
 import { createDraftGuard } from '../public/manager/draft-guard.mjs';
 test('typing a new query cancels the previous edition selection before it can populate the form', async () => {
@@ -222,6 +228,8 @@ test('editor does not silently overwrite another panel after SSE updates revisio
     uploading: false,
     validateBookForm,
     CATEGORY_PRESETS,
+    OTHER_CATEGORY,
+    shelfForCategory,
     resolveCategoryChoice,
     draftGuard: createDraftGuard(),
     editorFields: () => ({ readDate: $('read-date').value }),
@@ -329,7 +337,7 @@ test('Escape in AI confirmation leaves the underlying editor draft open', async 
     },
     querySelector: () => (modal ? {} : null),
   };
-  vm.runInNewContext(keydown, { document, closeEditor: () => closed++ });
+  vm.runInNewContext(keydown, { t, document, closeEditor: () => closed++ });
   handler({ key: 'Escape' });
   assert.equal(closed, 0);
   modal = false;
@@ -422,6 +430,8 @@ test('editor loads and saves the chosen completion date', async () => {
     uploading: false,
     validateBookForm,
     CATEGORY_PRESETS,
+    OTHER_CATEGORY,
+    shelfForCategory,
     resolveCategoryChoice,
     draftGuard: createDraftGuard(),
     editorFields: () => ({ readDate: $('read-date').value }),

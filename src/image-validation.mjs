@@ -1,6 +1,7 @@
 import { inflateSync } from 'node:zlib';
 import { imageMime } from './covers.mjs';
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 const crcTable = Uint32Array.from({ length: 256 }, (_, value) => {
   for (let bit = 0; bit < 8; bit++) value = value & 1 ? (value >>> 1) ^ 0xedb88320 : value >>> 1;
@@ -12,7 +13,7 @@ function crc(bytes) {
   return (value ^ 0xffffffff) >>> 0;
 }
 const invalid = () => {
-  throw problem('INVALID', 'Nieprawidłowa struktura obrazu.');
+  throw problem('INVALID', t('Nieprawidłowa struktura obrazu.'));
 };
 function dimensions(width, height) {
   if (!width || !height || width > 16384 || height > 16384 || width * height > 16000000) invalid();

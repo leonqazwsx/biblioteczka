@@ -1,6 +1,7 @@
 import { el } from '../shared/api.mjs';
 import { makeSpine } from '../shared/spines.mjs';
 import { readingDateLabel } from '../shared/reading-date.mjs';
+import { t } from '../shared/i18n.mjs';
 
 export function createBookCard(
   book,
@@ -28,7 +29,7 @@ export function createBookCard(
     check.type = 'checkbox';
     check.checked = selected;
     check.dataset.focusKey = 'select:' + book.id;
-    check.setAttribute('aria-label', 'Zaznacz: ' + book.title);
+    check.setAttribute('aria-label', t('Zaznacz: ') + book.title);
     check.onchange = () => onSelect(check.checked);
     label.append(check);
     row.append(label);
@@ -42,7 +43,7 @@ export function createBookCard(
   const cover = el('button', 'book-cover-button');
   cover.type = 'button';
   cover.dataset.focusKey = 'book:' + book.id;
-  cover.setAttribute('aria-label', 'Szczegóły książki: ' + book.title);
+  cover.setAttribute('aria-label', t('Szczegóły książki: ') + book.title);
   cover.onclick = onInspect;
   const fallback = () => {
     const spine = makeSpine(book),
@@ -71,35 +72,35 @@ export function createBookCard(
   if (date) status.append(el('small', 'read-date-label', date));
   const actions = el('div', 'row-actions'),
     menu = el('details', 'book-actions'),
-    summary = el('summary', '', 'Więcej'),
+    summary = el('summary', '', t('Więcej')),
     extra = el('div', 'book-actions-list');
   summary.dataset.focusKey = 'more:' + book.id;
-  summary.setAttribute('aria-label', 'Więcej działań dla: ' + book.title);
+  summary.setAttribute('aria-label', t('Więcej działań dla: ') + book.title);
   menu.append(summary, extra);
   if (manual)
     for (const [text, delta] of [
       ['↑', -1],
       ['↓', 1],
     ]) {
-      const move = el('button', '', delta < 0 ? 'Przesuń wcześniej' : 'Przesuń później');
+      const move = el('button', '', delta < 0 ? t('Przesuń wcześniej') : t('Przesuń później'));
       move.type = 'button';
       move.dataset.focusKey = 'move:' + delta + ':' + book.id;
       move.disabled = !manual || index + delta < 0 || index + delta >= count;
-      move.title = delta < 0 ? 'Przesuń wcześniej' : 'Przesuń później';
+      move.title = delta < 0 ? t('Przesuń wcześniej') : t('Przesuń później');
       move.setAttribute('aria-label', move.title + ': ' + book.title);
       move.onclick = () => onMove(index + delta);
       extra.append(move);
     }
-  const edit = el('button', '', 'Edytuj');
+  const edit = el('button', '', t('Edytuj'));
   edit.type = 'button';
   edit.dataset.focusKey = 'edit:' + book.id;
-  edit.setAttribute('aria-label', 'Edytuj: ' + book.title);
+  edit.setAttribute('aria-label', t('Edytuj: ') + book.title);
   edit.onclick = onEdit;
-  const remove = el('button', 'delete', 'Usuń książkę');
+  const remove = el('button', 'delete', t('Usuń książkę'));
   remove.type = 'button';
   remove.dataset.focusKey = 'delete:' + book.id;
-  remove.title = 'Usuń książkę';
-  remove.setAttribute('aria-label', 'Usuń: ' + book.title);
+  remove.title = t('Usuń książkę');
+  remove.setAttribute('aria-label', t('Usuń: ') + book.title);
   remove.onclick = onDelete;
   extra.append(remove);
   actions.append(edit, menu);

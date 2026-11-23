@@ -1,6 +1,7 @@
 import { ROOM_SCENES } from './room-scene.mjs';
+import { t } from './i18n.mjs';
 const invalid = () => {
-  throw Object.assign(new Error('Nieprawidłowe rozmieszczenie książek.'), { code: 'INVALID' });
+  throw Object.assign(new Error(t('Nieprawidłowe rozmieszczenie książek.')), { code: 'INVALID' });
 };
 function object(value) {
   if (

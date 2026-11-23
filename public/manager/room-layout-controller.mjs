@@ -1,10 +1,13 @@
 import { getRoomScene } from '../shared/room-scene.mjs';
 import { normalizeRoomLayouts } from '../shared/room-layout.mjs';
+import { t } from '../shared/i18n.mjs';
 const empty = () => ({ enabled: false, cavities: {}, placements: {} });
 const conflict = () =>
   Object.assign(
     new Error(
-      'Kolekcja lub sesja zmieniła się. Szkic zachowano. Cofnij zmiany, aby wczytać aktualną wersję.',
+      t(
+        'Kolekcja lub sesja zmieniła się. Szkic zachowano. Cofnij zmiany, aby wczytać aktualną wersję.',
+      ),
     ),
     { code: 'CONFLICT' },
   );
@@ -35,7 +38,7 @@ export function createRoomLayoutController(initial) {
     latest.revision !== revision ||
     JSON.stringify(latest.settings.roomLayouts?.[roomId] ?? empty()) !== JSON.stringify(baseline);
   const mutate = (fn) => {
-    if (saving) throw new Error('Poczekaj na zakończenie zapisu.');
+    if (saving) throw new Error(t('Poczekaj na zakończenie zapisu.'));
     const next = structuredClone(draft);
     fn(next);
     draft = normalizeRoomLayouts({ [roomId]: next }, saved)[roomId];
@@ -74,7 +77,8 @@ export function createRoomLayoutController(initial) {
       return saving;
     },
     select(id) {
-      if (!getRoomScene(roomId).slots.some((s) => s.id === id)) throw new Error('Nieznana wnęka.');
+      if (!getRoomScene(roomId).slots.some((s) => s.id === id))
+        throw new Error(t('Nieznana wnęka.'));
       selected = id;
     },
     setEnabled(enabled) {
@@ -161,7 +165,7 @@ export function createRoomLayoutController(initial) {
       });
     },
     async save(send) {
-      if (saving) throw new Error('Trwa zapis.');
+      if (saving) throw new Error(t('Trwa zapis.'));
       if (stale()) throw conflict();
       saving = true;
       try {

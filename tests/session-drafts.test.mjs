@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { t } from '../public/shared/i18n.mjs';
 import { topLevelStatement } from './helpers/source.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -9,7 +10,11 @@ import { createRevisionFeed } from '../public/manager/revision-feed.mjs';
 import { createDraftGuard } from '../public/manager/draft-guard.mjs';
 import { makeSpine } from '../public/shared/spines.mjs';
 import { validateBookForm } from '../public/manager/forms.mjs';
-import { CATEGORY_PRESETS } from '../public/shared/categories.mjs';
+import {
+  CATEGORY_PRESETS,
+  OTHER_CATEGORY,
+  shelfForCategory,
+} from '../public/shared/categories.mjs';
 import { resolveCategoryChoice } from '../public/manager/editor-category.mjs';
 import { createGoodreadsImportController } from '../public/manager/goodreads-import-controller.mjs';
 import { createRoomLayoutController } from '../public/manager/room-layout-controller.mjs';
@@ -45,6 +50,7 @@ function fixture() {
 }
 function context(globals) {
   const c = vm.createContext({
+    t,
     coverPicker: null,
     catalogImageId: null,
     connectionSession: 'old',
@@ -101,6 +107,8 @@ test('editor preserves its draft when recovery reuses the opening revision for a
     uploading: false,
     validateBookForm,
     CATEGORY_PRESETS,
+    OTHER_CATEGORY,
+    shelfForCategory,
     resolveCategoryChoice,
     draftGuard: createDraftGuard(),
     editorFields: () => ({ title: $('title').value }),

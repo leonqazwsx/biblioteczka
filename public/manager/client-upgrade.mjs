@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n.mjs';
 export function createClientUpgrade({ isEditing, reload, notice }) {
   let pending = false;
   return {
@@ -5,7 +6,9 @@ export function createClientUpgrade({ isEditing, reload, notice }) {
       if (isEditing()) {
         pending = true;
         notice(
-          'Jest nowa wersja Biblioteczki. Zapisz lub odrzuć wszystkie niezapisane zmiany w formularzu, rozmieszczeniu i imporcie; panel odświeży się, gdy wszystkie będą zamknięte.',
+          t(
+            'Jest nowa wersja Biblioteczki. Zapisz lub odrzuć wszystkie niezapisane zmiany w formularzu, rozmieszczeniu i imporcie; panel odświeży się, gdy wszystkie będą zamknięte.',
+          ),
         );
       } else reload();
     },

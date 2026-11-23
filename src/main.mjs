@@ -14,6 +14,7 @@ import { createStorageGate, guardStorage, openAssetMaintenance } from './asset-m
 import { createInventaireCoverLookup } from './inventaire-covers.mjs';
 import { createCoverImageLoader } from './cover-images.mjs';
 import { createCoverDiscovery } from './cover-discovery.mjs';
+import { t } from '../public/shared/i18n.mjs';
 export async function run({
   appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
   port = 47831,
@@ -22,7 +23,7 @@ export async function run({
   hostExe = null,
 } = {}) {
   if (!Number.isSafeInteger(port) || port < 0 || port > 65535)
-    throw problem('INVALID', 'Nieprawidłowy port.');
+    throw problem('INVALID', t('Nieprawidłowy port.'));
   const identity = installationId(appRoot, dataDir);
   if (port) {
     try {
@@ -37,7 +38,7 @@ export async function run({
         return { origin: 'http://127.0.0.1:' + port, alreadyRunning: true, close: async () => {} };
       throw problem(
         'PORT_IN_USE',
-        'Port jest zajęty przez inny program lub inną instalację Biblioteczki.',
+        t('Port jest zajęty przez inny program lub inną instalację Biblioteczki.'),
       );
     } catch (e) {
       if (e.code === 'PORT_IN_USE') throw e;
@@ -119,7 +120,7 @@ export async function run({
       server.once('error', (e) =>
         reject(
           e.code === 'EADDRINUSE'
-            ? problem('PORT_IN_USE', 'Port jest zajęty przez inny program.')
+            ? problem('PORT_IN_USE', t('Port jest zajęty przez inny program.'))
             : e,
         ),
       );

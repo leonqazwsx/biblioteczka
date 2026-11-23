@@ -4,6 +4,7 @@ import { renderScene } from '../wallpaper/scene-renderer.mjs';
 import { createRoomLayoutController } from './room-layout-controller.mjs';
 import { rememberLayoutFocus } from './layout-focus.mjs';
 import { isMonthlyView, readingYearValue } from './annual-settings.mjs';
+import { t } from '../shared/i18n.mjs';
 function choose(label, options, value, change) {
   const wrap = el('label', 'layout-field', label),
     s = el('select');
@@ -56,24 +57,30 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
   function paintAnnual(restoreFocus) {
     const scene = getRoomScene(activeState.settings.room);
     root.append(
-      el('h2', '', 'Widok roczny ' + readingYearValue(activeState.settings) + ' · ' + scene.name),
+      el(
+        'h2',
+        '',
+        t('Widok roczny ') + readingYearValue(activeState.settings) + ' · ' + scene.name,
+      ),
       el(
         'p',
         'muted',
-        'Miesiące zajmują stałe wnęki, wierszami od lewej do prawej. Aby edytować rozmieszczenie, przełącz na gatunki.',
+        t(
+          'Miesiące zajmują stałe wnęki, wierszami od lewej do prawej. Aby edytować rozmieszczenie, przełącz na gatunki.',
+        ),
       ),
     );
     if (c.dirty) {
       const status = el(
         'p',
         'layout-draft-status',
-        'Niezapisany szkic rozmieszczenia zachowano. Wróć do gatunków, aby go edytować.',
+        t('Niezapisany szkic rozmieszczenia zachowano. Wróć do gatunków, aby go edytować.'),
       );
       status.setAttribute('role', 'status');
       root.append(status);
     }
     root.append(
-      action('Pokaż według gatunków', () =>
+      action(t('Pokaż według gatunków'), () =>
         onSave({ type: 'updateSettings', patch: { grouping: 'shelves' } }),
       ),
     );
@@ -91,7 +98,7 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
         width: stage.clientWidth,
         height: stage.clientHeight,
         embedded: true,
-        onBook: (b) => notice('Wybrano: ' + b.title),
+        onBook: (b) => notice(t('Wybrano: ') + b.title),
         onTooltip() {},
         onLeave() {},
       });
@@ -102,13 +109,13 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
         next = action('→', () => {
           page++;
         });
-      prev.setAttribute('aria-label', 'Poprzednia strona podglądu');
-      next.setAttribute('aria-label', 'Następna strona podglądu');
+      prev.setAttribute('aria-label', t('Poprzednia strona podglądu'));
+      next.setAttribute('aria-label', t('Następna strona podglądu'));
       prev.disabled = page === 0;
       next.disabled = page === result.pageCount - 1;
       pager.replaceChildren(
         prev,
-        el('span', '', `Podgląd ${page + 1} / ${result.pageCount}`),
+        el('span', '', t('Podgląd {page} / {pages}', { page: page + 1, pages: result.pageCount })),
         next,
       );
       restorePagerFocus();
@@ -131,34 +138,36 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
       s = c.state,
       draft = c.layout;
     root.append(
-      el('h2', '', 'Rozmieszczenie · ' + scene.name),
+      el('h2', '', t('Rozmieszczenie · ') + scene.name),
       el(
         'p',
         'muted',
-        'Wybierz wnękę na mapie lub z listy. Zmiany zobaczysz na tapecie po zapisaniu.',
+        t('Wybierz wnękę na mapie lub z listy. Zmiany zobaczysz na tapecie po zapisaniu.'),
       ),
     );
     const status = el(
       'p',
       'layout-draft-status',
       c.saving
-        ? 'Zapisuję…'
+        ? t('Zapisuję…')
         : c.stale
-          ? 'Kolekcja lub zapisany układ zmieniły się. Szkic zachowano. Cofnij zmiany, aby wczytać aktualną wersję.'
+          ? t(
+              'Kolekcja lub zapisany układ zmieniły się. Szkic zachowano. Cofnij zmiany, aby wczytać aktualną wersję.',
+            )
           : c.dirty
-            ? 'Niezapisany szkic · zachowany również po zmianie zakładki.'
-            : 'Rozmieszczenie zapisane.',
+            ? t('Niezapisany szkic · zachowany również po zmianie zakładki.')
+            : t('Rozmieszczenie zapisane.'),
     );
     status.setAttribute('role', 'status');
     root.append(status);
     const enabled = el('label', 'checkbox-label'),
       check = el('input');
     check.type = 'checkbox';
-    check.setAttribute('aria-label', 'Własny układ w tym pokoju');
+    check.setAttribute('aria-label', t('Własny układ w tym pokoju'));
     check.checked = draft.enabled;
     check.disabled = c.saving;
     check.onchange = () => edit(() => c.setEnabled(check.checked));
-    enabled.append(check, el('span', '', 'Własny układ w tym pokoju'));
+    enabled.append(check, el('span', '', t('Własny układ w tym pokoju')));
     root.append(enabled);
     const stage = el('div', 'layout-map'),
       visual = el('div', 'room-scene'),
@@ -175,7 +184,7 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
         embedded: true,
         onBook: (b) => {
           c.select(draft.placements[b.id]?.slotId ?? c.selectedSlot);
-          notice('Wybrano: ' + b.title);
+          notice(t('Wybrano: ') + b.title);
           paint();
         },
         onTooltip() {},
@@ -191,7 +200,7 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
           },
           'cavity-marker',
         );
-        dot.setAttribute('aria-label', 'Wybierz wnękę ' + (i + 1));
+        dot.setAttribute('aria-label', t('Wybierz wnękę ') + (i + 1));
         dot.setAttribute('aria-pressed', slot.id === c.selectedSlot);
         dot.style.left = (slot.books.x + slot.books.width / 2) * 100 + '%';
         dot.style.top = slot.books.y * 100 + '%';
@@ -206,13 +215,21 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
           page++;
           preview();
         });
-      prev.setAttribute('aria-label', 'Poprzednia strona podglądu');
-      next.setAttribute('aria-label', 'Następna strona podglądu');
+      prev.setAttribute('aria-label', t('Poprzednia strona podglądu'));
+      next.setAttribute('aria-label', t('Następna strona podglądu'));
       prev.disabled = page === 0;
       next.disabled = page === result.pageCount - 1;
       pager.append(
         prev,
-        el('span', '', `Podgląd ${page + 1} / ${result.pageCount} · ${s.books.length} książek`),
+        el(
+          'span',
+          '',
+          t('Podgląd {page} / {pages} · {count} książek', {
+            page: page + 1,
+            pages: result.pageCount,
+            count: s.books.length,
+          }),
+        ),
         next,
       );
     }
@@ -220,14 +237,14 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
     const cavity = draft.cavities[c.selectedSlot] ?? { source: null, decoration: null };
     controls.append(
       choose(
-        'Wnęka',
-        scene.slots.map((v, i) => [v.id, 'Wnęka ' + (i + 1)]),
+        t('Wnęka'),
+        scene.slots.map((v, i) => [v.id, t('Wnęka ') + (i + 1)]),
         c.selectedSlot,
         (id) => edit(() => c.select(id)),
       ),
       choose(
-        'Wypełnienie wnęki',
-        [['', 'Automatycznie'], ...s.shelves.map((v) => ['shelf:' + v.id, v.name])],
+        t('Wypełnienie wnęki'),
+        [['', t('Automatycznie')], ...s.shelves.map((v) => ['shelf:' + v.id, v.name])],
         cavity.source ? cavity.source.kind + ':' + cavity.source.id : '',
         (value) =>
           edit(() => {
@@ -244,14 +261,16 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
         el(
           'p',
           'muted',
-          'Włącz własny układ, aby przypisać gatunki i książki do wnęk. Wyłączenie zachowuje zapisane wybory.',
+          t(
+            'Włącz własny układ, aby przypisać gatunki i książki do wnęk. Wyłączenie zachowuje zapisane wybory.',
+          ),
         ),
       );
     const add = el('div', 'layout-add'),
       bookField = choose(
-        'Przypisz książkę',
+        t('Przypisz książkę'),
         [
-          ['', 'Wybierz książkę'],
+          ['', t('Wybierz książkę')],
           ...s.books
             .toSorted((a, b) => a.title.localeCompare(b.title, 'pl'))
             .map((b) => [b.id, b.title + ' · ' + b.authors.join(', ')]),
@@ -262,7 +281,7 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
     const bookSelect = bookField.querySelector('select');
     add.append(
       bookField,
-      action('Dodaj do wnęki', () => {
+      action(t('Dodaj do wnęki'), () => {
         if (bookSelect.value) edit(() => c.place(bookSelect.value));
       }),
     );
@@ -273,7 +292,7 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
         el(
           'p',
           'muted',
-          'Brak ręcznych przypisań w tej wnęce. Książki dobierze ustawione wypełnienie.',
+          t('Brak ręcznych przypisań w tej wnęce. Książki dobierze ustawione wypełnienie.'),
         ),
       );
     for (const [i, b] of books.entries()) {
@@ -286,36 +305,36 @@ export function createRoomLayoutPanel({ state, onSave, onDirtyChange, notice }) 
         const move = action(text, () => edit(() => c.shift(b.id, delta)));
         move.setAttribute(
           'aria-label',
-          (delta < 0 ? 'Przesuń wcześniej: ' : 'Przesuń później: ') + b.title,
+          (delta < 0 ? t('Przesuń wcześniej: ') : t('Przesuń później: ')) + b.title,
         );
         move.disabled = c.saving || i + delta < 0 || i + delta >= books.length;
         row.append(move);
       }
-      row.append(action('Usuń przypisanie', () => edit(() => c.remove(b.id))));
+      row.append(action(t('Usuń przypisanie'), () => edit(() => c.remove(b.id))));
       root.append(row);
     }
     const footer = el('div', 'layout-actions'),
       save = action(
-        'Zapisz rozmieszczenie',
+        t('Zapisz rozmieszczenie'),
         async () => {
           const promise = c.save(onSave);
           paint();
           await promise;
-          notice('Rozmieszczenie zapisane. Tapeta jest aktualna.');
+          notice(t('Rozmieszczenie zapisane. Tapeta jest aktualna.'));
         },
         'primary',
       );
     save.disabled = !c.dirty || c.stale || c.saving;
     footer.append(
       save,
-      action('Cofnij zmiany', () => {
-        if (!c.dirty || confirm('Odrzucić niezapisany szkic rozmieszczenia?')) {
+      action(t('Cofnij zmiany'), () => {
+        if (!c.dirty || confirm(t('Odrzucić niezapisany szkic rozmieszczenia?'))) {
           c.discard();
           page = 0;
         }
       }),
-      action('Przywróć automatyczny układ', () => {
-        if (confirm('Usunąć przypisania tego pokoju? Zmiana zadziała po zapisie.'))
+      action(t('Przywróć automatyczny układ'), () => {
+        if (confirm(t('Usunąć przypisania tego pokoju? Zmiana zadziała po zapisie.')))
           edit(() => c.reset());
       }),
     );

@@ -1,19 +1,20 @@
 import { normalizeReadDate } from './calendar-date.mjs';
 import { sortBooks } from './book-order.mjs';
+import { t } from './i18n.mjs';
 
 const monthNames = [
-  'Styczeń',
-  'Luty',
-  'Marzec',
-  'Kwiecień',
-  'Maj',
-  'Czerwiec',
-  'Lipiec',
-  'Sierpień',
-  'Wrzesień',
-  'Październik',
-  'Listopad',
-  'Grudzień',
+  t('Styczeń'),
+  t('Luty'),
+  t('Marzec'),
+  t('Kwiecień'),
+  t('Maj'),
+  t('Czerwiec'),
+  t('Lipiec'),
+  t('Sierpień'),
+  t('Wrzesień'),
+  t('Październik'),
+  t('Listopad'),
+  t('Grudzień'),
 ];
 function calendarParts(value) {
   try {

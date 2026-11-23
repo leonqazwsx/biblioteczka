@@ -1,4 +1,5 @@
 import { sortBooks } from './book-order.mjs';
+import { t } from './i18n.mjs';
 const matches = (book, source) => source?.kind === 'shelf' && book.shelfId === source.id;
 export function buildCustomPages(state, { scene, slots, size, fit }) {
   const layout = state.settings.roomLayouts[scene.id],
@@ -19,7 +20,7 @@ export function buildCustomPages(state, { scene, slots, size, fit }) {
             slotId: slot.id,
             bounds: slot.books,
             key: 'custom-' + slot.id + '-' + pages.length,
-            label: sourceName(source) || 'Półka ' + (i + 1),
+            label: sourceName(source) || t('Półka ') + (i + 1),
             books: [],
           };
         used.set(row, 0);
@@ -38,7 +39,7 @@ export function buildCustomPages(state, { scene, slots, size, fit }) {
         return d.width > 0 && d.height > 0 && d.width <= slot.books.width * fit.width + 0.001;
       })
     )
-      throw Object.assign(new Error('Powiększ podgląd, aby zobaczyć książki.'), {
+      throw Object.assign(new Error(t('Powiększ podgląd, aby zobaczyć książki.')), {
         code: 'VIEWPORT_TOO_SMALL',
       });
     let index = cursors.get(key) ?? 0;
@@ -84,7 +85,7 @@ export function buildCustomPages(state, { scene, slots, size, fit }) {
     for (const [i, row] of rows.entries()) {
       const source = layout.cavities[row.slotId]?.source;
       if (source && row.books.some((item) => !matches(item.book, source)))
-        row.label = 'Półka ' + (i + 1);
+        row.label = t('Półka ') + (i + 1);
     }
   return pages;
 }

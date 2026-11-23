@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n.mjs';
 const snapshot = (value) => JSON.stringify(value);
 export function createDraftGuard() {
   let initial = null;
@@ -15,7 +16,7 @@ export function createDraftGuard() {
       return (
         initial === null ||
         snapshot(value) === initial ||
-        confirm('Odrzucić niezapisane zmiany książki?')
+        confirm(t('Odrzucić niezapisane zmiany książki?'))
       );
     },
     reset() {

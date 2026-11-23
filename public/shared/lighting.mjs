@@ -1,8 +1,9 @@
+import { t } from './i18n.mjs';
 export const LIGHTING_OPTIONS = [
-  ['theme', 'Zgodnie z motywem'],
-  ['day', 'Dzień'],
-  ['evening', 'Wieczór'],
-  ['auto', 'Automatycznie · 07:00–19:00'],
+  ['theme', t('Zgodnie z motywem')],
+  ['day', t('Dzień')],
+  ['evening', t('Wieczór')],
+  ['auto', t('Automatycznie · 07:00–19:00')],
 ];
 export function resolveLighting(settings, date = new Date()) {
   if (settings.lighting === 'day' || settings.lighting === 'evening') return settings.lighting;

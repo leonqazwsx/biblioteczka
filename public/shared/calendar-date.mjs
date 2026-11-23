@@ -1,3 +1,4 @@
+import { t } from './i18n.mjs';
 // Store a calendar day, never a timestamp: time zones must not move this date.
 export function localCalendarDate(date = new Date()) {
   const year = String(date.getFullYear()).padStart(4, '0');
@@ -8,7 +9,7 @@ export function localCalendarDate(date = new Date()) {
 export function normalizeReadDate(value) {
   if (value == null || value === '') return null;
   const invalid = () => {
-    throw Object.assign(new Error('Podaj prawidłową datę przeczytania.'), { code: 'INVALID' });
+    throw Object.assign(new Error(t('Podaj prawidłową datę przeczytania.')), { code: 'INVALID' });
   };
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) invalid();
   const [year, month, day] = value.split('-').map(Number);

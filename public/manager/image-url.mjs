@@ -1,4 +1,5 @@
 import { el, request } from '../shared/api.mjs';
+import { t } from '../shared/i18n.mjs';
 export function createImageUrlControl(
   root,
   {
@@ -11,12 +12,12 @@ export function createImageUrlControl(
   },
 ) {
   const details = el('details', 'image-url'),
-    summary = el('summary', '', 'Wklej link'),
+    summary = el('summary', '', t('Wklej link')),
     fieldLabel = el('label', '', label),
     row = el('div', 'image-url-row'),
     input = el('input'),
-    button = el('button', 'secondary', 'Pobierz obraz'),
-    note = el('p', 'muted', 'Bezpośredni link HTTPS do JPEG, PNG lub WebP, do 5 MiB.'),
+    button = el('button', 'secondary', t('Pobierz obraz')),
+    note = el('p', 'muted', t('Bezpośredni link HTTPS do JPEG, PNG lub WebP, do 5 MiB.')),
     feedback = el('p', 'image-url-feedback');
   input.type = 'url';
   input.placeholder = 'https://…';
@@ -61,7 +62,7 @@ export function createImageUrlControl(
     } catch {
       feedback.hidden = false;
       feedback.className = 'image-url-feedback ai-error';
-      feedback.textContent = 'Wklej poprawny, bezpośredni adres HTTPS obrazu.';
+      feedback.textContent = t('Wklej poprawny, bezpośredni adres HTTPS obrazu.');
       return;
     }
     controller = new AbortController();
@@ -72,13 +73,13 @@ export function createImageUrlControl(
     button.disabled = true;
     feedback.hidden = false;
     feedback.className = 'image-url-feedback';
-    feedback.textContent = 'Pobieram obraz…';
+    feedback.textContent = t('Pobieram obraz…');
     try {
       const image = await download(url.href, signal);
       if (current !== revision || signal.aborted || !root.contains(details)) return;
       await onImport(image, context);
       if (current === revision && !signal.aborted && root.contains(details)) {
-        feedback.textContent = 'Obraz pobrany.';
+        feedback.textContent = t('Obraz pobrany.');
         input.value = '';
       }
     } catch (error) {

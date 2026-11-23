@@ -1,8 +1,9 @@
 import { el } from '../shared/api.mjs';
+import { t } from '../shared/i18n.mjs';
 
 export function createBookPicker({ onBook, onOpen = () => {} }) {
   let books = [];
-  const opener = el('button', null, 'Lista książek');
+  const opener = el('button', null, t('Lista książek'));
   opener.id = 'book-picker-open';
   opener.type = 'button';
   opener.setAttribute('aria-haspopup', 'dialog');
@@ -10,13 +11,13 @@ export function createBookPicker({ onBook, onOpen = () => {} }) {
   const dialog = el('dialog');
   dialog.id = 'book-picker';
   dialog.setAttribute('aria-labelledby', 'book-picker-title');
-  const heading = el('h2', null, 'Książki na tej stronie');
+  const heading = el('h2', null, t('Książki na tej stronie'));
   heading.id = 'book-picker-title';
   const close = el('button', 'close-card', '×');
   close.type = 'button';
-  close.setAttribute('aria-label', 'Zamknij listę książek');
+  close.setAttribute('aria-label', t('Zamknij listę książek'));
   close.onclick = () => dialog.close();
-  const label = el('label', null, 'Szukaj książki na tej stronie'),
+  const label = el('label', null, t('Szukaj książki na tej stronie')),
     search = el('input');
   search.id = 'book-picker-search';
   search.type = 'search';
@@ -48,8 +49,8 @@ export function createBookPicker({ onBook, onOpen = () => {} }) {
       if (book.id === focused) button.focus({ preventScroll: true });
     }
     status.textContent = matches.length
-      ? `${matches.length} z ${books.length} książek`
-      : 'Brak pasujących książek na tej stronie.';
+      ? t('{shown} z {total} książek', { shown: matches.length, total: books.length })
+      : t('Brak pasujących książek na tej stronie.');
   }
   search.addEventListener('input', paint);
   opener.onclick = () => {

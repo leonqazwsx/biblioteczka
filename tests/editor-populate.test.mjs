@@ -1,10 +1,15 @@
 import test from 'node:test';
+import { t } from '../public/shared/i18n.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
 import { importDom } from './helpers/import-dom.mjs';
 import { makeSpine } from '../public/shared/spines.mjs';
-import { CATEGORY_PRESETS } from '../public/shared/categories.mjs';
+import {
+  CATEGORY_PRESETS,
+  OTHER_CATEGORY,
+  shelfForCategory,
+} from '../public/shared/categories.mjs';
 import { editorCategory, resolveCategoryChoice } from '../public/manager/editor-category.mjs';
 import { createSearchController } from '../public/manager/search.mjs';
 const source = await fs.readFile(new URL('../public/manager/app.mjs', import.meta.url), 'utf8');
@@ -26,6 +31,7 @@ function setup(draft) {
     return node;
   };
   const context = vm.createContext({
+    t,
     coverPicker: null,
     catalogImageId: null,
     connectionSession: 'fixture',
@@ -43,6 +49,8 @@ function setup(draft) {
     el,
     makeSpine,
     CATEGORY_PRESETS,
+    OTHER_CATEGORY,
+    shelfForCategory,
     editorCategory,
     resolveCategoryChoice,
     bookSnapshot: (b) => JSON.stringify(b),
@@ -126,6 +134,7 @@ test('opening a fresh editor resets the old query, pagination and a cancelled lo
       return fields.get(id);
     };
   const context = vm.createContext({
+    t,
     coverPicker: null,
     catalogImageId: null,
     $,

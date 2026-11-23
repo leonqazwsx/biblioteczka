@@ -1,9 +1,10 @@
+import { t } from './i18n.mjs';
 export const SORT_OPTIONS = [
-  ['manual', 'Kolejność ręczna'],
-  ['title-asc', 'Tytuł A–Z'],
-  ['title-desc', 'Tytuł Z–A'],
-  ['read-newest', 'Przeczytane: najnowsze'],
-  ['read-oldest', 'Przeczytane: najstarsze'],
+  ['manual', t('Kolejność ręczna')],
+  ['title-asc', t('Tytuł A–Z')],
+  ['title-desc', t('Tytuł Z–A')],
+  ['read-newest', t('Przeczytane: najnowsze')],
+  ['read-oldest', t('Przeczytane: najstarsze')],
 ];
 const titles = new Intl.Collator('pl', { numeric: true, sensitivity: 'base' });
 const manual = (a, b) =>

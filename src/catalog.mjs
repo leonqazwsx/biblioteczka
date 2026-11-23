@@ -4,6 +4,7 @@ import { createOpenLibraryCatalog, normalizeIsbn } from './open-library-catalog.
 import { createBnCatalog } from './bn-catalog.mjs';
 import { canonicalIsbn } from '../public/shared/book-identity.mjs';
 import { cleanSubjects } from '../public/shared/categories.mjs';
+import { t } from '../public/shared/i18n.mjs';
 export { normalizeIsbn };
 
 const normalize = (value) =>
@@ -56,7 +57,7 @@ export function createCatalog(options = {}) {
     bn = createBnCatalog(options);
   async function searchPage(query, { signal, cursor = null } = {}) {
     if (typeof query !== 'string' || !query.trim() || query.length > 500)
-      throw problem('INVALID', 'Wpisz tytuł, autora lub ISBN.');
+      throw problem('INVALID', t('Wpisz tytuł, autora lub ISBN.'));
     signal?.throwIfAborted();
     query = query.trim();
     const isbn = normalizeIsbn(query),
@@ -88,7 +89,7 @@ export function createCatalog(options = {}) {
           )
             throw Error();
       } catch {
-        throw problem('INVALID', 'Nieprawidłowa strona wyników. Wyszukaj książkę ponownie.');
+        throw problem('INVALID', t('Nieprawidłowa strona wyników. Wyszukaj książkę ponownie.'));
       }
     }
     const sources = [
@@ -119,7 +120,7 @@ export function createCatalog(options = {}) {
     if (outcomes.length && outcomes.every((result) => result.status === 'rejected'))
       throw problem(
         'CATALOG_UNAVAILABLE',
-        'Katalogi są teraz niedostępne. Spróbuj ponownie lub dodaj książkę ręcznie.',
+        t('Katalogi są teraz niedostępne. Spróbuj ponownie lub dodaj książkę ręcznie.'),
       );
     const items = [],
       warnings = [],
@@ -127,7 +128,7 @@ export function createCatalog(options = {}) {
     outcomes.forEach((result, index) => {
       const source = sources[index];
       if (result.status === 'rejected') {
-        warnings.push(source.name + ' — chwilowo brak połączenia. Wyniki mogą być niepełne.');
+        warnings.push(source.name + t(' — chwilowo brak połączenia. Wyniki mogą być niepełne.'));
         return;
       }
       next[source.key] = result.value.next;

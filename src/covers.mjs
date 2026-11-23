@@ -6,6 +6,7 @@ import { problem } from './domain.mjs';
 import { canonicalIsbn } from '../public/shared/book-identity.mjs';
 import { validateImageBytes } from './image-validation.mjs';
 import { createCoverImageLoader } from './cover-images.mjs';
+import { t } from '../public/shared/i18n.mjs';
 export function imageMime(bytes) {
   if (
     bytes.length > 8 &&
@@ -20,7 +21,7 @@ export function imageMime(bytes) {
     bytes.toString('ascii', 8, 12) === 'WEBP'
   )
     return 'image/webp';
-  throw problem('INVALID', 'Wybierz poprawny obraz JPEG, PNG lub WebP.');
+  throw problem('INVALID', t('Wybierz poprawny obraz JPEG, PNG lub WebP.'));
 }
 function boundedSignal(parent, milliseconds) {
   const controller = new AbortController(),
@@ -69,15 +70,15 @@ export async function openCoverStore(
   await f.mkdir(root, { recursive: true });
   function file(id) {
     if (typeof id !== 'string' || !/^[a-f0-9]{64}$/.test(id))
-      throw problem('INVALID', 'Nieprawidłowy identyfikator okładki.');
+      throw problem('INVALID', t('Nieprawidłowy identyfikator okładki.'));
     return path.join(root, id);
   }
   const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
   async function put(bytes, mime) {
     if (!Buffer.isBuffer(bytes) || bytes.length > 5 * 1024 * 1024)
-      throw problem('TOO_LARGE', 'Okładka jest za duża.');
+      throw problem('TOO_LARGE', t('Okładka jest za duża.'));
     if (imageMime(bytes) !== mime)
-      throw problem('INVALID', 'Format obrazu nie odpowiada zawartości.');
+      throw problem('INVALID', t('Format obrazu nie odpowiada zawartości.'));
     const coverId = hash(bytes),
       destination = file(coverId);
     try {
@@ -112,7 +113,7 @@ export async function openCoverStore(
     }
     try {
       const bytes = await f.readFile(file(entry.coverId));
-      if (hash(bytes) !== entry.coverId) throw problem('INVALID', 'Uszkodzona okładka.');
+      if (hash(bytes) !== entry.coverId) throw problem('INVALID', t('Uszkodzona okładka.'));
       validateImageBytes(bytes, entry.mime);
       localImages.delete(key);
       localImages.set(key, entry);
@@ -149,7 +150,7 @@ export async function openCoverStore(
     options.signal?.throwIfAborted();
     if (!image) {
       if (options.allowMissing) return null;
-      throw problem('COVER_UNAVAILABLE', 'Nie znaleziono okładki. Możesz dodać plik lub link.', {
+      throw problem('COVER_UNAVAILABLE', t('Nie znaleziono okładki. Możesz dodać plik lub link.'), {
         reason: 'missing',
       });
     }
@@ -160,12 +161,12 @@ export async function openCoverStore(
     async read(id) {
       const bytes = await f.readFile(file(id));
       if (hash(bytes) !== id)
-        throw problem('INVALID', 'Uszkodzona okładka. Przywróć ją z kopii lub dodaj ponownie.');
+        throw problem('INVALID', t('Uszkodzona okładka. Przywróć ją z kopii lub dodaj ponownie.'));
       return { bytes, mime: imageMime(bytes) };
     },
     async fetchCatalogCover(id, options = {}) {
       if (!Number.isSafeInteger(id) || id <= 0)
-        throw problem('INVALID', 'Nieprawidłowa okładka katalogowa.');
+        throw problem('INVALID', t('Nieprawidłowa okładka katalogowa.'));
       return fetchCover('id', id, options);
     },
     async fetchIsbnCover(value, options = {}) {
@@ -174,7 +175,7 @@ export async function openCoverStore(
           ? value.replace(/[\s-]/g, '').toUpperCase()
           : null,
       );
-      if (!isbn) throw problem('INVALID_ISBN', 'Podaj poprawny ISBN książki.');
+      if (!isbn) throw problem('INVALID_ISBN', t('Podaj poprawny ISBN książki.'));
       options.signal?.throwIfAborted();
       const overall = boundedSignal(options.signal, 20000);
       let primaryError;
@@ -192,7 +193,7 @@ export async function openCoverStore(
           primaryError =
             error.code === 'COVER_UNAVAILABLE'
               ? error
-              : problem('COVER_UNAVAILABLE', 'Źródło okładki przekroczyło czas oczekiwania.', {
+              : problem('COVER_UNAVAILABLE', t('Źródło okładki przekroczyło czas oczekiwania.'), {
                   reason: 'timeout',
                 });
         } finally {
@@ -220,7 +221,7 @@ export async function openCoverStore(
             options.signal?.throwIfAborted();
             throw problem(
               'COVER_UNAVAILABLE',
-              'Nie udało się pobrać okładki z dostępnych źródeł. Możesz dodać plik lub link.',
+              t('Nie udało się pobrać okładki z dostępnych źródeł. Możesz dodać plik lub link.'),
               error.details ?? { reason: fallback.signal.aborted ? 'timeout' : 'network' },
             );
           } finally {

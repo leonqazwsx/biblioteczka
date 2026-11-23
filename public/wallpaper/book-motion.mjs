@@ -1,5 +1,6 @@
 import { bookMotionGeometry } from './book-motion-geometry.mjs';
 import { readingDateLabel } from '../shared/reading-date.mjs';
+import { t } from '../shared/i18n.mjs';
 
 export function loadBookCover(
   book,
@@ -176,8 +177,8 @@ export function createBookMotion({
   function prepareInfo(book) {
     caption.textContent = book.title;
     author.textContent = book.authors.join(', ');
-    genre.textContent = getGenre(book) || 'Bez gatunku';
-    date.textContent = readingDateLabel(book) || 'Data przeczytania nieuzupełniona';
+    genre.textContent = getGenre(book) || t('Bez gatunku');
+    date.textContent = readingDateLabel(book) || t('Data przeczytania nieuzupełniona');
     info.dataset.ready = 'false';
     info.inert = true;
     info.style.width = '';
@@ -223,7 +224,7 @@ export function createBookMotion({
     volume.style.setProperty('--volume-depth', geometry.model.depth + 'px');
     for (const property of ['--spine', '--letter', '--spine-accent'])
       volume.style.setProperty(property, source.style.getPropertyValue(property));
-    volume.setAttribute('aria-label', 'Odłóż książkę: ' + book.title);
+    volume.setAttribute('aria-label', t('Odłóż książkę: ') + book.title);
     volume.setAttribute('aria-busy', 'true');
     Object.assign(info.style, {
       left: geometry.info.x + 'px',
@@ -259,7 +260,7 @@ export function createBookMotion({
     }
     const controller = new AbortController();
     pending = { controller, bookId: book.id };
-    status.textContent = 'Wczytuję okładkę…';
+    status.textContent = t('Wczytuję okładkę…');
     try {
       const image = await loadCover(book, { signal: controller.signal });
       if (
@@ -321,7 +322,7 @@ export function createBookMotion({
         info.dataset.ready = 'true';
         info.inert = false;
         volume.setAttribute('aria-busy', 'false');
-        status.textContent = 'Podgląd okładki: ' + book.title;
+        status.textContent = t('Podgląd okładki: ') + book.title;
         if (
           keyboardActivation &&
           (target.activeElement === initialFocus || target.activeElement === target.body)

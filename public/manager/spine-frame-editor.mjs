@@ -4,6 +4,7 @@ import {
   effectiveSpineFrame,
   normalizeSpineFrame,
 } from '../shared/spine-frame.mjs';
+import { t } from '../shared/i18n.mjs';
 const clone = (value) => (value ? { ...value } : null);
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const imageId = (spine) => (/^[a-f0-9]{64}$/.test(spine?.assetId ?? '') ? spine.assetId : null);
@@ -31,7 +32,7 @@ export function createSpineFrameDraft() {
     },
     set(key, value) {
       if (!assetId || stale || !['x', 'y', 'zoom'].includes(key))
-        throw new Error('Kadr nie jest dostępny.');
+        throw new Error(t('Kadr nie jest dostępny.'));
       current = normalizeSpineFrame({ ...effectiveSpineFrame(current), [key]: value });
     },
     restoreDefault() {
@@ -50,7 +51,7 @@ export function createSpineFrameDraft() {
       if (stale)
         throw Object.assign(
           new Error(
-            'Ilustracja zmieniła się. Otwórz aktualną wersję książki przed zapisaniem kadru.',
+            t('Ilustracja zmieniła się. Otwórz aktualną wersję książki przed zapisaniem kadru.'),
           ),
           { code: 'CONFLICT' },
         );
@@ -61,26 +62,26 @@ export function createSpineFrameDraft() {
 export function createSpineFrameEditor(root, { onChange, onConflict = () => {} }) {
   const draft = createSpineFrameDraft(),
     details = el('details', 'spine-frame-editor'),
-    summary = el('summary', '', 'Dopasuj kadr'),
+    summary = el('summary', '', t('Dopasuj kadr')),
     fields = el('div', 'spine-frame-fields');
   const description = el(
       'p',
       'muted',
-      'Ustaw motyw w widocznej części grzbietu. Kadr zapisze się razem ze zmianami książki.',
+      t('Ustaw motyw w widocznej części grzbietu. Kadr zapisze się razem ze zmianami książki.'),
     ),
     warning = el(
       'p',
       'ai-error',
-      'Ilustracja zmieniła się w drugim oknie. Szkic zachowano. Otwórz aktualną wersję książki.',
+      t('Ilustracja zmieniła się w drugim oknie. Szkic zachowano. Otwórz aktualną wersję książki.'),
     );
   warning.setAttribute('role', 'alert');
   warning.hidden = true;
   const controls = [];
   let visible = true;
   for (const [key, title, min, max, step] of [
-    ['x', 'Położenie poziome', 0, 100, 1],
-    ['y', 'Położenie pionowe', 0, 100, 1],
-    ['zoom', 'Przybliżenie', 100, 300, 5],
+    ['x', t('Położenie poziome'), 0, 100, 1],
+    ['y', t('Położenie pionowe'), 0, 100, 1],
+    ['zoom', t('Przybliżenie'), 100, 300, 5],
   ]) {
     const line = el('div', 'spine-frame-line'),
       label = el('label', '', title),
@@ -103,7 +104,7 @@ export function createSpineFrameEditor(root, { onChange, onConflict = () => {} }
     fields.append(line);
     controls.push({ key, input, output });
   }
-  const reset = el('button', 'text-button', 'Przywróć domyślny');
+  const reset = el('button', 'text-button', t('Przywróć domyślny'));
   reset.type = 'button';
   reset.onclick = () => {
     draft.restoreDefault();

@@ -10,6 +10,7 @@ import {
 } from './domain.mjs';
 import { migrateState } from './migrations.mjs';
 import { bookIdentityFingerprint } from './cover-resolver.mjs';
+import { t } from '../public/shared/i18n.mjs';
 export async function openStore(dataDir, { fsAdapter = fs, requireExisting = false } = {}) {
   const f = fsAdapter;
   await f.mkdir(dataDir, { recursive: true });
@@ -75,9 +76,12 @@ export async function openStore(dataDir, { fsAdapter = fs, requireExisting = fal
   }
   async function persist(next, expectedRevision, restore = false) {
     if (recovery === 'unrecoverable' && !restore)
-      throw problem('RECOVERY_REQUIRED', 'Nie można odczytać kolekcji. Przywróć poprawną kopię.');
+      throw problem(
+        'RECOVERY_REQUIRED',
+        t('Nie można odczytać kolekcji. Przywróć poprawną kopię.'),
+      );
     if (expectedRevision !== state.revision)
-      throw problem('CONFLICT', 'Kolekcja zmieniła się w innym oknie. Odśwież widok.');
+      throw problem('CONFLICT', t('Kolekcja zmieniła się w innym oknie. Odśwież widok.'));
     const validated = validateState(next);
     if (recovery !== 'unrecoverable') await atomic(backup, JSON.stringify(state, null, 2));
     await atomic(primary, JSON.stringify(validated, null, 2));
@@ -93,13 +97,13 @@ export async function openStore(dataDir, { fsAdapter = fs, requireExisting = fal
     commit: (cmd, expected) =>
       schedule(() => {
         if (expected !== state.revision)
-          throw problem('CONFLICT', 'Kolekcja zmieniła się w innym oknie.');
+          throw problem('CONFLICT', t('Kolekcja zmieniła się w innym oknie.'));
         return persist(applyCommand(state, cmd), expected);
       }),
     replace: (next, expected, expectedCollectionId) =>
       schedule(() => {
         if (expectedCollectionId !== undefined && expectedCollectionId !== state.collectionId)
-          throw problem('CONFLICT', 'Kolekcja zmieniła się. Wczytaj kopię ponownie.');
+          throw problem('CONFLICT', t('Kolekcja zmieniła się. Wczytaj kopię ponownie.'));
         return persist(
           { ...next, collectionId: crypto.randomUUID(), revision: state.revision + 1 },
           expected,
@@ -109,7 +113,7 @@ export async function openStore(dataDir, { fsAdapter = fs, requireExisting = fal
     appendImported: (drafts, { expectedRevision, expectedCollectionId } = {}) =>
       schedule(() => {
         if (expectedCollectionId !== state.collectionId || expectedRevision !== state.revision)
-          throw problem('CONFLICT', 'Kolekcja zmieniła się. Wczytaj CSV ponownie.');
+          throw problem('CONFLICT', t('Kolekcja zmieniła się. Wczytaj CSV ponownie.'));
         return persist(appendImportedBooks(state, drafts), expectedRevision);
       }),
     attachCoverIfCurrent: ({ collectionId, bookId, identity }, coverId) =>
@@ -155,11 +159,11 @@ export async function openStore(dataDir, { fsAdapter = fs, requireExisting = fal
     beginSpine: (bookId, { expectedRevision }) =>
       schedule(async () => {
         if (expectedRevision !== state.revision)
-          throw problem('CONFLICT', 'Kolekcja zmieniła się w innym oknie.');
+          throw problem('CONFLICT', t('Kolekcja zmieniła się w innym oknie.'));
         const next = structuredClone(state),
           b = next.books.find((b) => b.id === bookId);
-        if (!b) throw problem('NOT_FOUND', 'Nie znaleziono książki.');
-        if (!b.coverId) throw problem('INVALID', 'Dodaj okładkę przed generowaniem.');
+        if (!b) throw problem('NOT_FOUND', t('Nie znaleziono książki.'));
+        if (!b.coverId) throw problem('INVALID', t('Dodaj okładkę przed generowaniem.'));
         b.spineGeneration++;
         next.revision++;
         const saved = await persist(next, expectedRevision);

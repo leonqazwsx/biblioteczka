@@ -4,13 +4,14 @@ import { isIP } from 'node:net';
 import { problem } from './domain.mjs';
 import { imageMime } from './covers.mjs';
 import { validateImageBytes } from './image-validation.mjs';
+import { t } from '../public/shared/i18n.mjs';
 const maximum = 5 * 1024 * 1024;
 const invalid = () =>
-  problem('INVALID', 'Wklej bezpośredni adres HTTPS publicznego obrazu JPEG, PNG lub WebP.');
+  problem('INVALID', t('Wklej bezpośredni adres HTTPS publicznego obrazu JPEG, PNG lub WebP.'));
 const unavailable = () =>
   problem(
     'IMAGE_UNAVAILABLE',
-    'Nie udało się pobrać obrazu. Sprawdź link lub wybierz plik z komputera.',
+    t('Nie udało się pobrać obrazu. Sprawdź link lub wybierz plik z komputera.'),
   );
 function publicAddress(address) {
   if (isIP(address) === 4) {
@@ -181,7 +182,7 @@ export async function downloadRemoteImage(
       }
       if (Number(response.headers['content-length']) > maximum) {
         response.destroy();
-        throw problem('TOO_LARGE', 'Obraz z linku może mieć maksymalnie 5 MiB.');
+        throw problem('TOO_LARGE', t('Obraz z linku może mieć maksymalnie 5 MiB.'));
       }
       const chunks = [];
       let size = 0;
@@ -190,7 +191,7 @@ export async function downloadRemoteImage(
         size += chunk.length;
         if (size > maximum) {
           response.destroy();
-          throw problem('TOO_LARGE', 'Obraz z linku może mieć maksymalnie 5 MiB.');
+          throw problem('TOO_LARGE', t('Obraz z linku może mieć maksymalnie 5 MiB.'));
         }
         chunks.push(chunk);
       }

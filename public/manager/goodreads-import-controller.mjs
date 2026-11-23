@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n.mjs';
 const failure = (message) => {
   throw new Error(message);
 };
@@ -30,11 +31,11 @@ export function createGoodreadsImportController({
     }
   }
   function idle() {
-    if (loading || saving) failure('Poczekaj na zakończenie odczytu lub zapisu.');
+    if (loading || saving) failure(t('Poczekaj na zakończenie odczytu lub zapisu.'));
   }
   function row(id) {
     const result = byId.get(id);
-    if (!result?.selectable) failure('Ta pozycja nie może być wybrana.');
+    if (!result?.selectable) failure(t('Ta pozycja nie może być wybrana.'));
     return result;
   }
   function receive(state) {
@@ -75,13 +76,13 @@ export function createGoodreadsImportController({
     select(id, value) {
       idle();
       row(id);
-      if (typeof value !== 'boolean') failure('Nieprawidłowy wybór.');
+      if (typeof value !== 'boolean') failure(t('Nieprawidłowy wybór.'));
       if (value) selected.add(id);
       else selected.delete(id);
     },
     selectAll(value) {
       idle();
-      if (typeof value !== 'boolean') failure('Nieprawidłowy wybór.');
+      if (typeof value !== 'boolean') failure(t('Nieprawidłowy wybór.'));
       selected = new Set(
         value ? (preview?.rows ?? []).filter((r) => r.selectable).map((r) => r.rowId) : [],
       );
@@ -95,7 +96,7 @@ export function createGoodreadsImportController({
         Array.isArray(patch) ||
         Object.keys(patch).some((k) => !['status', 'shelfId', 'newShelfName'].includes(k))
       )
-        failure('Nieprawidłowa zmiana pozycji.');
+        failure(t('Nieprawidłowa zmiana pozycji.'));
       const next = {
         status: current.candidate.status,
         shelfId: current.candidate.shelfId,
@@ -104,20 +105,20 @@ export function createGoodreadsImportController({
         ...patch,
       };
       if (next.status !== 'read' || !!next.shelfId === !!next.newShelfName)
-        failure('Wybierz gatunek przeczytanej książki.');
+        failure(t('Wybierz gatunek przeczytanej książki.'));
       overrides.set(id, next);
     },
     setPage(value) {
       idle();
       const count = Math.max(1, Math.ceil((preview?.rows.length ?? 0) / 50));
       if (!Number.isSafeInteger(value) || value < 0 || value >= count)
-        failure('Nieprawidłowa strona podglądu.');
+        failure(t('Nieprawidłowa strona podglądu.'));
       page = value;
     },
     async confirm() {
       idle();
-      if (!preview || !selected.size) failure('Wybierz książki do dołączenia.');
-      if (isStale()) failure('Podgląd wygasł lub kolekcja zmieniła się. Wczytaj CSV ponownie.');
+      if (!preview || !selected.size) failure(t('Wybierz książki do dołączenia.'));
+      if (isStale()) failure(t('Podgląd wygasł lub kolekcja zmieniła się. Wczytaj CSV ponownie.'));
       saving = true;
       message = '';
       error = false;
@@ -130,7 +131,14 @@ export function createGoodreadsImportController({
       try {
         const result = await request('/api/goodreads/confirm', { method: 'POST', body });
         await onImported(result);
-        message = `Dołączono ${selected.size} książek. Pominięto ${preview.summary.duplicates} duplikatów i ${preview.summary.invalid} błędnych pozycji.`;
+        message = t(
+          'Dołączono {added} książek. Pominięto {duplicates} duplikatów i {invalid} błędnych pozycji.',
+          {
+            added: selected.size,
+            duplicates: preview.summary.duplicates,
+            invalid: preview.summary.invalid,
+          },
+        );
         preview = null;
         byId = new Map();
         selected = new Set();
@@ -151,7 +159,9 @@ export function createGoodreadsImportController({
             'FORBIDDEN',
             'RECOVERY_REQUIRED',
           ].includes(e.code)
-            ? 'Nie otrzymano potwierdzenia zapisu. Zapis mógł się udać. Sprawdź kolekcję i wczytaj CSV ponownie; duplikaty zostaną pominięte.'
+            ? t(
+                'Nie otrzymano potwierdzenia zapisu. Zapis mógł się udać. Sprawdź kolekcję i wczytaj CSV ponownie; duplikaty zostaną pominięte.',
+              )
             : e.message;
         error = true;
         throw e;
@@ -168,7 +178,7 @@ export function createGoodreadsImportController({
       overrides = new Map();
       page = 0;
       stale = false;
-      message = 'Podgląd odrzucono. Kolekcja pozostała bez zmian.';
+      message = t('Podgląd odrzucono. Kolekcja pozostała bez zmian.');
       error = false;
       notify();
     },

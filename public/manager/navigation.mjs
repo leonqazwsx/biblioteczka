@@ -1,8 +1,9 @@
+import { t } from '../shared/i18n.mjs';
 export const SETTINGS_GROUPS = [
-  ['appearance', 'Wygląd'],
-  ['wallpaper', 'Tapeta'],
-  ['collection', 'Kolekcja'],
-  ['advanced', 'Zaawansowane'],
+  ['appearance', t('Wygląd')],
+  ['wallpaper', t('Tapeta')],
+  ['collection', t('Kolekcja')],
+  ['advanced', t('Zaawansowane')],
 ];
 const views = new Set(['books', 'shelves', 'settings', 'wallpaper']);
 export function readRoute(hash, shelves = []) {

@@ -1,6 +1,7 @@
 import { problem } from './domain.mjs';
 import { parseGoodreadsCsv, proposeGoodreadsCategory } from './goodreads-csv.mjs';
 import { createBookIdentityIndex } from '../public/shared/book-identity.mjs';
+import { t } from '../public/shared/i18n.mjs';
 const invalid = (message) => {
   throw problem('INVALID', message);
 };
@@ -15,7 +16,7 @@ export function createGoodreadsImports({ store, now = Date.now }) {
       if (!entry.busy && entry.expiresAt <= timestamp) entries.delete(id);
     if (entries.size >= 3) {
       const idle = [...entries].find(([, entry]) => !entry.busy);
-      if (!idle) throw problem('CONFLICT', 'Inne importy są zapisywane. Spróbuj ponownie.');
+      if (!idle) throw problem('CONFLICT', t('Inne importy są zapisywane. Spróbuj ponownie.'));
       entries.delete(idle[0]);
     }
     const existing = createBookIdentityIndex(state.books),
@@ -46,7 +47,7 @@ export function createGoodreadsImports({ store, now = Date.now }) {
       const result = {
         ...row,
         warnings: skipped
-          ? [...row.warnings, 'Pominięto książkę bez oznaczenia przeczytania w Goodreads.']
+          ? [...row.warnings, t('Pominięto książkę bez oznaczenia przeczytania w Goodreads.')]
           : row.warnings,
         candidate,
         category,
@@ -86,23 +87,23 @@ export function createGoodreadsImports({ store, now = Date.now }) {
         (k) => !['importId', 'expectedRevision', 'selectedRowIds', 'overrides'].includes(k),
       )
     )
-      invalid('Nieprawidłowe potwierdzenie importu.');
+      invalid(t('Nieprawidłowe potwierdzenie importu.'));
     const entry = typeof input.importId === 'string' ? entries.get(input.importId) : null;
-    if (!entry) invalid('Podgląd CSV wygasł. Wczytaj plik ponownie.');
-    if (entry.busy) throw problem('CONFLICT', 'Ten import jest już zapisywany.');
+    if (!entry) invalid(t('Podgląd CSV wygasł. Wczytaj plik ponownie.'));
+    if (entry.busy) throw problem('CONFLICT', t('Ten import jest już zapisywany.'));
     if (entry.expiresAt <= now()) {
       entries.delete(input.importId);
-      invalid('Podgląd CSV wygasł. Wczytaj plik ponownie.');
+      invalid(t('Podgląd CSV wygasł. Wczytaj plik ponownie.'));
     }
     if (!Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 0)
-      invalid('Nieprawidłowa wersja podglądu.');
+      invalid(t('Nieprawidłowa wersja podglądu.'));
     const current = store.read();
     if (
       input.expectedRevision !== entry.revision ||
       current.revision !== entry.revision ||
       current.collectionId !== entry.collectionId
     )
-      throw problem('CONFLICT', 'Kolekcja zmieniła się. Wczytaj CSV ponownie.');
+      throw problem('CONFLICT', t('Kolekcja zmieniła się. Wczytaj CSV ponownie.'));
     const selected = input.selectedRowIds,
       overrides = input.overrides ?? {};
     if (
@@ -112,13 +113,13 @@ export function createGoodreadsImports({ store, now = Date.now }) {
       selected.some((id) => typeof id !== 'string') ||
       new Set(selected).size !== selected.length
     )
-      invalid('Wybierz poprawne książki do dołączenia.');
+      invalid(t('Wybierz poprawne książki do dołączenia.'));
     const selectedSet = new Set(selected);
     if (!object(overrides) || Object.keys(overrides).some((id) => !selectedSet.has(id)))
-      invalid('Nieprawidłowe zmiany importu.');
+      invalid(t('Nieprawidłowe zmiany importu.'));
     const drafts = selected.map((id) => {
       const row = entry.byId.get(id);
-      if (!row?.selectable) invalid('Pozycja nie może zostać dołączona.');
+      if (!row?.selectable) invalid(t('Pozycja nie może zostać dołączona.'));
       if (!Object.hasOwn(overrides, id)) return structuredClone(row.candidate);
       const patch = overrides[id];
       if (
@@ -126,7 +127,7 @@ export function createGoodreadsImports({ store, now = Date.now }) {
         Object.keys(patch).some((k) => !['status', 'shelfId', 'newShelfName'].includes(k)) ||
         (patch.status !== undefined && patch.status !== 'read')
       )
-        invalid('Wybierz gatunek przeczytanej książki.');
+        invalid(t('Wybierz gatunek przeczytanej książki.'));
       const hasShelf = typeof patch.shelfId === 'string' && !!patch.shelfId,
         hasNew = typeof patch.newShelfName === 'string' && !!patch.newShelfName.trim();
       if (
@@ -136,7 +137,7 @@ export function createGoodreadsImports({ store, now = Date.now }) {
         (hasShelf && !current.shelves.some((s) => s.id === patch.shelfId)) ||
         (hasNew && patch.newShelfName.trim().length > 100)
       )
-        invalid('Wybierz jedną istniejącą lub nową półkę.');
+        invalid(t('Wybierz jedną istniejącą lub nową półkę.'));
       return {
         ...structuredClone(row.candidate),
         status: 'read',

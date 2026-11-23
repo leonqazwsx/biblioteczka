@@ -4,6 +4,7 @@ import { createSpineElement } from '../shared/spine-art.mjs';
 import { fitSpineTitles } from '../shared/spine-title-fit.mjs';
 import { el } from '../shared/api.mjs';
 import { roomPresentation } from '../shared/lighting.mjs';
+import { t } from '../shared/i18n.mjs';
 const scenes = new WeakMap();
 function extendRoomEdges(root, { scene, fit, width, height, asset }) {
   const images = [];
@@ -129,7 +130,7 @@ export function renderScene(
   backdrop.setAttribute('aria-hidden', 'true');
   root.append(backdrop);
   backdrop.onerror = () => {
-    const note = el('p', 'room-error', 'Nie udało się wczytać pokoju. Odśwież tapetę.');
+    const note = el('p', 'room-error', t('Nie udało się wczytać pokoju. Odśwież tapetę.'));
     note.setAttribute('role', 'status');
     root.append(note);
   };

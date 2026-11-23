@@ -1,4 +1,5 @@
 import { calibrateShelfContacts } from './shelf-contact.mjs';
+import { t } from './i18n.mjs';
 // Measurements belong to the empty production photographs (1672 × 941).
 // Slots are in reading order: left to right, then the next lower level.
 const rect = (x, y, width, height) => ({
@@ -40,8 +41,8 @@ export const ANNUAL_SCENES = [
   scene(
     'annual-niches',
     1,
-    'Nisze w tynku',
-    'Dwanaście półek w jasnym tynku i ciepłym dębie',
+    t('Nisze w tynku'),
+    t('Dwanaście półek w jasnym tynku i ciepłym dębie'),
     88,
     [
       shelf('niches-1', 390, 599, 307, 112, 377, 613, 20),
@@ -62,8 +63,8 @@ export const ANNUAL_SCENES = [
   scene(
     'annual-divider',
     4,
-    'Regał jako przegroda',
-    'Orzech, lekki metal i ogród za otwartym regałem',
+    t('Regał jako przegroda'),
+    t('Orzech, lekki metal i ogród za otwartym regałem'),
     111,
     [294, 532, 755].flatMap((bottom, row) =>
       [
@@ -80,8 +81,8 @@ export const ANNUAL_SCENES = [
   scene(
     'annual-lines',
     5,
-    'Zawieszone linie',
-    'Dwanaście stalowych półek na mineralnej ścianie',
+    t('Zawieszone linie'),
+    t('Dwanaście stalowych półek na mineralnej ścianie'),
     78,
     [
       [
@@ -114,8 +115,8 @@ export const ANNUAL_SCENES = [
   scene(
     'annual-panorama',
     6,
-    'Niska biblioteka z widokiem',
-    'Jesion, aluminium i spokojny pejzaż za oknem',
+    t('Niska biblioteka z widokiem'),
+    t('Jesion, aluminium i spokojny pejzaż za oknem'),
     96,
     // Inner wooden edge after each aluminium jamb; lip masks retain their own bounds.
     [596, 734].flatMap((bottom, row) =>

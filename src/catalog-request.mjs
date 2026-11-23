@@ -1,4 +1,5 @@
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 function untilAborted(promise, signal) {
   if (!signal) return promise;
   return new Promise((resolve, reject) => {
@@ -69,7 +70,7 @@ export function createCatalogRequest(
           sharedSignal.throwIfAborted();
           throw problem(
             'CATALOG_UNAVAILABLE',
-            'Katalog jest teraz niedostępny. Spróbuj ponownie lub dodaj książkę ręcznie.',
+            t('Katalog jest teraz niedostępny. Spróbuj ponownie lub dodaj książkę ręcznie.'),
           );
         }
       });

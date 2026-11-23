@@ -2,6 +2,7 @@ import { problem } from './domain.mjs';
 import { cleanSubjects } from '../public/shared/categories.mjs';
 import { canonicalIsbn } from '../public/shared/book-identity.mjs';
 import { createCatalogRequest } from './catalog-request.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 const endpoint = '/api/institutions/bibs.json';
 const clean = (value) =>
@@ -111,7 +112,7 @@ export function createBnCatalog(options = {}) {
     if (Number(since) > 0) params.set('sinceId', since);
     const data = await request(endpoint + '?' + params, signal);
     if (!Array.isArray(data?.bibs))
-      throw problem('CATALOG_UNAVAILABLE', 'Biblioteka Narodowa zwróciła nieprawidłowe dane.');
+      throw problem('CATALOG_UNAVAILABLE', t('Biblioteka Narodowa zwróciła nieprawidłowe dane.'));
     const warnings = [];
     let next = null;
     if (data.bibs.length && data.nextPage) {
@@ -128,7 +129,7 @@ export function createBnCatalog(options = {}) {
           throw Error('Invalid cursor');
         next = value;
       } catch {
-        warnings.push('Biblioteka Narodowa: dalsza strona wyników jest niedostępna.');
+        warnings.push(t('Biblioteka Narodowa: dalsza strona wyników jest niedostępna.'));
       }
     }
     return {
@@ -141,13 +142,13 @@ export function createBnCatalog(options = {}) {
     searchPage,
     async resolveEdition(id, { signal } = {}) {
       if (typeof id !== 'string' || !/^bn:\d{1,16}$/.test(id))
-        throw problem('INVALID', 'Nieprawidłowe wydanie.');
+        throw problem('INVALID', t('Nieprawidłowe wydanie.'));
       const data = await request(
         endpoint + '?' + new URLSearchParams({ id: id.slice(3), kind: 'książka', limit: '1' }),
         signal,
       );
       if (!Array.isArray(data?.bibs))
-        throw problem('CATALOG_UNAVAILABLE', 'Biblioteka Narodowa zwróciła nieprawidłowe dane.');
+        throw problem('CATALOG_UNAVAILABLE', t('Biblioteka Narodowa zwróciła nieprawidłowe dane.'));
       return bnBook(data.bibs.find((record) => 'bn:' + record.id === id));
     },
   };

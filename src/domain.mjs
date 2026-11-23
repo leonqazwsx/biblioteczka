@@ -1,3 +1,4 @@
+import { t } from '../public/shared/i18n.mjs';
 import { localCalendarDate, normalizeReadDate } from '../public/shared/calendar-date.mjs';
 import { DEFAULT_ROOM_ID, ROOM_SCENES } from '../public/shared/room-scene.mjs';
 import { SORT_OPTIONS } from '../public/shared/book-order.mjs';
@@ -13,19 +14,19 @@ const invalid = (message) => {
 };
 const text = (v, label, max = 500) => {
   if (typeof v !== 'string' || !v.trim() || v.trim().length > max)
-    invalid(`Nieprawidłowe pole: ${label}.`);
+    invalid(t('Nieprawidłowe pole: {label}.', { label }));
   return v.trim();
 };
 const id = (v) => {
   if (typeof v !== 'string' || !/^[a-zA-Z0-9_-]{1,100}$/.test(v))
-    invalid('Nieprawidłowy identyfikator.');
+    invalid(t('Nieprawidłowy identyfikator.'));
   return v;
 };
 const optional = (v) => (v == null || v === '' ? null : text(v, 'dane wydania'));
 const editionIsbn = (b) => canonicalIsbn(typeof b.isbn === 'string' ? b.isbn.trim() : b.isbn);
 const statuses = ['to-read', 'reading', 'read'];
 function integer(v, min = 0, max = 100000) {
-  if (!Number.isSafeInteger(v) || v < min || v > max) invalid('Nieprawidłowa liczba.');
+  if (!Number.isSafeInteger(v) || v < min || v > max) invalid(t('Nieprawidłowa liczba.'));
   return v;
 }
 function settings(v, books, shelves) {
@@ -40,7 +41,7 @@ function settings(v, books, shelves) {
     !ROOM_SCENES.some((s) => s.id === (v.room ?? DEFAULT_ROOM_ID)) ||
     !SORT_OPTIONS.some(([id]) => id === (v.sort ?? 'manual'))
   )
-    invalid('Nieprawidłowe ustawienia.');
+    invalid(t('Nieprawidłowe ustawienia.'));
   const scales = v.bookScales === undefined ? {} : v.bookScales;
   if (
     !scales ||
@@ -54,9 +55,9 @@ function settings(v, books, shelves) {
         value > 1.4,
     )
   )
-    invalid('Nieprawidłowy rozmiar książek.');
+    invalid(t('Nieprawidłowy rozmiar książek.'));
   if (!LIGHTING_OPTIONS.some(([key]) => key === (v.lighting === undefined ? 'theme' : v.lighting)))
-    invalid('Nieprawidłowe oświetlenie pokoju.');
+    invalid(t('Nieprawidłowe oświetlenie pokoju.'));
   return {
     theme: v.theme,
     room: v.room ?? DEFAULT_ROOM_ID,
@@ -72,7 +73,8 @@ function settings(v, books, shelves) {
   };
 }
 function hash(v) {
-  if (typeof v !== 'string' || !/^[a-f0-9]{64}$/.test(v)) invalid('Nieprawidłowy obraz grzbietu.');
+  if (typeof v !== 'string' || !/^[a-f0-9]{64}$/.test(v))
+    invalid(t('Nieprawidłowy obraz grzbietu.'));
   return v;
 }
 function frame(v) {
@@ -84,7 +86,7 @@ function frame(v) {
 }
 function spine(v) {
   if (v == null) return null;
-  if (!['ai', 'manual'].includes(v.kind)) invalid('Nieprawidłowe pochodzenie ilustracji.');
+  if (!['ai', 'manual'].includes(v.kind)) invalid(t('Nieprawidłowe pochodzenie ilustracji.'));
   const saved = {
       assetId: hash(v.assetId),
       kind: v.kind,
@@ -98,13 +100,13 @@ function spine(v) {
 }
 function book(v, shelves) {
   if (!v || !Array.isArray(v.authors) || !v.authors.length || v.authors.length > 20)
-    invalid('Podaj autora książki.');
-  if (!shelves.some((s) => s.id === v.shelfId)) invalid('Wybierz istniejącą półkę.');
-  if (!statuses.includes(v.status)) invalid('Nieprawidłowy status książki.');
+    invalid(t('Podaj autora książki.'));
+  if (!shelves.some((s) => s.id === v.shelfId)) invalid(t('Wybierz istniejącą półkę.'));
+  if (!statuses.includes(v.status)) invalid(t('Nieprawidłowy status książki.'));
   const isbn = optional(v.isbn);
   if (isbn) {
-    if (!/^([0-9]{13}|[0-9]{9}[0-9X])$/.test(isbn)) invalid('Nieprawidłowy ISBN.');
-    if (!canonicalIsbn(isbn)) invalid('Nieprawidłowa suma kontrolna ISBN.');
+    if (!/^([0-9]{13}|[0-9]{9}[0-9X])$/.test(isbn)) invalid(t('Nieprawidłowy ISBN.'));
+    if (!canonicalIsbn(isbn)) invalid(t('Nieprawidłowa suma kontrolna ISBN.'));
   }
   const palette = v.palette ?? [];
   if (
@@ -112,20 +114,20 @@ function book(v, shelves) {
     palette.length > 5 ||
     palette.some((c) => typeof c !== 'string' || !/^#[\da-fA-F]{6}$/.test(c))
   )
-    invalid('Nieprawidłowe kolory.');
+    invalid(t('Nieprawidłowe kolory.'));
   const coverId = optional(v.coverId);
-  if (coverId && !/^[a-f0-9]{64}$/.test(coverId)) invalid('Nieprawidłowa okładka.');
+  if (coverId && !/^[a-f0-9]{64}$/.test(coverId)) invalid(t('Nieprawidłowa okładka.'));
   const provider = v.provider ?? null;
   if (provider !== null && !['openlibrary', 'bn'].includes(provider))
-    invalid('Nieprawidłowy katalog.');
+    invalid(t('Nieprawidłowy katalog.'));
   const goodreadsId = v.goodreadsId ?? null;
   if (goodreadsId !== null && (typeof goodreadsId !== 'string' || !/^\d{1,32}$/.test(goodreadsId)))
-    invalid('Nieprawidłowy identyfikator Goodreads.');
+    invalid(t('Nieprawidłowy identyfikator Goodreads.'));
   const subjects = v.subjects ?? [];
-  if (!Array.isArray(subjects) || subjects.length > 80) invalid('Nieprawidłowe tematy książki.');
+  if (!Array.isArray(subjects) || subjects.length > 80) invalid(t('Nieprawidłowe tematy książki.'));
   return {
     id: id(v.id),
-    title: text(v.title, 'tytuł'),
+    title: text(v.title, t('tytuł')),
     authors: v.authors.map((a) => text(a, 'autor', 200)),
     isbn,
     goodreadsId,
@@ -135,7 +137,7 @@ function book(v, shelves) {
     publicationYear: optional(v.publicationYear),
     language: optional(v.language),
     pageCount: v.pageCount == null ? null : integer(v.pageCount, 1),
-    subjects: subjects.map((s) => text(s, 'temat książki', 160)),
+    subjects: subjects.map((s) => text(s, t('temat książki'), 160)),
     shelfId: v.shelfId,
     status: 'read',
     readDate: normalizeReadDate(v.readDate),
@@ -153,7 +155,7 @@ export function createInitialState() {
     collectionId: crypto.randomUUID(),
     revision: 0,
     books: [],
-    shelves: ['Fantastyka', 'Kryminał', 'Pozostałe'].map((name, order) => ({
+    shelves: [t('Fantastyka'), t('Kryminał'), t('Pozostałe')].map((name, order) => ({
       id: ['fantasy', 'crime', 'other'][order],
       name,
       order,
@@ -181,20 +183,20 @@ export function validateState(v) {
     v.books.length > 10000 ||
     v.shelves.length > 200
   )
-    invalid('Nieobsługiwany lub uszkodzony format kolekcji.');
+    invalid(t('Nieobsługiwany lub uszkodzony format kolekcji.'));
   const shelves = v.shelves.map((s) => ({
     id: id(s.id),
-    name: text(s.name, 'nazwa półki', 100),
+    name: text(s.name, t('nazwa półki'), 100),
     order: integer(s.order),
   }));
   if (new Set(shelves.map((s) => s.id)).size !== shelves.length)
-    invalid('Powtórzone identyfikatory półek.');
+    invalid(t('Powtórzone identyfikatory półek.'));
   const books = v.books.map((b) => book(b, shelves));
   if (new Set(books.map((b) => b.id)).size !== books.length)
-    invalid('Powtórzone identyfikatory książek.');
+    invalid(t('Powtórzone identyfikatory książek.'));
   for (const key of ['isbn', 'providerId', 'goodreadsId']) {
     const values = books.map((b) => b[key]).filter(Boolean);
-    if (new Set(values).size !== values.length) invalid('Powtórzone wydania w kolekcji.');
+    if (new Set(values).size !== values.length) invalid(t('Powtórzone wydania w kolekcji.'));
   }
   return {
     schemaVersion: 2,
@@ -207,7 +209,7 @@ export function validateState(v) {
 }
 function find(items, wanted) {
   const item = items.find((x) => x.id === wanted);
-  if (!item) throw problem('NOT_FOUND', 'Nie znaleziono wpisu.');
+  if (!item) throw problem('NOT_FOUND', t('Nie znaleziono wpisu.'));
   return item;
 }
 function reindex(items) {
@@ -215,7 +217,7 @@ function reindex(items) {
 }
 function requestedShelf(s, name, fallback) {
   if (name == null) return fallback;
-  const cleaned = text(name, 'nazwa półki', 100),
+  const cleaned = text(name, t('nazwa półki'), 100),
     key = cleaned.toLocaleLowerCase('pl');
   let shelf = s.shelves.find((x) => x.name.toLocaleLowerCase('pl') === key);
   if (!shelf) {
@@ -226,7 +228,7 @@ function requestedShelf(s, name, fallback) {
 }
 export function applyCommand(previous, cmd) {
   const s = validateState(previous);
-  if (!cmd || typeof cmd.type !== 'string') invalid('Nieprawidłowe polecenie.');
+  if (!cmd || typeof cmd.type !== 'string') invalid(t('Nieprawidłowe polecenie.'));
   const previousIsbns = new Map(s.books.map((b) => [b.id, editionIsbn(b)]));
   switch (cmd.type) {
     case 'addBook': {
@@ -268,7 +270,7 @@ export function applyCommand(previous, cmd) {
         'spineFrame',
       ];
       for (const [key, value] of Object.entries(patch)) {
-        if (!allowed.includes(key)) invalid('Nieprawidłowe pole książki.');
+        if (!allowed.includes(key)) invalid(t('Nieprawidłowe pole książki.'));
         if (key !== 'spineFrame') b[key] = value;
       }
       b.shelfId = requestedShelf(s, cmd.newShelfName, b.shelfId);
@@ -286,12 +288,12 @@ export function applyCommand(previous, cmd) {
           !Object.hasOwn(requested, 'frame') ||
           Object.keys(requested).some((k) => !['assetId', 'frame'].includes(k))
         )
-          invalid('Nieprawidłowy kadr ilustracji.');
+          invalid(t('Nieprawidłowy kadr ilustracji.'));
         const expectedAsset = hash(requested.assetId);
         if (!b.spine || b.spine.assetId !== expectedAsset)
           throw problem(
             'CONFLICT',
-            'Ilustracja zmieniła się. Otwórz aktualną wersję książki przed zapisaniem kadru.',
+            t('Ilustracja zmieniła się. Otwórz aktualną wersję książki przed zapisaniem kadru.'),
           );
         const crop = frame(requested.frame);
         if (crop) b.spine.frame = crop;
@@ -315,7 +317,7 @@ export function applyCommand(previous, cmd) {
         cmd.ids.length > 10000 ||
         new Set(cmd.ids).size !== cmd.ids.length
       )
-        invalid('Wybierz książki bez powtórzeń.');
+        invalid(t('Wybierz książki bez powtórzeń.'));
       const patch = cmd.patch ? { ...cmd.patch } : cmd.patch;
       if (
         !patch ||
@@ -324,17 +326,17 @@ export function applyCommand(previous, cmd) {
         !Object.keys(patch).length ||
         Object.keys(patch).some((key) => !['shelfId', 'status', 'readDate'].includes(key))
       )
-        invalid('Nieprawidłowa zmiana zbiorcza.');
+        invalid(t('Nieprawidłowa zmiana zbiorcza.'));
       const indexed = new Map(s.books.map((book) => [book.id, book]));
       const selected = cmd.ids.map((wanted) => {
         id(wanted);
         const b = indexed.get(wanted);
-        if (!b) throw problem('NOT_FOUND', 'Wybrana książka została usunięta.');
+        if (!b) throw problem('NOT_FOUND', t('Wybrana książka została usunięta.'));
         return b;
       });
       if ('shelfId' in patch) find(s.shelves, patch.shelfId);
       if ('status' in patch && !statuses.includes(patch.status))
-        invalid('Nieprawidłowy status książki.');
+        invalid(t('Nieprawidłowy status książki.'));
       if ('readDate' in patch) patch.readDate = normalizeReadDate(patch.readDate);
       const moved = 'shelfId' in patch ? selected.filter((b) => b.shelfId !== patch.shelfId) : [];
       const sourceIds = new Set(moved.map((b) => b.shelfId));
@@ -374,7 +376,7 @@ export function applyCommand(previous, cmd) {
       const affected = s.books.filter((b) => b.shelfId === cmd.id);
       if (affected.length) {
         if (cmd.targetId === cmd.id || !s.shelves.some((x) => x.id === cmd.targetId))
-          invalid('Wybierz półkę docelową dla książek.');
+          invalid(t('Wybierz półkę docelową dla książek.'));
         let order = s.books.filter((b) => b.shelfId === cmd.targetId).length;
         affected.forEach((b) => {
           b.shelfId = cmd.targetId;
@@ -394,7 +396,7 @@ export function applyCommand(previous, cmd) {
         cmd.ids.length !== s.shelves.length ||
         new Set(cmd.ids).size !== s.shelves.length
       )
-        invalid('Nieprawidłowa kolejność półek.');
+        invalid(t('Nieprawidłowa kolejność półek.'));
       s.shelves = cmd.ids.map((x) => find(s.shelves, x));
       reindex(s.shelves);
       break;
@@ -432,12 +434,12 @@ export function applyCommand(previous, cmd) {
             ].includes(k),
         )
       )
-        invalid('Nieprawidłowe ustawienie.');
+        invalid(t('Nieprawidłowe ustawienie.'));
       s.settings = { ...s.settings, ...p };
       break;
     }
     case 'setRoomLayout': {
-      if (typeof cmd.roomId !== 'string') invalid('Nieprawidłowy pokój.');
+      if (typeof cmd.roomId !== 'string') invalid(t('Nieprawidłowy pokój.'));
       s.settings.roomLayouts = normalizeRoomLayouts(
         { ...s.settings.roomLayouts, [cmd.roomId]: cmd.layout },
         { books: s.books, shelves: s.shelves },
@@ -445,7 +447,7 @@ export function applyCommand(previous, cmd) {
       break;
     }
     default:
-      invalid('Nieznane polecenie.');
+      invalid(t('Nieznane polecenie.'));
   }
   // Keep historical ISBN10/13 pairs editable; only newly introduced identities conflict.
   for (const b of s.books) {
@@ -453,7 +455,7 @@ export function applyCommand(previous, cmd) {
     if (!isbn || previousIsbns.get(b.id) === isbn) continue;
     const duplicate = s.books.find((other) => other.id !== b.id && editionIsbn(other) === isbn);
     if (duplicate)
-      throw problem('DUPLICATE', 'To wydanie jest już w biblioteczce.', {
+      throw problem('DUPLICATE', t('To wydanie jest już w biblioteczce.'), {
         id: duplicate.id,
         reason: 'isbn',
       });
@@ -462,7 +464,9 @@ export function applyCommand(previous, cmd) {
     const seen = new Map();
     for (const b of s.books) {
       if (b[key] && seen.has(b[key]))
-        throw problem('DUPLICATE', 'To wydanie jest już w biblioteczce.', { id: seen.get(b[key]) });
+        throw problem('DUPLICATE', t('To wydanie jest już w biblioteczce.'), {
+          id: seen.get(b[key]),
+        });
       if (b[key]) seen.set(b[key], b.id);
     }
   }
@@ -470,10 +474,10 @@ export function applyCommand(previous, cmd) {
   return validateState(s);
 }
 export function appendImportedBooks(previous, drafts) {
-  if (!Array.isArray(drafts) || !drafts.length) invalid('Wybierz książki do dołączenia.');
+  if (!Array.isArray(drafts) || !drafts.length) invalid(t('Wybierz książki do dołączenia.'));
   const s = validateState(previous);
   if (s.books.length + drafts.length > 10000)
-    throw problem('TOO_LARGE', 'Kolekcja może zawierać maksymalnie 10000 książek.');
+    throw problem('TOO_LARGE', t('Kolekcja może zawierać maksymalnie 10000 książek.'));
   const identities = createBookIdentityIndex(s.books),
     orders = new Map();
   for (const b of s.books) orders.set(b.shelfId, Math.max(orders.get(b.shelfId) ?? 0, b.order + 1));
@@ -506,15 +510,15 @@ export function appendImportedBooks(previous, drafts) {
       Array.isArray(draft) ||
       Object.keys(draft).some((k) => !allowed.has(k))
     )
-      invalid('Nieprawidłowe dane importu.');
+      invalid(t('Nieprawidłowe dane importu.'));
     for (const k of ['provider', 'providerId', 'language', 'coverId', 'spine'])
-      if (draft[k] != null) invalid('Import CSV nie dołącza katalogu ani obrazów.');
+      if (draft[k] != null) invalid(t('Import CSV nie dołącza katalogu ani obrazów.'));
     if (
       (draft.palette !== undefined && (!Array.isArray(draft.palette) || draft.palette.length)) ||
       (draft.spineGeneration != null && draft.spineGeneration !== 0) ||
       (draft.spineStyle != null && draft.spineStyle !== 0)
     )
-      invalid('Nieprawidłowe dane grzbietu importu.');
+      invalid(t('Nieprawidłowe dane grzbietu importu.'));
     const hasShelf = typeof draft.shelfId === 'string' && !!draft.shelfId,
       hasNew = typeof draft.newShelfName === 'string' && !!draft.newShelfName.trim();
     if (
@@ -522,10 +526,10 @@ export function appendImportedBooks(previous, drafts) {
       (draft.shelfId != null && !hasShelf) ||
       (draft.newShelfName != null && !hasNew)
     )
-      invalid('Wybierz jedną półkę dla książki.');
+      invalid(t('Wybierz jedną półkę dla książki.'));
     const shelfId = requestedShelf(s, hasNew ? draft.newShelfName : null, draft.shelfId);
     if (s.shelves.length > 200)
-      throw problem('TOO_LARGE', 'Kolekcja może zawierać maksymalnie 200 półek.');
+      throw problem('TOO_LARGE', t('Kolekcja może zawierać maksymalnie 200 półek.'));
     const candidate = book(
       {
         ...draft,
@@ -541,7 +545,7 @@ export function appendImportedBooks(previous, drafts) {
     );
     const duplicate = identities.find(candidate);
     if (duplicate)
-      throw problem('DUPLICATE', 'Ta książka jest już w biblioteczce.', {
+      throw problem('DUPLICATE', t('Ta książka jest już w biblioteczce.'), {
         id: duplicate.id,
         reason: duplicate.reason,
       });

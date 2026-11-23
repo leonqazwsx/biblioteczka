@@ -6,6 +6,7 @@ import { createBackup, validateBackup } from './backup.mjs';
 import packageInfo from '../package.json' with { type: 'json' };
 import { createGoodreadsImports } from './goodreads-import.mjs';
 import { downloadRemoteImage } from './remote-image.mjs';
+import { t } from '../public/shared/i18n.mjs';
 const mime = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -17,6 +18,7 @@ const mime = {
   '.ico': 'image/x-icon',
   '.ttf': 'font/ttf',
   '.txt': 'text/plain; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
 };
 export function createAppServer({
   store,
@@ -80,7 +82,7 @@ export function createAppServer({
       !input.base64.length ||
       !/^[A-Za-z0-9+/]*={0,2}$/.test(input.base64)
     )
-      throw problem('INVALID', 'Nieprawidłowy obraz.');
+      throw problem('INVALID', t('Nieprawidłowy obraz.'));
     return Buffer.from(input.base64, 'base64');
   };
   async function body(req, limit) {
@@ -90,14 +92,14 @@ export function createAppServer({
       size += chunk.length;
       if (size > limit) {
         req.resume();
-        throw problem('TOO_LARGE', 'Plik lub żądanie jest za duże.');
+        throw problem('TOO_LARGE', t('Plik lub żądanie jest za duże.'));
       }
       chunks.push(chunk);
     }
     try {
       return JSON.parse(Buffer.concat(chunks).toString('utf8'));
     } catch {
-      throw problem('INVALID', 'Nieprawidłowe dane JSON.');
+      throw problem('INVALID', t('Nieprawidłowe dane JSON.'));
     }
   }
   const server = http.createServer(async (req, res) => {
@@ -116,17 +118,18 @@ export function createAppServer({
     try {
       const origin = 'http://127.0.0.1:' + server.address().port;
       if (req.headers.host !== new URL(origin).host)
-        throw problem('FORBIDDEN', 'Niedozwolony adres aplikacji.');
+        throw problem('FORBIDDEN', t('Niedozwolony adres aplikacji.'));
       const url = new URL(req.url, origin),
         route = url.pathname;
-      if (!['GET', 'POST'].includes(req.method)) throw problem('INVALID', 'Niedozwolona metoda.');
+      if (!['GET', 'POST'].includes(req.method))
+        throw problem('INVALID', t('Niedozwolona metoda.'));
       if (
         req.method === 'POST' &&
         (req.headers.origin !== origin ||
           req.headers['x-bookshelf-token'] !== token ||
           !req.headers['content-type']?.startsWith('application/json'))
       )
-        throw problem('FORBIDDEN', 'Odśwież panel, aby bezpiecznie zapisać zmiany.');
+        throw problem('FORBIDDEN', t('Odśwież panel, aby bezpiecznie zapisać zmiany.'));
       if (req.method === 'GET') {
         if (route === '/api/health')
           return json(res, 200, {
@@ -171,7 +174,7 @@ export function createAppServer({
         const coverPreview = route.match(/^\/api\/cover-search\/([^/]{1,100})\/([^/]{1,100})$/);
         if (coverPreview) {
           if (!coverDiscovery)
-            throw problem('COVER_UNAVAILABLE', 'Wyszukiwanie okładek jest niedostępne.');
+            throw problem('COVER_UNAVAILABLE', t('Wyszukiwanie okładek jest niedostępne.'));
           return await catalogResponse(req, res, async (signal) => {
             const image = await coverDiscovery.preview(coverPreview[1], coverPreview[2], {
               signal,
@@ -193,13 +196,13 @@ export function createAppServer({
             jobs: [],
           });
         if (route === '/api/storage') {
-          if (!storage) throw problem('STORAGE_UNAVAILABLE', 'Raport miejsca jest niedostępny.');
+          if (!storage) throw problem('STORAGE_UNAVAILABLE', t('Raport miejsca jest niedostępny.'));
           return json(res, 200, await storage.report());
         }
         if (route === '/api/export')
           return json(res, 200, await createBackup(store.read(), covers, spines));
         if (route.startsWith('/spines/')) {
-          if (!spines) throw problem('NOT_FOUND', 'Brak ilustracji.');
+          if (!spines) throw problem('NOT_FOUND', t('Brak ilustracji.'));
           const img = await spines.read(route.slice(8));
           res.writeHead(200, {
             'Content-Type': img.mime,
@@ -225,7 +228,7 @@ export function createAppServer({
               : decodeURIComponent(route).slice(1);
         const file = path.resolve(publicDir, relative);
         if (!file.startsWith(path.resolve(publicDir) + path.sep))
-          throw problem('NOT_FOUND', 'Nie znaleziono strony.');
+          throw problem('NOT_FOUND', t('Nie znaleziono strony.'));
         const bytes = await fs.readFile(file);
         res.writeHead(200, {
           'Content-Type': mime[path.extname(file)] ?? 'application/octet-stream',
@@ -255,7 +258,7 @@ export function createAppServer({
           Object.keys(input).some((key) => key !== 'url') ||
           typeof input.url !== 'string'
         )
-          throw problem('INVALID', 'Wklej bezpośredni link do obrazu.');
+          throw problem('INVALID', t('Wklej bezpośredni link do obrazu.'));
         return await catalogResponse(req, res, async (signal) => {
           const image = await imageDownloader(input.url, { signal });
           return { mime: image.mime, base64: image.bytes.toString('base64') };
@@ -264,7 +267,7 @@ export function createAppServer({
       const mutate = storage?.withMutation ?? ((operation) => operation());
       if (route === '/api/cover-search') {
         if (!coverDiscovery)
-          throw problem('COVER_UNAVAILABLE', 'Wyszukiwanie okładek jest niedostępne.');
+          throw problem('COVER_UNAVAILABLE', t('Wyszukiwanie okładek jest niedostępne.'));
         return await catalogResponse(req, res, (signal) =>
           coverDiscovery.search(input, { signal }),
         );
@@ -283,9 +286,9 @@ export function createAppServer({
           typeof input.candidateId !== 'string' ||
           input.candidateId.length > 100
         )
-          throw problem('INVALID', 'Wybierz propozycję z galerii okładek.');
+          throw problem('INVALID', t('Wybierz propozycję z galerii okładek.'));
         if (!coverDiscovery)
-          throw problem('COVER_UNAVAILABLE', 'Wyszukiwanie okładek jest niedostępne.');
+          throw problem('COVER_UNAVAILABLE', t('Wyszukiwanie okładek jest niedostępne.'));
         return await catalogResponse(req, res, async (signal) => {
           const image = await coverDiscovery.select(input.searchId, input.candidateId, { signal });
           signal.throwIfAborted();
@@ -303,7 +306,7 @@ export function createAppServer({
           Object.keys(input).some((key) => key !== 'isbn') ||
           typeof input.isbn !== 'string'
         )
-          throw problem('INVALID', 'Podaj ISBN książki.');
+          throw problem('INVALID', t('Podaj ISBN książki.'));
         return await catalogResponse(
           req,
           res,
@@ -325,11 +328,11 @@ export function createAppServer({
           Array.isArray(input) ||
           Object.keys(input).length
         )
-          throw problem('INVALID', 'Nieprawidłowe żądanie otwarcia ustawień.');
+          throw problem('INVALID', t('Nieprawidłowe żądanie otwarcia ustawień.'));
         if (typeof windows?.openSettings !== 'function')
           throw problem(
             'WINDOWS_UNAVAILABLE',
-            'Otwieranie ustawień w przeglądarce jest niedostępne.',
+            t('Otwieranie ustawień w przeglądarce jest niedostępne.'),
           );
         return json(res, 200, await windows.openSettings());
       }
@@ -338,7 +341,7 @@ export function createAppServer({
           ['/api/storage/quarantine', '/api/storage/restore', '/api/storage/purge'].includes(route)
         ) {
           if (!storage)
-            throw problem('STORAGE_UNAVAILABLE', 'Porządkowanie obrazów jest niedostępne.');
+            throw problem('STORAGE_UNAVAILABLE', t('Porządkowanie obrazów jest niedostępne.'));
           const keys = route.endsWith('/quarantine')
             ? ['expectedRevision', 'assets']
             : ['expectedRevision', 'quarantineId'];
@@ -350,7 +353,7 @@ export function createAppServer({
             !Number.isSafeInteger(input.expectedRevision) ||
             input.expectedRevision < 0
           )
-            throw problem('INVALID', 'Nieprawidłowe żądanie porządkowania.');
+            throw problem('INVALID', t('Nieprawidłowe żądanie porządkowania.'));
           return json(res, 200, await storage[route.split('/').at(-1)](input));
         }
         if (route === '/api/goodreads/preview') {
@@ -363,12 +366,12 @@ export function createAppServer({
             input.base64.length % 4 !== 0 ||
             !/^[A-Za-z0-9+/]*={0,2}$/.test(input.base64)
           )
-            throw problem('INVALID', 'Nieprawidłowy plik CSV.');
+            throw problem('INVALID', t('Nieprawidłowy plik CSV.'));
           const bytes = Buffer.from(input.base64, 'base64');
           if (bytes.length > 10 * 1024 * 1024)
-            throw problem('TOO_LARGE', 'Plik CSV może mieć maksymalnie 10 MiB.');
+            throw problem('TOO_LARGE', t('Plik CSV może mieć maksymalnie 10 MiB.'));
           if (bytes.toString('base64') !== input.base64)
-            throw problem('INVALID', 'Nieprawidłowe kodowanie pliku.');
+            throw problem('INVALID', t('Nieprawidłowe kodowanie pliku.'));
           return json(res, 200, goodreads.preview(bytes));
         }
         if (route === '/api/goodreads/confirm') {
@@ -382,19 +385,19 @@ export function createAppServer({
             typeof input.autostart !== 'boolean' ||
             Object.keys(input).some((key) => key !== 'autostart')
           )
-            throw problem('INVALID', 'Nieprawidłowe ustawienie Windows.');
+            throw problem('INVALID', t('Nieprawidłowe ustawienie Windows.'));
           if (!windows)
-            throw problem('WINDOWS_UNAVAILABLE', 'Integracja Windows jest niedostępna.');
+            throw problem('WINDOWS_UNAVAILABLE', t('Integracja Windows jest niedostępna.'));
           return json(res, 200, await windows.setAutostart(input.autostart));
         }
         if (route === '/api/spines/generate') {
           return json(res, 410, {
             code: 'GENERATION_RETIRED',
-            message: 'Ilustracje przygotowują się automatycznie. Odśwież panel.',
+            message: t('Ilustracje przygotowują się automatycznie. Odśwież panel.'),
           });
         }
         if (route === '/api/spines/upload') {
-          if (!spines) throw problem('AI_UNAVAILABLE', 'Magazyn ilustracji jest niedostępny.');
+          if (!spines) throw problem('AI_UNAVAILABLE', t('Magazyn ilustracji jest niedostępny.'));
           const saved = await spines.put(imageBytes(input), input.mime);
           const next = await store.commit(
             {
@@ -416,7 +419,7 @@ export function createAppServer({
         if (route === '/api/commands') {
           const command = input.command;
           if (command?.type === 'setBookSpine')
-            throw problem('INVALID', 'Użyj importu ilustracji.');
+            throw problem('INVALID', t('Użyj importu ilustracji.'));
           if (command?.type === 'addBook' || command?.type === 'updateBook') {
             const coverId = (command.draft ?? command.patch)?.coverId;
             if (coverId) await covers.read(coverId);
@@ -431,7 +434,7 @@ export function createAppServer({
             result = await covers.fetchCatalogCover(input.catalogCoverId);
           else {
             if (typeof input.base64 !== 'string' || !/^[A-Za-z0-9+/]*={0,2}$/.test(input.base64))
-              throw problem('INVALID', 'Nieprawidłowy obraz.');
+              throw problem('INVALID', t('Nieprawidłowy obraz.'));
             result = await covers.put(Buffer.from(input.base64, 'base64'), input.mime);
           }
           return json(res, 200, result);
@@ -459,7 +462,7 @@ export function createAppServer({
         if (route === '/api/import/confirm') {
           const entry = imports.get(input.importId);
           if (!entry || entry.expires < Date.now())
-            throw problem('INVALID', 'Podgląd kopii wygasł. Wybierz plik ponownie.');
+            throw problem('INVALID', t('Podgląd kopii wygasł. Wybierz plik ponownie.'));
           const current = store.read();
           if (
             entry.busy ||
@@ -467,12 +470,12 @@ export function createAppServer({
             current.revision !== entry.revision ||
             current.collectionId !== entry.collectionId
           )
-            throw problem('CONFLICT', 'Kolekcja zmieniła się. Wczytaj kopię ponownie.');
+            throw problem('CONFLICT', t('Kolekcja zmieniła się. Wczytaj kopię ponownie.'));
           entry.busy = true;
           try {
             for (const img of entry.checked.images) await covers.put(img.bytes, img.mime);
             for (const img of entry.checked.spineImages) {
-              if (!spines) throw problem('INVALID', 'Brak magazynu ilustracji.');
+              if (!spines) throw problem('INVALID', t('Brak magazynu ilustracji.'));
               await spines.put(img.bytes, img.mime);
             }
             const next = await store.replace(
@@ -489,7 +492,7 @@ export function createAppServer({
         }
         if (route === '/api/shutdown') {
           if (input.expectedPid !== undefined && input.expectedPid !== process.pid)
-            throw problem('CONFLICT', 'Serwer został ponownie uruchomiony. Odśwież panel.');
+            throw problem('CONFLICT', t('Serwer został ponownie uruchomiony. Odśwież panel.'));
           await onStopping();
           json(res, 200, { ok: true });
           setTimeout(() => {
@@ -499,7 +502,7 @@ export function createAppServer({
           }, 100).unref();
           return;
         }
-        throw problem('NOT_FOUND', 'Nie znaleziono strony.');
+        throw problem('NOT_FOUND', t('Nie znaleziono strony.'));
       });
     } catch (e) {
       if (res.headersSent) {
@@ -534,7 +537,9 @@ export function createAppServer({
         code,
         message:
           status === 500
-            ? 'Nie udało się zapisać lub odczytać danych. Sprawdź dostęp do folderu i wolne miejsce.'
+            ? t(
+                'Nie udało się zapisać lub odczytać danych. Sprawdź dostęp do folderu i wolne miejsce.',
+              )
             : e.message,
         details: e.details,
       });

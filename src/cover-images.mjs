@@ -4,13 +4,14 @@ import { problem } from './domain.mjs';
 import { imageMime } from './covers.mjs';
 import { validateImageBytes } from './image-validation.mjs';
 import { createCoverRedirectValidator } from './cover-redirects.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 const imageLimit = 5 * 1024 * 1024,
   cacheLifetime = 15 * 60 * 1000,
   maximumEntries = 100;
 const copy = (image) => (image ? { bytes: Buffer.from(image.bytes), mime: image.mime } : null);
 const unavailable = (reason, details = {}) =>
-  problem('COVER_UNAVAILABLE', 'Nie udało się pobrać okładki. Możesz dodać plik lub link.', {
+  problem('COVER_UNAVAILABLE', t('Nie udało się pobrać okładki. Możesz dodać plik lub link.'), {
     reason,
     ...details,
   });
@@ -49,24 +50,25 @@ function boundedSignal(parent, milliseconds) {
 }
 function identifier(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input))
-    throw problem('INVALID', 'Nieprawidłowa okładka.');
+    throw problem('INVALID', t('Nieprawidłowa okładka.'));
   let { kind, value, size = 'L' } = input;
-  if (!['S', 'M', 'L'].includes(size)) throw problem('INVALID', 'Nieprawidłowy rozmiar okładki.');
+  if (!['S', 'M', 'L'].includes(size))
+    throw problem('INVALID', t('Nieprawidłowy rozmiar okładki.'));
   if (kind === 'id') {
     if (typeof value === 'string' && /^[1-9]\d{0,15}$/.test(value)) value = Number(value);
     if (!Number.isSafeInteger(value) || value <= 0)
-      throw problem('INVALID', 'Nieprawidłowa okładka katalogowa.');
+      throw problem('INVALID', t('Nieprawidłowa okładka katalogowa.'));
   } else if (kind === 'olid') {
     if (typeof value !== 'string' || !/^OL[1-9]\d{0,15}M$/.test(value))
-      throw problem('INVALID', 'Nieprawidłowe wydanie katalogowe.');
+      throw problem('INVALID', t('Nieprawidłowe wydanie katalogowe.'));
   } else if (kind === 'isbn') {
     value = canonicalIsbn(
       typeof value === 'string' && value.length <= 24
         ? value.replace(/[\s-]/g, '').toUpperCase()
         : null,
     );
-    if (!value) throw problem('INVALID', 'Nieprawidłowy ISBN okładki.');
-  } else throw problem('INVALID', 'Nieprawidłowe źródło okładki.');
+    if (!value) throw problem('INVALID', t('Nieprawidłowy ISBN okładki.'));
+  } else throw problem('INVALID', t('Nieprawidłowe źródło okładki.'));
   return { kind, value, size, key: `openlibrary:${kind}:${value}:${size}` };
 }
 function retryAfter(value, now) {
@@ -114,9 +116,9 @@ export function createCoverImageLoader({
   }
   function remember(key, image) {
     if (typeof key !== 'string' || !key || key.length > 300)
-      throw problem('INVALID', 'Nieprawidłowy klucz obrazu.');
+      throw problem('INVALID', t('Nieprawidłowy klucz obrazu.'));
     if (Buffer.isBuffer(image?.bytes) && image.bytes.length > imageLimit)
-      throw problem('TOO_LARGE', 'Okładka jest za duża.');
+      throw problem('TOO_LARGE', t('Okładka jest za duża.'));
     validateImageBytes(image?.bytes, image?.mime);
     prune();
     remove(key);
@@ -161,7 +163,7 @@ export function createCoverImageLoader({
       const declared = response.headers.get('content-length');
       if (declared && Number(declared) > imageLimit) {
         await untilAborted(response.body?.cancel(), signal);
-        throw problem('TOO_LARGE', 'Okładka jest za duża.');
+        throw problem('TOO_LARGE', t('Okładka jest za duża.'));
       }
       const read = async () => {
         const chunks = [];
@@ -171,7 +173,7 @@ export function createCoverImageLoader({
         const append = (chunk) => {
           signal.throwIfAborted();
           size += chunk.length;
-          if (size > imageLimit) throw problem('TOO_LARGE', 'Okładka jest za duża.');
+          if (size > imageLimit) throw problem('TOO_LARGE', t('Okładka jest za duża.'));
           chunks.push(Buffer.from(chunk));
         };
         const abort = () => {
@@ -204,7 +206,7 @@ export function createCoverImageLoader({
       validateImageBytes(bytes, mime);
       return { bytes, mime };
     }
-    throw problem('INVALID', 'Zbyt wiele przekierowań okładki.');
+    throw problem('INVALID', t('Zbyt wiele przekierowań okładki.'));
   }
   async function download(request, sharedSignal) {
     const total = boundedSignal(sharedSignal, 8000),

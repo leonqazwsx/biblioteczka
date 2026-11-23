@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { t } from '../public/shared/i18n.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
@@ -9,6 +10,7 @@ test('reconnecting to a new application version reloads once and refreshes the c
   const revisions = [],
     sent = [];
   const context = vm.createContext({
+    t,
     EventSource: class {
       constructor() {
         stream = this;
@@ -34,7 +36,7 @@ test('reconnecting to a new application version reloads once and refreshes the c
     },
   });
   const source = await fs.readFile(new URL('../public/shared/api.mjs', import.meta.url), 'utf8');
-  vm.runInContext(source.replaceAll('export ', ''), context);
+  vm.runInContext(source.replace(/^import .*$/gm, '').replaceAll('export ', ''), context);
   context.onRevision = (value) => revisions.push(value);
   await vm.runInContext('api.bootstrap()', context);
   vm.runInContext('api.events(onRevision)', context);
@@ -55,6 +57,7 @@ test('legacy events without a version still deliver collection revisions', async
     reloads = 0;
   const revisions = [];
   const context = vm.createContext({
+    t,
     EventSource: class {
       constructor() {
         stream = this;
@@ -69,7 +72,7 @@ test('legacy events without a version still deliver collection revisions', async
     fetch: async () => ({ ok: true, json: async () => ({ token: 'legacy' }) }),
   });
   const source = await fs.readFile(new URL('../public/shared/api.mjs', import.meta.url), 'utf8');
-  vm.runInContext(source.replaceAll('export ', ''), context);
+  vm.runInContext(source.replace(/^import .*$/gm, '').replaceAll('export ', ''), context);
   context.onRevision = (value) => revisions.push(value);
   await vm.runInContext('api.bootstrap()', context);
   vm.runInContext('api.events(onRevision)', context);
@@ -84,6 +87,7 @@ test('same-version recovery notifies the panel before delivering a lower revisio
     boot = 0;
   const sequence = [];
   const context = vm.createContext({
+    t,
     EventSource: class {
       constructor() {
         stream = this;
@@ -108,7 +112,7 @@ test('same-version recovery notifies the panel before delivering a lower revisio
     }),
   });
   const source = await fs.readFile(new URL('../public/shared/api.mjs', import.meta.url), 'utf8');
-  vm.runInContext(source.replaceAll('export ', ''), context);
+  vm.runInContext(source.replace(/^import .*$/gm, '').replaceAll('export ', ''), context);
   context.onRevision = (value) => sequence.push(['revision', value]);
   context.onSession = (info) => sequence.push(['session', info.sessionId, info.recovery]);
   await vm.runInContext('api.bootstrap()', context);

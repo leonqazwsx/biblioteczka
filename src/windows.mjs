@@ -1,6 +1,7 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 const executeDefault = promisify(execFile);
 const ACTIONS = new Set(['status', 'enable', 'disable', 'open-settings']);
@@ -21,14 +22,14 @@ export function createWindowsIntegration({
   let opening;
 
   async function control(action) {
-    if (!ACTIONS.has(action)) throw problem('INVALID', 'Nieznane polecenie Windows.');
+    if (!ACTIONS.has(action)) throw problem('INVALID', t('Nieznane polecenie Windows.'));
     if (!available) {
       if (action === 'status') return { ...unsupported };
       throw problem(
         'WINDOWS_UNAVAILABLE',
         action === 'open-settings'
-          ? 'Panel otwiera się z aplikacji Biblioteczka.'
-          : 'Autostart jest dostępny w aplikacji Biblioteczka dla Windows.',
+          ? t('Panel otwiera się z aplikacji Biblioteczka.')
+          : t('Autostart jest dostępny w aplikacji Biblioteczka dla Windows.'),
       );
     }
     let result;
@@ -44,12 +45,12 @@ export function createWindowsIntegration({
       throw problem(
         'WINDOWS_UNAVAILABLE',
         action === 'open-settings'
-          ? 'Nie udało się otworzyć panelu. Spróbuj ponownie.'
-          : 'Nie udało się odczytać ustawień Windows. Spróbuj uruchomić Biblioteczkę ponownie.',
+          ? t('Nie udało się otworzyć panelu. Spróbuj ponownie.')
+          : t('Nie udało się odczytać ustawień Windows. Spróbuj uruchomić Biblioteczkę ponownie.'),
       );
     }
     if (!result || typeof result !== 'object' || Array.isArray(result))
-      throw problem('WINDOWS_UNAVAILABLE', 'Nieprawidłowa odpowiedź aplikacji.');
+      throw problem('WINDOWS_UNAVAILABLE', t('Nieprawidłowa odpowiedź aplikacji.'));
     if (typeof result.error === 'string') throw problem('WINDOWS_UNAVAILABLE', result.error);
     return result;
   }
@@ -58,18 +59,18 @@ export function createWindowsIntegration({
     status: () => control('status'),
     setAutostart: async (enabled) => {
       if (typeof enabled !== 'boolean')
-        throw problem('INVALID', 'Wybierz włączenie lub wyłączenie autostartu.');
+        throw problem('INVALID', t('Wybierz włączenie lub wyłączenie autostartu.'));
       return control(enabled ? 'enable' : 'disable');
     },
     openSettings: async () => {
       if (!Number.isSafeInteger(port) || port < 1 || port > 65535)
-        throw problem('INVALID', 'Nieprawidłowy port.');
+        throw problem('INVALID', t('Nieprawidłowy port.'));
       opening ??= control('open-settings')
         .then((result) => {
           if (result.opened !== true)
             throw problem(
               'WINDOWS_UNAVAILABLE',
-              'Nie udało się otworzyć panelu. Spróbuj ponownie.',
+              t('Nie udało się otworzyć panelu. Spróbuj ponownie.'),
             );
           return { opened: true };
         })

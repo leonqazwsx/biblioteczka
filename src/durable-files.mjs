@@ -3,6 +3,7 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 export async function assertSafePath(target, { directory = false, missing = false, f = fs } = {}) {
   const stat = await f.lstat(target).catch((error) => {
@@ -10,7 +11,7 @@ export async function assertSafePath(target, { directory = false, missing = fals
     throw error;
   });
   if (stat && (stat.isSymbolicLink() || (directory ? !stat.isDirectory() : !stat.isFile())))
-    throw problem('UNSAFE_PATH', 'Niebezpieczna ścieżka danych.');
+    throw problem('UNSAFE_PATH', t('Niebezpieczna ścieżka danych.'));
   return stat;
 }
 

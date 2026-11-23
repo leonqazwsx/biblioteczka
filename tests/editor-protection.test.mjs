@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { t } from '../public/shared/i18n.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
@@ -9,6 +10,7 @@ function editor(confirmResult) {
   draftGuard.start({ title: 'Saved' });
   const fields = { editor: { hidden: false }, 'add-book': { focus() {} } },
     context = vm.createContext({
+      t,
       $: (id) => fields[id],
       draftGuard,
       editorFields: () => ({ title: 'Changed' }),
@@ -42,6 +44,7 @@ test('page unload protects a changed book form', () => {
   const draftGuard = createDraftGuard();
   draftGuard.start({ title: 'Saved' });
   const context = vm.createContext({
+    t,
     addEventListener: (name, fn) => {
       handler = fn;
     },
@@ -63,6 +66,7 @@ test('manual spine upload refuses an unsaved cover change before sending an uplo
   let controls,
     requests = 0;
   const context = vm.createContext({
+    t,
     state: { revision: 1, books: [{ id: 'b', coverId: 'old' }] },
     editing: 'b',
     coverId: 'new',

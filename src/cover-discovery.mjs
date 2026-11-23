@@ -3,6 +3,7 @@ import { createCatalogRequest } from './catalog-request.mjs';
 import { canonicalIsbn } from '../public/shared/book-identity.mjs';
 import { validateImageBytes } from './image-validation.mjs';
 import { problem } from './domain.mjs';
+import { t } from '../public/shared/i18n.mjs';
 
 const origin = 'https://openlibrary.org',
   ttl = 15 * 60 * 1000;
@@ -34,8 +35,8 @@ const warning = (source, error) => ({
     source +
     ': ' +
     (error?.details?.reason === 'rate_limit'
-      ? 'chwilowy limit zapytań.'
-      : 'część okładek jest chwilowo niedostępna.'),
+      ? t('chwilowy limit zapytań.')
+      : t('część okładek jest chwilowo niedostępna.')),
 });
 function abortable(promise, signal) {
   return new Promise((resolve, reject) => {
@@ -69,7 +70,7 @@ function validateInput(input) {
       (k) => !['title', 'authors', 'isbn', 'providerId', 'catalogCoverId'].includes(k),
     )
   )
-    throw problem('INVALID', 'Podaj dane książki do wyszukania okładki.');
+    throw problem('INVALID', t('Podaj dane książki do wyszukania okładki.'));
   const title = text(input.title),
     authors = input.authors ?? [],
     isbn = isbnOf(input.isbn),
@@ -83,23 +84,23 @@ function validateInput(input) {
     authors.some((a) => typeof a !== 'string' || a.length > 200) ||
     (!isbn && (!title || !text(authors[0])))
   )
-    throw problem('INVALID', 'Podaj ISBN albo tytuł i autora.');
+    throw problem('INVALID', t('Podaj ISBN albo tytuł i autora.'));
   if (input.isbn != null && input.isbn !== '' && !isbn)
-    throw problem('INVALID_ISBN', 'Podaj poprawny ISBN książki.');
+    throw problem('INVALID_ISBN', t('Podaj poprawny ISBN książki.'));
   if (
     providerId !== null &&
     !editionKey(providerId) &&
     !(typeof providerId === 'string' && /^bn:\d{1,16}$/.test(providerId))
   )
-    throw problem('INVALID', 'Nieprawidłowe wydanie książki.');
+    throw problem('INVALID', t('Nieprawidłowe wydanie książki.'));
   if (catalogCoverId !== null && (!Number.isSafeInteger(catalogCoverId) || catalogCoverId <= 0))
-    throw problem('INVALID', 'Nieprawidłowa okładka katalogowa.');
+    throw problem('INVALID', t('Nieprawidłowa okładka katalogowa.'));
   return { title, authors: authors.map(text).filter(Boolean), isbn, providerId, catalogCoverId };
 }
 // Existing byte validation checks the entire structure. This extra check is only
 // for remote gallery images, so tiny historic local test/user assets still load.
 function checkImage(image) {
-  if (!image) throw problem('COVER_UNAVAILABLE', 'Ta okładka jest teraz niedostępna.');
+  if (!image) throw problem('COVER_UNAVAILABLE', t('Ta okładka jest teraz niedostępna.'));
   const b = image.bytes;
   validateImageBytes(b, image.mime);
   let width = 5,
@@ -146,7 +147,7 @@ function checkImage(image) {
     }
   }
   if (width <= 4 && height <= 4)
-    throw problem('COVER_UNAVAILABLE', 'Źródło zwróciło pustą miniaturę.');
+    throw problem('COVER_UNAVAILABLE', t('Źródło zwróciło pustą miniaturę.'));
   return image;
 }
 
@@ -166,10 +167,10 @@ export function createCoverDiscovery({
       await response.body?.cancel();
       const next = new URL(response.headers.get('location'), url);
       if (next.origin !== origin || next.username || next.password)
-        throw problem('INVALID', 'Niedozwolone przekierowanie katalogu.');
+        throw problem('INVALID', t('Niedozwolone przekierowanie katalogu.'));
       url = next.href;
     }
-    throw problem('CATALOG_UNAVAILABLE', 'Katalog zwrócił zbyt wiele przekierowań.');
+    throw problem('CATALOG_UNAVAILABLE', t('Katalog zwrócił zbyt wiele przekierowań.'));
   }
   const request = createCatalogRequest(origin, {
     fetchImpl: safeFetch,
@@ -180,7 +181,7 @@ export function createCoverDiscovery({
       candidate = session?.items.find((c) => c.id === candidateId);
     if (!session || session.until <= now() || !candidate) {
       if (session?.until <= now()) sessions.delete(searchId);
-      throw problem('COVER_SEARCH_EXPIRED', 'Propozycje okładek wygasły. Wyszukaj je ponownie.');
+      throw problem('COVER_SEARCH_EXPIRED', t('Propozycje okładek wygasły. Wyszukaj je ponownie.'));
     }
     sessions.delete(searchId);
     sessions.set(searchId, session);
@@ -427,7 +428,7 @@ export function createCoverDiscovery({
     signal?.throwIfAborted();
     const { session, candidate } = alive(searchId, candidateId);
     if (candidate.duplicate)
-      throw problem('COVER_DUPLICATE', 'Ta sama grafika jest już na liście.');
+      throw problem('COVER_DUPLICATE', t('Ta sama grafika jest już na liście.'));
     let result = candidate.image
       ? await imageLoader.load({ ...candidate.image, size }, { signal })
       : imageLoader.cached(candidate.cacheKey);
@@ -444,7 +445,7 @@ export function createCoverDiscovery({
       existing = session.seen.get(digest);
     if (existing && existing !== candidateId) {
       candidate.duplicate = true;
-      throw problem('COVER_DUPLICATE', 'Ta sama grafika jest już na liście.');
+      throw problem('COVER_DUPLICATE', t('Ta sama grafika jest już na liście.'));
     }
     session.seen.set(digest, candidateId);
     return { ...result, source: candidate.source };

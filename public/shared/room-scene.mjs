@@ -1,5 +1,6 @@
 import { ANNUAL_SCENES } from './annual-scenes.mjs';
 import { calibrateShelfContacts } from './shelf-contact.mjs';
+import { t } from './i18n.mjs';
 // Pixel measurements of the approved 1672 x 941 room, normalized for every layer.
 const rect = (x, y, width, height) => ({
   x: x / 1672,
@@ -15,8 +16,8 @@ const slot = (id, x, y, width, height, frontX, frontY, frontWidth) => ({
 export const DEFAULT_ROOM_ID = 'reading-room-v1';
 export const ROOM_SCENE = calibrateShelfContacts({
   id: DEFAULT_ROOM_ID,
-  name: 'Orzechowy pokój',
-  description: 'Dotychczasowe wnętrze, w dzień i wieczorem',
+  name: t('Orzechowy pokój'),
+  description: t('Dotychczasowe wnętrze, w dzień i wieczorem'),
   lighting: 'theme',
   bookHeight: 88,
   aspectRatio: 16 / 9,
@@ -53,8 +54,8 @@ export const ROOM_SCENES = [
   ROOM_SCENE,
   room(
     'oak-library',
-    'Jasny dąb',
-    'Ciepłe drewno i lniany fotel',
+    t('Jasny dąb'),
+    t('Ciepłe drewno i lniany fotel'),
     'day',
     '/assets/room/oak.png',
     [
@@ -70,8 +71,8 @@ export const ROOM_SCENES = [
   ),
   room(
     'green-library',
-    'Zielona biblioteka',
-    'Oliwkowa zabudowa i skórzany fotel',
+    t('Zielona biblioteka'),
+    t('Oliwkowa zabudowa i skórzany fotel'),
     'day',
     '/assets/room/green.png',
     [
@@ -89,8 +90,8 @@ export const ROOM_SCENES = [
   ),
   room(
     'window-reading',
-    'Czytelnia przy oknie',
-    'Biała biblioteka i miejsce wśród zieleni',
+    t('Czytelnia przy oknie'),
+    t('Biała biblioteka i miejsce wśród zieleni'),
     'day',
     '/assets/room/window.png',
     [
@@ -108,8 +109,8 @@ export const ROOM_SCENES = [
   ),
   room(
     'walnut-library',
-    'Orzechowa biblioteka',
-    'Orzech, miękki fotel i światło z okna',
+    t('Orzechowa biblioteka'),
+    t('Orzech, miękki fotel i światło z okna'),
     'evening',
     '/assets/room/walnut.png',
     [
@@ -127,8 +128,8 @@ export const ROOM_SCENES = [
   ),
   room(
     'navy-study',
-    'Granatowy gabinet',
-    'Spokojne miejsce do czytania i pracy',
+    t('Granatowy gabinet'),
+    t('Spokojne miejsce do czytania i pracy'),
     'day',
     '/assets/room/navy.png',
     [

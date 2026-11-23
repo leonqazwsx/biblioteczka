@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n.mjs';
 let pickerNumber = 0;
 const languages = {
   pol: 'polski',
@@ -10,8 +11,8 @@ const languages = {
   fre: 'francuski',
   fra: 'francuski',
   fr: 'francuski',
-  spa: 'hiszpański',
-  es: 'hiszpański',
+  spa: t('hiszpański'),
+  es: t('hiszpański'),
 };
 const sources = { openlibrary: 'Open Library', inventaire: 'Inventaire' };
 
@@ -56,20 +57,20 @@ export function createCoverPicker(
     return node;
   };
   const container = element('section', 'cover-picker');
-  const action = button('text-button cover-picker-action', 'Znajdź okładkę');
+  const action = button('text-button cover-picker-action', t('Znajdź okładkę'));
   const status = element('p', 'cover-picker-status');
-  const retry = button('text-button cover-picker-retry', 'Spróbuj ponownie');
+  const retry = button('text-button cover-picker-retry', t('Spróbuj ponownie'));
   const panel = element('div', 'cover-picker-panel');
   const note = element(
     'p',
     'cover-picker-note',
-    'Wybór grafiki zmienia tylko okładkę. Dane wydania pozostają bez zmian.',
+    t('Wybór grafiki zmienia tylko okładkę. Dane wydania pozostają bez zmian.'),
   );
   const grid = element('div', 'cover-picker-grid');
-  const close = button('text-button cover-picker-close', 'Zwiń propozycje');
+  const close = button('text-button cover-picker-close', t('Zwiń propozycje'));
   panel.id = 'cover-picker-' + ++pickerNumber;
   panel.setAttribute('role', 'region');
-  panel.setAttribute('aria-label', 'Propozycje okładek');
+  panel.setAttribute('aria-label', t('Propozycje okładek'));
   action.setAttribute('aria-controls', panel.id);
   action.setAttribute('aria-expanded', 'false');
   status.setAttribute('role', 'status');
@@ -96,7 +97,7 @@ export function createCoverPicker(
     mounted() && ticket === generation && contextKey(context()) === contextKey(original);
   function syncAction() {
     const value = context();
-    action.textContent = value?.coverId ? 'Wybierz inną okładkę' : 'Znajdź okładkę';
+    action.textContent = value?.coverId ? t('Wybierz inną okładkę') : t('Znajdź okładkę');
     action.disabled = !value || destroyed;
   }
   function feedback(text = '', canRetry = false) {
@@ -107,8 +108,8 @@ export function createCoverPicker(
   function selectionFailed(error) {
     feedback(
       expired(error)
-        ? 'Propozycja okładki wygasła. Wyszukaj ponownie lub dodaj plik albo link.'
-        : 'Wybrana okładka jest chwilowo niedostępna. Spróbuj ponownie lub wybierz inną.',
+        ? t('Propozycja okładki wygasła. Wyszukaj ponownie lub dodaj plik albo link.')
+        : t('Wybrana okładka jest chwilowo niedostępna. Spróbuj ponownie lub wybierz inną.'),
       true,
     );
     onError(error);
@@ -173,7 +174,7 @@ export function createCoverPicker(
       const title = element(
         'strong',
         'cover-picker-title',
-        candidate.title || original.book.title || 'Okładka książki',
+        candidate.title || original.book.title || t('Okładka książki'),
       );
       const hasEdition = !!(
         candidate.isbn ||
@@ -183,26 +184,26 @@ export function createCoverPicker(
       );
       const match =
         candidate.match === 'edition'
-          ? 'Wybrane wydanie'
+          ? t('Wybrane wydanie')
           : hasEdition
-            ? 'Inne wydanie tej książki'
-            : 'Inna okładka tej książki · wydanie nieustalone';
+            ? t('Inne wydanie tej książki')
+            : t('Inna okładka tej książki · wydanie nieustalone');
       const edition = element('span', 'cover-picker-edition', match);
       const language = candidate.language
-        ? 'Język: ' + (languages[candidate.language] ?? candidate.language)
-        : 'Język nieustalony';
+        ? t('Język: ') + (languages[candidate.language] ?? candidate.language)
+        : t('Język nieustalony');
       const publication =
         [candidate.publisher, candidate.publicationYear].filter(Boolean).join(' · ') ||
-        'Wydawca i rok nieustalone';
+        t('Wydawca i rok nieustalone');
       const metadata = element('span', 'cover-picker-metadata', language + ' · ' + publication);
       const source = element(
         'span',
         'cover-picker-source',
         candidate.source
-          ? 'Źródło: ' + (sources[candidate.source] ?? candidate.source)
-          : 'Źródło nieustalone',
+          ? t('Źródło: ') + (sources[candidate.source] ?? candidate.source)
+          : t('Źródło nieustalone'),
       );
-      const unavailable = element('span', 'cover-picker-unavailable', 'Podgląd niedostępny');
+      const unavailable = element('span', 'cover-picker-unavailable', t('Podgląd niedostępny'));
       unavailable.hidden = true;
       copy.append(title, edition, metadata, source, unavailable);
       choice.append(image, copy);
@@ -218,8 +219,8 @@ export function createCoverPicker(
         const available = cards.filter((item) => !item.broken);
         feedback(
           available.length
-            ? 'Niektóre podglądy są niedostępne. Pozostałe okładki nadal można wybrać.'
-            : 'Nie udało się wczytać podglądów. Spróbuj ponownie lub dodaj plik albo link.',
+            ? t('Niektóre podglądy są niedostępne. Pozostałe okładki nadal można wybrać.')
+            : t('Nie udało się wczytać podglądów. Spróbuj ponownie lub dodaj plik albo link.'),
           true,
         );
         if (doc.activeElement === choice)
@@ -234,17 +235,17 @@ export function createCoverPicker(
     const warnings = Array.isArray(data.warnings) && data.warnings.length > 0;
     if (warnings && cards.length)
       feedback(
-        'Część źródeł jest chwilowo niedostępna. Dostępne okładki nadal można wybrać.',
+        t('Część źródeł jest chwilowo niedostępna. Dostępne okładki nadal można wybrać.'),
         true,
       );
     else if (warnings)
       feedback(
-        'Źródła okładek są chwilowo niedostępne. Spróbuj ponownie lub dodaj plik albo link.',
+        t('Źródła okładek są chwilowo niedostępne. Spróbuj ponownie lub dodaj plik albo link.'),
         true,
       );
     else if (!cards.length)
-      feedback('Nie znaleziono okładek tej książki. Możesz dodać plik lub wkleić link.', true);
-    else feedback('Dostępne propozycje: ' + cards.length + '. Wybierz okładkę poniżej.');
+      feedback(t('Nie znaleziono okładek tej książki. Możesz dodać plik lub wkleić link.'), true);
+    else feedback(t('Dostępne propozycje: ') + cards.length + t('. Wybierz okładkę poniżej.'));
   }
   async function select(card, { automatic = false, ticket: searchTicket } = {}) {
     if (!mounted() || !cards.includes(card) || card.importing || !gallery)
@@ -266,7 +267,7 @@ export function createCoverPicker(
     card.button.disabled = true;
     busyOwner = ticket;
     onBusy(true);
-    feedback('Pobieram wybraną okładkę…');
+    feedback(t('Pobieram wybraną okładkę…'));
     try {
       const image = await request('/api/covers', {
         method: 'POST',
@@ -274,7 +275,7 @@ export function createCoverPicker(
         signal: controller.signal,
       });
       if (!current(ticket, original) || controller.signal.aborted) return { status: 'stale' };
-      if (!image?.coverId) throw new Error('Nie udało się pobrać wybranej okładki.');
+      if (!image?.coverId) throw new Error(t('Nie udało się pobrać wybranej okładki.'));
       await onApply(image, {
         ...original,
         isCurrent: () => current(ticket, original) && !controller.signal.aborted,
@@ -288,7 +289,7 @@ export function createCoverPicker(
         return { status: 'stale' };
       gallery.context = context();
       syncAction();
-      feedback('Okładka wybrana. Zapisz książkę, aby zachować zmianę.');
+      feedback(t('Okładka wybrana. Zapisz książkę, aby zachować zmianę.'));
       return { status: 'applied' };
     } catch (error) {
       if (!current(ticket, original) || controller.signal.aborted) return { status: 'stale' };
@@ -319,12 +320,12 @@ export function createCoverPicker(
       !original.book.isbn &&
       !(original.book.title.trim() && original.book.authors.some((author) => author.trim()))
     ) {
-      feedback('Podaj ISBN lub tytuł i autora, aby znaleźć okładkę.');
+      feedback(t('Podaj ISBN lub tytuł i autora, aby znaleźć okładkę.'));
       return;
     }
     const controller = new AbortController();
     searchController = controller;
-    feedback('Szukam okładek…');
+    feedback(t('Szukam okładek…'));
     try {
       const data = await request('/api/cover-search', {
         method: 'POST',
@@ -357,7 +358,7 @@ export function createCoverPicker(
     } catch (error) {
       if (!current(ticket, original) || controller.signal.aborted) return;
       feedback(
-        'Źródła okładek są chwilowo niedostępne. Spróbuj ponownie lub dodaj plik albo link.',
+        t('Źródła okładek są chwilowo niedostępne. Spróbuj ponownie lub dodaj plik albo link.'),
         true,
       );
       onError(error);

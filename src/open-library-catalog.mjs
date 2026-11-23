@@ -1,6 +1,7 @@
 import { problem } from './domain.mjs';
 import { cleanSubjects } from '../public/shared/categories.mjs';
 import { createCatalogRequest } from './catalog-request.mjs';
+import { t } from '../public/shared/i18n.mjs';
 export function normalizeIsbn(text) {
   const v = text.replace(/[\s-]/g, '').toUpperCase();
   if (!/^(\d{13}|\d{9}[\dX])$/.test(v)) return null;
@@ -9,7 +10,7 @@ export function normalizeIsbn(text) {
       ? [...v].reduce((s, c, i) => s + Number(c) * (i % 2 ? 3 : 1), 0)
       : [...v].reduce((s, c, i) => s + (c === 'X' ? 10 : Number(c)) * (10 - i), 0);
   if (sum % (v.length === 13 ? 10 : 11))
-    throw problem('INVALID_ISBN', 'ISBN ma nieprawidłową sumę kontrolną.');
+    throw problem('INVALID_ISBN', t('ISBN ma nieprawidłową sumę kontrolną.'));
   return v;
 }
 export function createOpenLibraryCatalog(options = {}) {
@@ -76,7 +77,7 @@ export function createOpenLibraryCatalog(options = {}) {
   }
   async function searchPage(query, { signal, page = 1 } = {}) {
     if (typeof query !== 'string' || !query.trim() || query.length > 500)
-      throw problem('INVALID', 'Wpisz tytuł, autora lub ISBN.');
+      throw problem('INVALID', t('Wpisz tytuł, autora lub ISBN.'));
     const isbn = normalizeIsbn(query);
     if (isbn) {
       const result = await edition(await request('/isbn/' + isbn + '.json', signal), isbn, signal);
@@ -91,7 +92,7 @@ export function createOpenLibraryCatalog(options = {}) {
       signal,
     );
     if (!Array.isArray(data?.docs))
-      throw problem('CATALOG_UNAVAILABLE', 'Katalog zwrócił nieprawidłowe dane.');
+      throw problem('CATALOG_UNAVAILABLE', t('Katalog zwrócił nieprawidłowe dane.'));
     const total = data.numFound ?? data.num_found;
     return {
       items: data.docs
@@ -110,7 +111,7 @@ export function createOpenLibraryCatalog(options = {}) {
     },
     async resolveEdition(id, { signal } = {}) {
       if (typeof id !== 'string' || !/^\/books\/OL\d+M$/.test(id))
-        throw problem('INVALID', 'Nieprawidłowe wydanie.');
+        throw problem('INVALID', t('Nieprawidłowe wydanie.'));
       return edition(await request(id + '.json', signal), null, signal);
     },
   };
