@@ -1,27 +1,29 @@
 # Biblioteczka – Bookshelf Wallpaper
 
-Interaktywna tapeta Windows z biblioteczką przeczytanych książek. Książki stoją na półkach w realistycznym pokoju, pod ikonami pulpitu. Po najechaniu grzbiet lekko się wysuwa, a kliknięcie otwiera kartę książki z okładką. Kolekcję prowadzisz w panelu: wyszukiwanie w Open Library i Bibliotece Narodowej, okładki, gatunki, daty przeczytania, import z Goodreads i własne rozmieszczenie na półkach.
+**English** · [Polski](README.pl.md)
 
-Wszystko działa lokalnie i bez konta. Internet jest potrzebny tylko do wyszukiwania książek i okładek. Aplikacja nie wysyła żadnych danych o użyciu.
+An interactive Windows wallpaper that shows the books you have read on a bookshelf. The books stand on the shelves of a realistic room, right under your desktop icons. Hover over a spine and the book slides out a little; click it to see its cover and details. You manage the collection in a panel: search Open Library and the National Library of Poland, pick covers, sort books into genres, record when you read them, import from Goodreads and arrange the shelves yourself.
 
-> Projekt jest w trakcie przejścia z wersji opartej na Lively Wallpaper na samodzielną aplikację Windows. Plan: [CLAUDE.md](CLAUDE.md).
+Everything runs locally, with no account. The internet is only needed to search for books and covers. The app sends no usage data.
 
-## Jak to działa
+> The project is moving from a Lively Wallpaper add-on to a standalone Windows app. Plan: [CLAUDE.md](CLAUDE.md) (in Polish).
 
-- **`host/`** – aplikacja Windows w C#/.NET 10 (WinForms + WebView2). Wyświetla tapetę między tapetą systemu a ikonami pulpitu, przekazuje do niej mysz, wstrzymuje ją przy grach i filmach na pełnym ekranie, otwiera panel we własnym oknie i zarządza ikoną w zasobniku oraz autostartem.
-- **`src/`** – lokalny serwer Node.js 24, uruchamiany przez aplikację jako proces pomocniczy. Przechowuje kolekcję i łączy się z katalogami.
-- **`public/`** – panel (`manager`) i tapeta (`wallpaper`) jako strony WWW, wyświetlane w WebView2.
+## How it works
 
-Kolekcja jest zapisywana w `Dokumenty\Biblioteczka` (`library.json`, okładki, grzbiety), więc przetrwa odinstalowanie aplikacji. Przy pierwszym uruchomieniu aplikacja proponuje skopiowanie kolekcji ze starszej wersji.
+- **`host/`** – the Windows app in C#/.NET 10 (WinForms + WebView2). It places the wallpaper between the Windows wallpaper and the desktop icons, forwards the mouse to it, pauses it under fullscreen games and videos, opens the panel in its own window and owns the tray icon and start-with-Windows.
+- **`src/`** – a local Node.js 24 server, started by the app as a helper process. It stores the collection and talks to the book catalogs.
+- **`public/`** – the panel (`manager`) and the wallpaper (`wallpaper`) as web pages shown in WebView2.
 
-Opis funkcji: [docs/funkcje.md](docs/funkcje.md).
+The collection is saved in `Documents\Biblioteczka` (`library.json`, covers, spines), so it survives uninstalling the app. On first start the app offers to copy the collection from an older version.
 
-## Wymagania
+The interface is available in English and Polish and follows the Windows display language. Detailed feature notes (in Polish): [docs/funkcje.md](docs/funkcje.md).
 
-- Windows 11 (23H2 lub nowszy) z WebView2 Runtime (wbudowany w Windows 11).
-- Do rozwoju: [.NET 10 SDK](https://dotnet.microsoft.com/) i [Node.js 24](https://nodejs.org/).
+## Requirements
 
-## Uruchomienie ze źródeł
+- Windows 11 (23H2 or later) with the WebView2 Runtime (built into Windows 11).
+- For development: the [.NET 10 SDK](https://dotnet.microsoft.com/) and [Node.js 24](https://nodejs.org/).
+
+## Running from source
 
 ```powershell
 npm install
@@ -29,11 +31,11 @@ dotnet build host/Biblioteczka.slnx
 host/Biblioteczka.Host/bin/Debug/net10.0-windows/Biblioteczka.exe
 ```
 
-Uruchomiona z repozytorium aplikacja pracuje w trybie deweloperskim: port `47832`, dane w `output/host-prototype-data`, dziennik w `output/host-state/host.log`. Nie dotyka zainstalowanej Biblioteczki.
+Started from the repository, the app runs in development mode: port `47832`, data in `output/host-prototype-data`, log in `output/host-state/host.log`. It does not touch an installed Biblioteczka. Add `--lang en` or `--lang pl` to try a language.
 
-Sam serwer, bez tapety i bez funkcji Windows: `npm start` (panel pod `http://127.0.0.1:47831/manager`).
+The server alone, without the wallpaper and Windows features: `npm start` (panel at `http://127.0.0.1:47831/manager`).
 
-## Testy i formatowanie
+## Tests and formatting
 
 ```powershell
 npm test
@@ -41,8 +43,12 @@ dotnet test host/Biblioteczka.slnx
 npm run format:check
 ```
 
-Testy nie korzystają z sieci. Pełny zestaw testów JS trwa około 10 minut.
+The tests do not use the network. The full JavaScript suite takes about 30 seconds.
 
-## Licencja
+## Translations
 
-GNU GPL 3.0 lub nowsza – zob. [LICENSE](LICENSE). Składniki zewnętrzne: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+Interface text is written in Polish inside `t('…')` (JavaScript) or `L.T("…")` (C#); the Polish text is the key and `public/locales/en.json` holds the English text. `node tools/i18n-keys.mjs` lists missing keys, and `tests/i18n.test.mjs` fails when a translation is missing or unused.
+
+## License
+
+GNU GPL 3.0 or later – see [LICENSE](LICENSE). Third-party components: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

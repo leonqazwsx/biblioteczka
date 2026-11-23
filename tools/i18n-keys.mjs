@@ -71,7 +71,9 @@ export function keysIn(file) {
   }
   if (file.endsWith('.html')) {
     // Mirrors translateDocument(): every text node and the translated attributes.
-    const html = text.replace(/<(script|style)\b[\s\S]*?<\/\1>/g, '').replace(/<!--[\s\S]*?-->/g, '');
+    const html = text
+      .replace(/<(script|style)\b[\s\S]*?<\/\1>/g, '')
+      .replace(/<!--[\s\S]*?-->/g, '');
     for (const m of html.matchAll(/>([^<]+)</g)) {
       const key = htmlKey(m[1].replaceAll('&nbsp;', ' '));
       if (key) keys.push(key);
