@@ -64,7 +64,7 @@ internal sealed class PanelWindow : Form
         catch (Exception error)
         {
             Log.Error("Panel failed to load", error);
-            MessageBox.Show(this, "Nie udało się otworzyć panelu: " + error.Message, "Biblioteczka",
+            MessageBox.Show(this, L.T("Nie udało się otworzyć panelu:") + " " + error.Message, "Biblioteczka",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             Close();
         }

@@ -5,7 +5,8 @@ import { renderScene } from './scene-renderer.mjs';
 import { readingDateLabel } from '../shared/reading-date.mjs';
 import { watchLighting } from '../shared/lighting-clock.mjs';
 import { createBookPicker } from './book-picker.mjs';
-import { t } from '../shared/i18n.mjs';
+import { t, translateDocument } from '../shared/i18n.mjs';
+translateDocument();
 let state,
   page = 0,
   loading = false,

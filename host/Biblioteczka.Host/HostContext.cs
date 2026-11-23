@@ -43,20 +43,20 @@ internal sealed class HostContext : ApplicationContext
         _shell.OpenPanelRequested += OpenPanel;
         _server.Restarted += () => _ui.Post(_ => _wallpaper?.Reload(), null);
         _server.GaveUp += () => _ui.Post(_ =>
-            Notify("Serwer kolekcji przestał działać. Zamknij Biblioteczkę i uruchom ją ponownie.", ToolTipIcon.Error), null);
+            Notify(L.T("Serwer kolekcji przestał działać. Zamknij Biblioteczkę i uruchom ją ponownie."), ToolTipIcon.Error), null);
 
         var menu = new ContextMenuStrip();
-        var open = new ToolStripMenuItem("Otwórz Biblioteczkę", null, (_, _) => OpenPanel())
+        var open = new ToolStripMenuItem(L.T("Otwórz Biblioteczkę"), null, (_, _) => OpenPanel())
         {
             Font = new Font(menu.Font, FontStyle.Bold),
         };
-        _autostartItem = new ToolStripMenuItem("Uruchamiaj z Windows", null, (_, _) => ToggleAutostart());
+        _autostartItem = new ToolStripMenuItem(L.T("Uruchamiaj z Windows"), null, (_, _) => ToggleAutostart());
         menu.Items.Add(open);
-        menu.Items.Add("Przeładuj tapetę", null, (_, _) => _ = RebuildWallpaperAsync());
+        menu.Items.Add(L.T("Przeładuj tapetę"), null, (_, _) => _ = RebuildWallpaperAsync());
         menu.Items.Add(_autostartItem);
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("Skopiuj raport o problemie", null, (_, _) => CopyReport());
-        menu.Items.Add("Zamknij Biblioteczkę", null, (_, _) => _ = ExitAsync());
+        menu.Items.Add(L.T("Skopiuj raport o problemie"), null, (_, _) => CopyReport());
+        menu.Items.Add(L.T("Zamknij Biblioteczkę"), null, (_, _) => _ = ExitAsync());
         menu.Opening += (_, _) => _autostartItem.Checked = SafeAutostart()?.Autostart ?? false;
         _tray = new NotifyIcon
         {
@@ -83,7 +83,8 @@ internal sealed class HostContext : ApplicationContext
             if (!LegacyImport.HasCollection(_options.DataDir)) OfferLegacyImport();
             WarnAboutSyncConflicts();
             await _server.StartAsync();
-            _environment = await CoreWebView2Environment.CreateAsync(null, _options.WebViewDataDir);
+            _environment = await CoreWebView2Environment.CreateAsync(null, _options.WebViewDataDir,
+                new CoreWebView2EnvironmentOptions { Language = L.Language == "pl" ? "pl-PL" : "en-US" });
             await RebuildWallpaperAsync();
             _ready = true;
             _watchdog.Start();
@@ -93,9 +94,9 @@ internal sealed class HostContext : ApplicationContext
         catch (Exception error)
         {
             Log.Error("Startup failed", error);
-            var message = error.Message.Contains("zajęty", StringComparison.Ordinal)
-                ? "Biblioteczka już działa w innej wersji (na przykład starsza wersja z Lively). Zamknij ją i uruchom tę ponownie."
-                : "Nie udało się uruchomić Biblioteczki:\n" + error.Message;
+            var message = error is NodeServer.PortInUseException
+                ? L.T("Biblioteczka już działa w innej wersji (na przykład starsza wersja z Lively). Zamknij ją i uruchom tę ponownie.")
+                : L.T("Nie udało się uruchomić Biblioteczki:") + "\n" + error.Message;
             MessageBox.Show(message, "Biblioteczka", MessageBoxButtons.OK, MessageBoxIcon.Error);
             await ExitAsync();
         }
@@ -109,15 +110,15 @@ internal sealed class HostContext : ApplicationContext
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)).FirstOrDefault();
         while (true)
         {
-            var useFound = found is null ? null : new TaskDialogButton("Skopiuj z: " + found);
-            var choose = new TaskDialogButton("Wskaż folder starej wersji…");
-            var empty = new TaskDialogButton("Zacznij od pustej kolekcji");
+            var useFound = found is null ? null : new TaskDialogButton(L.T("Skopiuj z: {path}", ("path", found)));
+            var choose = new TaskDialogButton(L.T("Wskaż folder starej wersji…"));
+            var empty = new TaskDialogButton(L.T("Zacznij od pustej kolekcji"));
             var page = new TaskDialogPage
             {
                 Caption = "Biblioteczka",
-                Heading = "Masz kolekcję ze starszej wersji Biblioteczki?",
-                Text = "Nowa wersja trzyma kolekcję w folderze " + _options.DataDir +
-                    ". Możesz skopiować do niego książki, okładki i ustawienia ze starej wersji. Stara kopia zostanie bez zmian.",
+                Heading = L.T("Masz kolekcję ze starszej wersji Biblioteczki?"),
+                Text = L.T("Nowa wersja trzyma kolekcję w folderze {folder}. Możesz skopiować do niego książki, okładki i ustawienia ze starej wersji. Stara kopia zostanie bez zmian.",
+                    ("folder", _options.DataDir)),
                 Icon = TaskDialogIcon.Information,
             };
             if (useFound is not null) page.Buttons.Add(useFound);
@@ -129,12 +130,12 @@ internal sealed class HostContext : ApplicationContext
             var source = found;
             if (answer == choose)
             {
-                using var dialog = new FolderBrowserDialog { Description = "Wybierz folder starej Biblioteczki (z podfolderem data) albo sam folder data." };
+                using var dialog = new FolderBrowserDialog { Description = L.T("Wybierz folder starej Biblioteczki (z podfolderem data) albo sam folder data.") };
                 if (dialog.ShowDialog() != DialogResult.OK) continue;
                 source = LegacyImport.ResolveDataDir(dialog.SelectedPath);
                 if (source is null)
                 {
-                    MessageBox.Show("W tym folderze nie ma kolekcji Biblioteczki (library.json).", "Biblioteczka",
+                    MessageBox.Show(L.T("W tym folderze nie ma kolekcji Biblioteczki (library.json)."), "Biblioteczka",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     continue;
                 }
@@ -142,7 +143,7 @@ internal sealed class HostContext : ApplicationContext
 
             if (LegacyImport.IsInUse(source!))
             {
-                MessageBox.Show("Stara wersja Biblioteczki wciąż działa. Zamknij ją (ikona w zasobniku → Zamknij) i spróbuj ponownie.",
+                MessageBox.Show(L.T("Stara wersja Biblioteczki wciąż działa. Zamknij ją (ikona w zasobniku → Zamknij) i spróbuj ponownie."),
                     "Biblioteczka", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 continue;
             }
@@ -156,7 +157,7 @@ internal sealed class HostContext : ApplicationContext
             catch (Exception error)
             {
                 Log.Error("Legacy import failed", error);
-                MessageBox.Show("Nie udało się skopiować kolekcji: " + error.Message, "Biblioteczka",
+                MessageBox.Show(L.T("Nie udało się skopiować kolekcji:") + " " + error.Message, "Biblioteczka",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -172,8 +173,8 @@ internal sealed class HostContext : ApplicationContext
             .ToList();
         if (conflicts.Count == 0) return;
         Log.Info("Possible sync conflict copies: " + string.Join(", ", conflicts));
-        Notify("W folderze kolekcji są kopie konfliktowe (" + string.Join(", ", conflicts) +
-            "). Program używa library.json; sprawdź, czy nie zginęły tam zmiany.", ToolTipIcon.Warning);
+        Notify(L.T("W folderze kolekcji są kopie konfliktowe ({files}). Program używa library.json; sprawdź, czy nie zginęły tam zmiany.",
+            ("files", string.Join(", ", conflicts))), ToolTipIcon.Warning);
     }
 
     private async Task RebuildWallpaperAsync()
@@ -255,7 +256,7 @@ internal sealed class HostContext : ApplicationContext
         if (running.Length == 0) return;
         _livelyWarned = true;
         Log.Info("Lively Wallpaper is running.");
-        Notify("Lively Wallpaper też jest uruchomione i może zasłaniać tapetę Biblioteczki. Jeśli jej nie widać albo miga, zamknij Lively.",
+        Notify(L.T("Lively Wallpaper też jest uruchomione i może zasłaniać tapetę Biblioteczki. Jeśli jej nie widać albo miga, zamknij Lively."),
             ToolTipIcon.Warning);
     }
 
@@ -302,8 +303,8 @@ internal sealed class HostContext : ApplicationContext
             var status = Autostart.For(_options).Set(true);
             Log.Info("First run: autostart " + (status.Autostart ? "enabled" : "left unchanged (conflict)") + ".");
             var text = status.Autostart
-                ? "Biblioteczka będzie się uruchamiać razem z Windows. Zmienisz to w menu tej ikony."
-                : "Nie udało się włączyć autostartu.";
+                ? L.T("Biblioteczka będzie się uruchamiać razem z Windows. Zmienisz to w menu tej ikony.")
+                : L.T("Nie udało się włączyć autostartu.");
             if (status.Message is not null) text += " " + status.Message;
             Notify(text, status.Autostart && status.Message is null ? ToolTipIcon.Info : ToolTipIcon.Warning);
         }
@@ -324,7 +325,7 @@ internal sealed class HostContext : ApplicationContext
         catch (Exception error)
         {
             Log.Error("Changing autostart failed", error);
-            Notify("Nie udało się zmienić autostartu: " + error.Message, ToolTipIcon.Error);
+            Notify(L.T("Nie udało się zmienić autostartu:") + " " + error.Message, ToolTipIcon.Error);
         }
     }
 
@@ -332,7 +333,7 @@ internal sealed class HostContext : ApplicationContext
     {
         var report = ProblemReport.Build(_options, _target?.Layout.ToString(), ProblemReport.ReadLogTail(_options.LogFile, 60));
         Clipboard.SetText(report);
-        Notify("Raport skopiowany do schowka. Wklej go do zgłoszenia problemu.", ToolTipIcon.Info);
+        Notify(L.T("Raport skopiowany do schowka. Wklej go do zgłoszenia problemu."), ToolTipIcon.Info);
     }
 
     private void Notify(string text, ToolTipIcon icon) => _tray.ShowBalloonTip(6000, "Biblioteczka", text, icon);

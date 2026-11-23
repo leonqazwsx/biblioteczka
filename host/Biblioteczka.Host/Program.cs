@@ -19,6 +19,7 @@ internal static class Program
             return 2;
         }
 
+        L.Init(options.Language, options.AppRoot);
         if (options.Control is not null) return RunControl(options);
 
         using var instance = new Mutex(true, @"Local\Biblioteczka.Host." + options.Port, out var first);
@@ -31,7 +32,7 @@ internal static class Program
 
         ApplicationConfiguration.Initialize();
         Log.Open(options.LogFile);
-        Log.Info($"Host starting ({(options.Development ? "development" : "production")}); port {options.Port}");
+        Log.Info($"Host starting ({(options.Development ? "development" : "production")}); port {options.Port}, language {options.Language}");
         SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
         Application.Run(new HostContext(options, openPanelOnStart: Array.IndexOf(args, "--autostart") < 0));
         return 0;
@@ -51,7 +52,7 @@ internal static class Program
                 "enable" => WriteControl(autostart.Set(true)),
                 "disable" => WriteControl(autostart.Set(false)),
                 "open-settings" => WriteControl(new { opened = ShellWindow.SignalOpenPanel(options.Port) }),
-                _ => WriteControl(new { error = "Nieznane polecenie." }, 2),
+                _ => WriteControl(new { error = L.T("Nieznane polecenie.") }, 2),
             };
         }
         catch (Exception error)

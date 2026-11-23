@@ -13,18 +13,19 @@ internal static class ProblemReport
     public static string Build(HostOptions options, string? desktopLayout, IEnumerable<string> logTail)
     {
         var text = new StringBuilder();
-        text.AppendLine("Biblioteczka – raport o problemie");
-        text.AppendLine("Wersja: " + Assembly.GetExecutingAssembly().GetName().Version);
-        text.AppendLine("Tryb: " + (options.Development ? "deweloperski" : "zwykły"));
+        text.AppendLine("Biblioteczka problem report");
+        text.AppendLine("Version: " + Assembly.GetExecutingAssembly().GetName().Version);
+        text.AppendLine("Mode: " + (options.Development ? "development" : "installed"));
+        text.AppendLine("Language: " + L.Language);
         text.AppendLine("Windows: " + Environment.OSVersion.Version);
         text.AppendLine("WebView2: " + SafeWebViewVersion());
-        text.AppendLine("Pulpit: " + (desktopLayout ?? "nie znaleziono"));
+        text.AppendLine("Desktop: " + (desktopLayout ?? "not found"));
         foreach (var screen in Screen.AllScreens)
         {
-            text.AppendLine($"Ekran: {screen.Bounds.Width}x{screen.Bounds.Height}{(screen.Primary ? " (główny)" : "")}");
+            text.AppendLine($"Screen: {screen.Bounds.Width}x{screen.Bounds.Height}{(screen.Primary ? " (primary)" : "")}");
         }
         text.AppendLine();
-        text.AppendLine("Ostatnie wpisy dziennika:");
+        text.AppendLine("Recent log entries:");
         foreach (var line in logTail) text.AppendLine(line);
         return text.ToString();
     }
@@ -40,7 +41,7 @@ internal static class ProblemReport
         }
         catch (IOException)
         {
-            return ["(dziennik niedostępny)"];
+            return ["(log unavailable)"];
         }
     }
 
@@ -52,7 +53,7 @@ internal static class ProblemReport
         }
         catch (Exception)
         {
-            return "brak";
+            return "missing";
         }
     }
 }

@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { TRANSLATED_ATTRIBUTES, htmlKey } from '../public/shared/i18n.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const POLISH = /[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/;
@@ -69,17 +70,17 @@ export function keysIn(file) {
     if (value !== null) keys.push(value);
   }
   if (file.endsWith('.html')) {
-    for (const m of text.matchAll(/<(\w+)[^>]*\sdata-i18n(?:\s|>|=)[^>]*>([^<]*)</g))
-      keys.push(m[2].trim());
-    for (const m of text.matchAll(/<\w+([^>]*)\sdata-i18n-attr="([^"]+)"([^>]*)>/g)) {
-      const attrs = m[1] + ' ' + m[3];
-      for (const name of m[2].split(',')) {
-        const value = attrs.match(new RegExp('\\s' + name.trim() + '="([^"]*)"'));
-        if (value) keys.push(value[1]);
-      }
+    // Mirrors translateDocument(): every text node and the translated attributes.
+    const html = text.replace(/<(script|style)\b[\s\S]*?<\/\1>/g, '').replace(/<!--[\s\S]*?-->/g, '');
+    for (const m of html.matchAll(/>([^<]+)</g)) {
+      const key = htmlKey(m[1].replaceAll('&nbsp;', ' '));
+      if (key) keys.push(key);
     }
-    const title = text.match(/<title>([^<]*)<\/title>/);
-    if (title) keys.push(title[1].trim());
+    for (const name of TRANSLATED_ATTRIBUTES)
+      for (const m of html.matchAll(new RegExp('\\s' + name + '="([^"]*)"', 'g'))) {
+        const key = htmlKey(m[1]);
+        if (key) keys.push(key);
+      }
   }
   return keys;
 }

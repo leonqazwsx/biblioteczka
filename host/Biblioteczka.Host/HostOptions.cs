@@ -13,7 +13,8 @@ internal sealed record HostOptions(
     string DataDir,
     string StateDir,
     bool Development,
-    string? Control)
+    string? Control,
+    string Language)
 {
     public const int ProductionPort = 47831;
     public const int DevelopmentPort = 47832;
@@ -35,7 +36,7 @@ internal sealed record HostOptions(
         }
 
         var appRoot = Path.GetFullPath(Value("--app-root") ?? FindAppRoot(AppContext.BaseDirectory)
-            ?? throw new InvalidOperationException("Nie znaleziono plików aplikacji (src/main.mjs)."));
+            ?? throw new InvalidOperationException("Application files not found (src/main.mjs)."));
         var development = Directory.Exists(Path.Combine(appRoot, ".git")) || File.Exists(Path.Combine(appRoot, ".git"));
         documents ??= Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         localAppData ??= Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -51,7 +52,7 @@ internal sealed record HostOptions(
         var bundledNode = Path.Combine(AppContext.BaseDirectory, "runtime", "node.exe");
         var node = Value("--node") ?? (File.Exists(bundledNode) ? bundledNode : "node");
         return new HostOptions(appRoot, node, port, Path.GetFullPath(dataDir), Path.GetFullPath(stateDir),
-            development, Value("--control"));
+            development, Value("--control"), L.Detect(Value("--lang")));
     }
 
     /// <summary>Walks up from <paramref name="start"/> to the folder that contains src/main.mjs.</summary>

@@ -21,6 +21,9 @@ internal sealed partial class NodeServer : IDisposable
 
     public NodeServer(HostOptions options) => _options = options;
 
+    /// <summary>Another Biblioteczka (for example the old Lively version) already answers on our port.</summary>
+    public sealed class PortInUseException(string message) : InvalidOperationException(message);
+
     /// <summary>Raised on the thread pool after the server became healthy again following a restart.</summary>
     public event Action? Restarted;
 
@@ -30,7 +33,7 @@ internal sealed partial class NodeServer : IDisposable
     public async Task StartAsync(CancellationToken cancel = default)
     {
         if (await IsHealthyAsync(cancel))
-            throw new InvalidOperationException("Port " + _options.Port + " jest już zajęty przez działającą Biblioteczkę.");
+            throw new PortInUseException(L.T("Port {port} jest już zajęty przez działającą Biblioteczkę.", ("port", _options.Port)));
         Launch();
         await WaitHealthyAsync(TimeSpan.FromSeconds(30), cancel);
     }
@@ -54,6 +57,7 @@ internal sealed partial class NodeServer : IDisposable
         info.ArgumentList.Add("--data-dir");
         info.ArgumentList.Add(_options.DataDir);
         // Lets the server reach Windows features (autostart, opening the panel) through this executable.
+        info.Environment["BIBLIOTECZKA_LANG"] = L.Language;
         info.ArgumentList.Add("--host-exe");
         info.ArgumentList.Add(_options.ExecutablePath);
         var process = new Process { StartInfo = info, EnableRaisingEvents = true };
@@ -98,10 +102,10 @@ internal sealed partial class NodeServer : IDisposable
         while (DateTime.UtcNow < deadline)
         {
             if (await IsHealthyAsync(cancel)) return;
-            if (_process is { HasExited: true }) throw new InvalidOperationException("Serwer zakończył pracę podczas uruchamiania.");
+            if (_process is { HasExited: true }) throw new InvalidOperationException(L.T("Serwer zakończył pracę podczas uruchamiania."));
             await Task.Delay(200, cancel);
         }
-        throw new TimeoutException("Serwer nie odpowiedział w ciągu " + timeout.TotalSeconds + " s.");
+        throw new TimeoutException(L.T("Serwer nie odpowiedział w ciągu {seconds} s.", ("seconds", timeout.TotalSeconds)));
     }
 
     private async Task<bool> IsHealthyAsync(CancellationToken cancel)

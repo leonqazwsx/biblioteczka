@@ -1,5 +1,5 @@
 import test from 'node:test';
-import { t } from '../public/shared/i18n.mjs';
+import { locale, t } from '../public/shared/i18n.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
@@ -66,6 +66,7 @@ function library(
   };
   const context = vm.createContext({
     t,
+    locale,
     state,
     selectionMode: false,
     selectedBooks: new Set(),

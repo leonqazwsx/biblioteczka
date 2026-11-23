@@ -16,11 +16,13 @@ export function detectLanguage(candidates) {
   return list[0].trim().toLowerCase().startsWith('pl') ? 'pl' : 'en';
 }
 
+// The server gets its language from the host (BIBLIOTECZKA_LANG). Node also has navigator.languages
+// (the system locale), so the browser check must not run there.
 function initialLanguage() {
-  if (typeof navigator !== 'undefined' && navigator.languages)
-    return detectLanguage([...navigator.languages]);
   if (typeof process !== 'undefined' && process.env?.BIBLIOTECZKA_LANG)
     return detectLanguage(process.env.BIBLIOTECZKA_LANG);
+  if (typeof document !== 'undefined' && typeof navigator !== 'undefined' && navigator.languages)
+    return detectLanguage([...navigator.languages]);
   return 'pl';
 }
 
@@ -52,17 +54,31 @@ export const t = (text, params) => translate(current, text, params);
 /** Locale for Intl formatting (dates, sorting, numbers). */
 export const locale = () => (current === 'pl' ? 'pl-PL' : 'en-US');
 
+/** Attributes of static HTML that hold interface text. */
+export const TRANSLATED_ATTRIBUTES = ['aria-label', 'placeholder', 'title', 'alt'];
+
+/** Whitespace-normalized text of an HTML text node, or null when it has no letters. */
+export const htmlKey = (text) => (/\p{L}/u.test(text) ? text.trim().replace(/\s+/g, ' ') : null);
+
 /**
- * Translates static HTML marked with data-i18n (text content) and
- * data-i18n-attr="aria-label,placeholder,title" (attribute values). The Polish text in the HTML is the key.
+ * Translates the static HTML of a page once at startup: every text node and the attributes above.
+ * The Polish text in the HTML is the key, so the HTML files stay readable and need no markup.
  */
-export function translateDocument(root = document) {
-  root.documentElement && (root.documentElement.lang = current);
-  for (const node of root.querySelectorAll('[data-i18n]'))
-    node.textContent = t(node.textContent.trim());
-  for (const node of root.querySelectorAll('[data-i18n-attr]'))
-    for (const name of node.getAttribute('data-i18n-attr').split(','))
-      if (node.hasAttribute(name.trim()))
-        node.setAttribute(name.trim(), t(node.getAttribute(name.trim())));
-  if (root.title) root.title = t(root.title);
+export function translateDocument(doc = globalThis.document) {
+  if (!doc?.createTreeWalker) return;
+  doc.documentElement.lang = current;
+  doc.title = t(htmlKey(doc.title) ?? doc.title);
+  if (current === 'pl') return;
+  const walker = doc.createTreeWalker(doc.body, 4 /* NodeFilter.SHOW_TEXT */);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const key = htmlKey(node.nodeValue);
+    if (!key) continue;
+    const [, lead, , trail] = node.nodeValue.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    node.nodeValue = lead + t(key) + trail;
+  }
+  for (const name of TRANSLATED_ATTRIBUTES)
+    for (const element of doc.body.querySelectorAll(`[${name}]`)) {
+      const key = htmlKey(element.getAttribute(name));
+      if (key) element.setAttribute(name, t(key));
+    }
 }

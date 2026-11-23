@@ -27,7 +27,7 @@ internal sealed class Autostart(string valueName, string executable, string runK
         return ours
             ? new Status(true, true, false, true, LegacyShortcutMessage())
             : new Status(true, false, true, false,
-                "Autostart wskazuje inną kopię Biblioteczki. Wyłącz go tam albo usuń wpis „" + valueName + "” w Menedżerze zadań → Aplikacje autostartu.");
+                L.T("Autostart wskazuje inną kopię Biblioteczki. Wyłącz go tam albo usuń wpis „{name}” w Menedżerze zadań → Aplikacje autostartu.", ("name", valueName)));
     }
 
     public Status Set(bool enabled)
@@ -45,7 +45,7 @@ internal sealed class Autostart(string valueName, string executable, string runK
     {
         var startup = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
         return Directory.Exists(startup) && Directory.EnumerateFiles(startup, "Biblioteczka*.lnk").Any()
-            ? "W folderze Autostart jest skrót starej wersji Biblioteczki. Usuń go, żeby po zalogowaniu nie uruchamiały się obie."
+            ? L.T("W folderze Autostart jest skrót starej wersji Biblioteczki. Usuń go, żeby po zalogowaniu nie uruchamiały się obie.")
             : null;
     }
 }

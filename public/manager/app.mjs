@@ -38,7 +38,8 @@ import {
   readingYearValue,
 } from './annual-settings.mjs';
 import { summarizeReadingYear } from '../shared/annual-reading.mjs';
-import { t } from '../shared/i18n.mjs';
+import { locale, t, translateDocument } from '../shared/i18n.mjs';
+translateDocument();
 const $ = (id) => document.getElementById(id);
 let connectionSession = null,
   refreshSequence = 0,
@@ -407,7 +408,7 @@ function renderBooks(main, toolRoot = main) {
     few: t('książki'),
     many: t('książek'),
     other: t('książki'),
-  }[new Intl.PluralRules('pl').select(result.total)];
+  }[new Intl.PluralRules(locale()).select(result.total)];
   heading(
     shelfFilter ? state.shelves.find((s) => s.id === shelfFilter)?.name : t('Moja biblioteczka'),
     result.total + ' ' + countLabel,

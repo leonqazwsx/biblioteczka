@@ -1,13 +1,13 @@
 import { el } from '../shared/api.mjs';
-import { t } from '../shared/i18n.mjs';
+import { locale, t } from '../shared/i18n.mjs';
 const names = { covers: t('Okładki'), spines: t('Grzbiety'), quarantine: t('Kwarantanna') };
 function bytes(value) {
   return value >= 1048576
-    ? (value / 1048576).toLocaleString('pl', {
+    ? (value / 1048576).toLocaleString(locale(), {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       }) + ' MiB'
-    : (value / 1024).toLocaleString('pl', { maximumFractionDigits: 1 }) + ' KiB';
+    : (value / 1024).toLocaleString(locale(), { maximumFractionDigits: 1 }) + ' KiB';
 }
 export async function renderStorageSettings(
   root,
@@ -117,7 +117,9 @@ export async function renderStorageSettings(
     for (const batch of report.quarantine) {
       const row = el('div', 'storage-batch');
       const date = new Date(batch.createdAt);
-      const label = Number.isFinite(+date) ? date.toLocaleDateString('pl') : t('data niedostępna');
+      const label = Number.isFinite(+date)
+        ? date.toLocaleDateString(locale())
+        : t('data niedostępna');
       row.append(
         el(
           'p',

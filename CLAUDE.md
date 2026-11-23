@@ -35,7 +35,8 @@ Stałe decyzje:
 ## Zasady
 
 - Kod formatuje Prettier (`.prettierrc`); nie pisz ręcznie zbitych jednolinijkowców.
-- Interfejs po polsku, prostymi zdaniami (do czasu etapu tłumaczeń). Kod, nazwy i commity po angielsku.
+- Interfejs jest dwujęzyczny (pl, en). Każdy tekst dla użytkownika piszesz po polsku w `t('…')` (JS, z `public/shared/i18n.mjs`) albo `L.T("…")` (C#), a tłumaczenie dodajesz do `public/locales/en.json`. Parametry w klamrach: `t('Strona {page}', { page })`. Statyczny HTML tłumaczy się sam (teksty i atrybuty aria-label/placeholder/title/alt). `node tools/i18n-keys.mjs` pokazuje brakujące klucze; test `tests/i18n.test.mjs` pilnuje kompletności. Nazwy półek i tytuły to dane użytkownika – nie tłumacz ich.
+- Kod, nazwy i commity po angielsku.
 - Format danych `library.json` (schemat 2) jest kontraktem: zmiany tylko z migracją i testem.
 - Prywatna kolekcja użytkownika nigdy nie trafia do repozytorium (`data/`, `output/` są ignorowane).
 - Zmiany zachowania wymagają testu; uruchom `npm test` przed commitem.

@@ -66,11 +66,11 @@ internal static class LegacyImport
     /// </summary>
     public static int Copy(string source, string target)
     {
-        if (!HasCollection(source)) throw new InvalidOperationException("W wybranym folderze nie ma kolekcji (library.json).");
-        if (HasCollection(target)) throw new InvalidOperationException("Nowa kolekcja już istnieje i nie zostanie nadpisana.");
+        if (!HasCollection(source)) throw new InvalidOperationException(L.T("W wybranym folderze nie ma kolekcji (library.json)."));
+        if (HasCollection(target)) throw new InvalidOperationException(L.T("Nowa kolekcja już istnieje i nie zostanie nadpisana."));
         using (var json = JsonDocument.Parse(File.ReadAllText(Path.Combine(source, "library.json"))))
             if (!json.RootElement.TryGetProperty("books", out var books) || books.ValueKind != JsonValueKind.Array)
-                throw new InvalidOperationException("Plik library.json nie wygląda na kolekcję Biblioteczki.");
+                throw new InvalidOperationException(L.T("Plik library.json nie wygląda na kolekcję Biblioteczki."));
 
         var parent = Path.GetDirectoryName(Path.GetFullPath(target))!;
         Directory.CreateDirectory(parent);
@@ -82,7 +82,7 @@ internal static class LegacyImport
             if (Directory.Exists(target))
             {
                 if (Directory.EnumerateFileSystemEntries(target).Any())
-                    throw new InvalidOperationException("Folder " + target + " nie jest pusty.");
+                    throw new InvalidOperationException(L.T("Folder {folder} nie jest pusty.", ("folder", target)));
                 Directory.Delete(target);
             }
             Directory.Move(staging, target);

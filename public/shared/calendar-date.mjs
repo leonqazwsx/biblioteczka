@@ -1,4 +1,4 @@
-import { t } from './i18n.mjs';
+import { language, t } from './i18n.mjs';
 // Store a calendar day, never a timestamp: time zones must not move this date.
 export function localCalendarDate(date = new Date()) {
   const year = String(date.getFullYear()).padStart(4, '0');
@@ -22,5 +22,12 @@ export function formatReadDate(value) {
   const date = normalizeReadDate(value);
   if (!date) return null;
   const [year, month, day] = date.split('-');
+  if (language() === 'en')
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'UTC',
+    }).format(Date.UTC(+year, +month - 1, +day));
   return `${day}.${month}.${year}`;
 }
