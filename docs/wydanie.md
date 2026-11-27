@@ -52,7 +52,7 @@ Te kroki wykonujesz sam – wymagają Twojego konta i akceptacji regulaminów Mi
 3. **Tożsamość paczki.** Product management → Product identity: skopiuj `Package/Identity/Name`, `Package/Identity/Publisher` i `Package/Properties/PublisherDisplayName` do parametrów `build-msix.ps1` i zbuduj paczkę ponownie.
 4. **Zgłoszenie (submission):**
    - Pricing and availability: bezpłatna, wszystkie rynki.
-   - Properties: kategoria **Personalization**; adres polityki prywatności: link do `PRIVACY.md` w publicznym repozytorium.
+   - Properties: kategoria **Personalization**; adres polityki prywatności: https://github.com/leonqazwsx/biblioteczka/blob/main/PRIVACY.md
    - Age ratings: wypełnij kwestionariusz (brak treści dla dorosłych, brak interakcji między użytkownikami, brak zakupów).
    - Packages: prześlij `.msix`.
    - Store listings: polski i angielski opis, co najmniej jeden zrzut ekranu 1920×1080 (tapeta z książkami, panel).
@@ -61,7 +61,7 @@ Te kroki wykonujesz sam – wymagają Twojego konta i akceptacji regulaminów Mi
 
 ## 4. GitHub Releases
 
-Po upublicznieniu repozytorium:
+Repozytorium jest publiczne: https://github.com/leonqazwsx/biblioteczka
 
 ```powershell
 gh release create v1.0.0 dist\Biblioteczka-1.0.0-win-x64.zip --title "Biblioteczka 1.0.0" --notes-file docs\release-notes-1.0.0.md

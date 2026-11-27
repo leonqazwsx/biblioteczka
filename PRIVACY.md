@@ -23,7 +23,7 @@ These services receive your request and your IP address, like any website you vi
 
 **Children.** The app collects no personal information from anyone.
 
-**Changes and contact.** Changes to this policy are published in this file in the project's repository. Questions: open an issue in the project's GitHub repository.
+**Changes and contact.** Changes to this policy are published in this file in the project's repository. Questions: open an issue at https://github.com/leonqazwsx/biblioteczka/issues.
 
 ---
 
@@ -52,4 +52,4 @@ Te serwisy otrzymują Twoje zapytanie i adres IP, jak każda odwiedzana strona, 
 
 **Dzieci.** Aplikacja nie zbiera danych osobowych od nikogo.
 
-**Zmiany i kontakt.** Zmiany tej polityki są publikowane w tym pliku w repozytorium projektu. Pytania: zgłoszenie (issue) w repozytorium projektu na GitHubie.
+**Zmiany i kontakt.** Zmiany tej polityki są publikowane w tym pliku w repozytorium projektu. Pytania: zgłoszenie (issue) na https://github.com/leonqazwsx/biblioteczka/issues.
